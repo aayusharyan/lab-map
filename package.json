@@ -4,13 +4,13 @@
   "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
   "type": "module",
   "main": "validate.js",
-  "homepage": "https://yush.dev/labmap",
+  "homepage": "https://yush.dev/lab-map",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aayusharyan/labmap.git"
+    "url": "git+https://github.com/aayusharyan/lab-map.git"
   },
   "bugs": {
-    "url": "https://github.com/aayusharyan/labmap/issues"
+    "url": "https://github.com/aayusharyan/lab-map/issues"
   },
   "scripts": {
     "dev": "vite",
