@@ -1,6 +1,6 @@
 {
   "name": "lab-map",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
   "type": "module",
   "main": "validate.js",
