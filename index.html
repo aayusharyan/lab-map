@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Map</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <div id="fallback"
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #171717; text-align: center; padding: 2rem;">
+      <img src="/favicon-192.png" alt="Lab Map" style="width: 64px; height: 64px; margin-bottom: 1.5rem;" />
+      <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Loading Lab Map...</h1>
+      <p style="color: #525252; max-width: 400px;">If this message persists, please ensure JavaScript is enabled in your
+        browser.</p>
+      <p style="color: #737373; margin-top: 1.5rem; font-size: 0.875rem;">If you think this is a mistake, please <a
+          href="https://github.com/aayusharyan/labmap/issues" target="_blank" rel="noopener noreferrer"
+          style="color: #2563eb; text-decoration: underline;">raise a bug report</a>.</p>
+    </div>
+  </div>
+  <noscript>
+    <style>
+      #fallback {
+        display: none !important;
+      }
+    </style>
+    <div
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: #fff; color: #171717; text-align: center; padding: 2rem;">
+      <img src="/favicon-192.png" alt="Lab Map" style="width: 64px; height: 64px; margin-bottom: 1.5rem;" />
+      <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">JavaScript Required</h1>
+      <p style="color: #525252; max-width: 400px;">Lab Map requires JavaScript to run. Please enable JavaScript in your
+        browser settings and reload the page.</p>
+      <p style="color: #737373; margin-top: 1.5rem; font-size: 0.875rem;">If you think this is a mistake, please <a
+          href="https://github.com/aayusharyan/labmap/issues" target="_blank" rel="noopener noreferrer"
+          style="color: #2563eb; text-decoration: underline;">raise a bug report</a>.</p>
+    </div>
+  </noscript>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
