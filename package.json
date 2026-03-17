@@ -46,6 +46,11 @@
     "url": "https://yush.dev"
   },
   "license": "MIT",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=9"
+  },
   "dependencies": {
     "konva": "^9.3.18",
     "react": "^18.3.1",
