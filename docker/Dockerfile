@@ -1,8 +1,8 @@
 # Multi-stage build serving static files via nginx.
 #
-# Build:   docker build -f docker/Dockerfile -t labmap .
-# Run:     docker run -p 8080:80 labmap
-# Custom:  docker run -p 8080:80 -v /path/to/data:/usr/share/nginx/html/data:ro labmap
+# Build:   docker build -f docker/Dockerfile -t lab-map .
+# Run:     docker run -p 8080:80 lab-map
+# Custom:  docker run -p 8080:80 -v /path/to/data:/usr/share/nginx/html/data:ro lab-map
 
 # -----------------------------------------------------------------------------
 # Stage 1: Build
@@ -29,6 +29,8 @@ RUN pnpm run build
 # -----------------------------------------------------------------------------
 # Serves static files via nginx Alpine (~40MB vs ~1GB with Node.js).
 FROM nginx:alpine AS production
+
+LABEL version="0.0.0"
 
 # SPA routing configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
