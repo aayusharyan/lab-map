@@ -1,0 +1,64 @@
+{
+  "name": "lab-map",
+  "version": "0.0.0",
+  "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
+  "type": "module",
+  "main": "validate.js",
+  "homepage": "https://yush.dev/labmap",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aayusharyan/labmap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aayusharyan/labmap/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "validate": "node validate.js"
+  },
+  "keywords": [
+    "datacenter",
+    "data-center",
+    "infrastructure",
+    "network-diagram",
+    "topology",
+    "visualization",
+    "server-rack",
+    "rack-diagram",
+    "diagram",
+    "server-room",
+    "network-map",
+    "infrastructure-diagram",
+    "IT",
+    "hardware",
+    "asset-management",
+    "network-topology",
+    "server",
+    "rack",
+    "cabling",
+    "documentation"
+  ],
+  "author": {
+    "name": "Aayush Sinha",
+    "email": "hello@yush.dev",
+    "url": "https://yush.dev"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "konva": "^9.3.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-konva": "^18.2.10",
+    "vis-network": "^9.1.9"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "ajv": "^8.18.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.5"
+  }
+}
