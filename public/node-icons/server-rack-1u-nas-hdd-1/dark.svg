@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 35" width="380" height="35">
+  <!-- 1U rack NAS - 4 landscape drive bays, single row -->
+
+  <!-- Rack ears -->
+  <rect x="0" y="0" width="10" height="35" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+  <circle cx="5" cy="8" r="2" fill="none" stroke="#4ade80" stroke-width="1"/>
+  <circle cx="5" cy="27" r="2" fill="none" stroke="#4ade80" stroke-width="1"/>
+  <rect x="370" y="0" width="10" height="35" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+  <circle cx="375" cy="8" r="2" fill="none" stroke="#4ade80" stroke-width="1"/>
+  <circle cx="375" cy="27" r="2" fill="none" stroke="#4ade80" stroke-width="1"/>
+
+  <!-- Chassis body -->
+  <rect x="10" y="0" width="360" height="35" rx="1" fill="#0d1f0d" stroke="#4ade80" stroke-width="1.5"/>
+
+  <!-- Single row: 4 landscape drive bays -->
+  <rect x="14" y="4" width="84" height="27" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+  <rect x="103" y="4" width="84" height="27" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+  <rect x="192" y="4" width="84" height="27" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+  <rect x="281" y="4" width="84" height="27" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
+</svg>
