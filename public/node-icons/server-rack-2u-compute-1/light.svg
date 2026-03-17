@@ -28,5 +28,6 @@
 
   <!-- Power button -->
   <circle cx="355" cy="52" r="10" fill="#b3e5fc" stroke="#0277bd" stroke-width="1.4"/>
-  <line   x1="355" y1="45" x2="355" y2="52" stroke="#0277bd" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M 357.5 47.7 A 5 5 0 1 1 352.5 47.7" fill="none" stroke="#0277bd" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="355" y1="45" x2="355" y2="50" stroke="#0277bd" stroke-width="1.4" stroke-linecap="round"/>
 </svg>
