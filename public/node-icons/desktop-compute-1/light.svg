@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 284 100" width="284" height="100">
+  <!-- HP EliteDesk SFF lying flat (light): 27cm W x 9.5cm H = 2.84:1 -->
+
+  <!-- Outer chassis -->
+  <rect x="0" y="0" width="284" height="100" rx="3" fill="#2a2a2a" stroke="#666" stroke-width="1"/>
+
+  <!-- Vent slat area -->
+  <clipPath id="vcl">
+    <rect x="1" y="1" width="282" height="67" rx="2"/>
+  </clipPath>
+  <rect x="1" y="1" width="282" height="67" rx="2" fill="#1e1e1e"/>
+  <g clip-path="url(#vcl)" stroke="#363636" stroke-width="2.8">
+    <line x1="-40" y1="0"  x2="60"  y2="120"/>
+    <line x1="-32" y1="0"  x2="68"  y2="120"/>
+    <line x1="-24" y1="0"  x2="76"  y2="120"/>
+    <line x1="-16" y1="0"  x2="84"  y2="120"/>
+    <line x1="-8"  y1="0"  x2="92"  y2="120"/>
+    <line x1="0"   y1="0"  x2="100" y2="120"/>
+    <line x1="8"   y1="0"  x2="108" y2="120"/>
+    <line x1="16"  y1="0"  x2="116" y2="120"/>
+    <line x1="24"  y1="0"  x2="124" y2="120"/>
+    <line x1="32"  y1="0"  x2="132" y2="120"/>
+    <line x1="40"  y1="0"  x2="140" y2="120"/>
+    <line x1="48"  y1="0"  x2="148" y2="120"/>
+    <line x1="56"  y1="0"  x2="156" y2="120"/>
+    <line x1="64"  y1="0"  x2="164" y2="120"/>
+    <line x1="72"  y1="0"  x2="172" y2="120"/>
+    <line x1="80"  y1="0"  x2="180" y2="120"/>
+    <line x1="88"  y1="0"  x2="188" y2="120"/>
+    <line x1="96"  y1="0"  x2="196" y2="120"/>
+    <line x1="104" y1="0"  x2="204" y2="120"/>
+    <line x1="112" y1="0"  x2="212" y2="120"/>
+    <line x1="120" y1="0"  x2="220" y2="120"/>
+    <line x1="128" y1="0"  x2="228" y2="120"/>
+    <line x1="136" y1="0"  x2="236" y2="120"/>
+    <line x1="144" y1="0"  x2="244" y2="120"/>
+    <line x1="152" y1="0"  x2="252" y2="120"/>
+    <line x1="160" y1="0"  x2="260" y2="120"/>
+    <line x1="168" y1="0"  x2="268" y2="120"/>
+    <line x1="176" y1="0"  x2="276" y2="120"/>
+    <line x1="184" y1="0"  x2="284" y2="120"/>
+    <line x1="192" y1="0"  x2="292" y2="120"/>
+    <line x1="200" y1="0"  x2="300" y2="120"/>
+    <line x1="208" y1="0"  x2="308" y2="120"/>
+    <line x1="216" y1="0"  x2="316" y2="120"/>
+    <line x1="224" y1="0"  x2="324" y2="120"/>
+    <line x1="232" y1="0"  x2="332" y2="120"/>
+    <line x1="240" y1="0"  x2="340" y2="120"/>
+    <line x1="248" y1="0"  x2="348" y2="120"/>
+    <line x1="256" y1="0"  x2="356" y2="120"/>
+    <line x1="264" y1="0"  x2="364" y2="120"/>
+    <line x1="272" y1="0"  x2="372" y2="120"/>
+  </g>
+
+  <!-- ODD bay recess -->
+  <rect x="130" y="26" width="130" height="14" rx="1" fill="#111" stroke="#333" stroke-width="0.7"/>
+  <line x1="132" y1="31"  x2="258" y2="31"  stroke="#282828" stroke-width="0.8"/>
+  <line x1="132" y1="37"  x2="258" y2="37"  stroke="#282828" stroke-width="0.8"/>
+
+  <!-- Silver bottom strip -->
+  <defs>
+    <linearGradient id="sgl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8e8e8"/>
+      <stop offset="100%" stop-color="#b8b8b8"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="69" width="284" height="31" fill="url(#sgl)"/>
+  <rect x="0" y="69" width="284" height="31" fill="none" stroke="#999" stroke-width="0.5"/>
+
+  <!-- SD card slot -->
+  <rect x="60" y="76" width="28" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <!-- USB-C -->
+  <rect x="96" y="76" width="12" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <!-- 4x USB-A -->
+  <rect x="114" y="76" width="16" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <rect x="134" y="76" width="16" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <rect x="154" y="76" width="16" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <rect x="174" y="76" width="16" height="8" rx="1" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <!-- Headset jack -->
+  <circle cx="200" cy="80" r="4.5" fill="#333" stroke="#777" stroke-width="0.6"/>
+  <!-- Power LED -->
+  <circle cx="220" cy="80" r="2.5" fill="#0277bd"/>
+  <!-- Power button: rounded rect, power symbol centered inside -->
+  <rect x="250" y="74" width="24" height="14" rx="3" fill="#c8c8c8" stroke="#888" stroke-width="0.9"/>
+  <line x1="262" y1="76.5" x2="262" y2="79.5" stroke="#444" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M259,79 A3.2,3.2 0 1,0 265,79" fill="none" stroke="#444" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
