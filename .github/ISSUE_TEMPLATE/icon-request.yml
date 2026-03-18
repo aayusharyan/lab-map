@@ -1,0 +1,72 @@
+name: Icon Request
+description: Suggest a new device icon for Lab Map
+title: "[Icon] "
+labels: ["icon", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new icon! Please fill out the details below.
+
+  - type: input
+    id: device-name
+    attributes:
+      label: Device Name
+      description: What device or equipment should the icon represent?
+      placeholder: e.g., "Synology 8-bay NAS", "Ubiquiti Dream Machine"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Device Category
+      description: What form factor is this device?
+      options:
+        - Server/Rack-mounted
+        - Desktop/Tower hardware
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device-type
+    attributes:
+      label: Device Type
+      description: What is the primary function of this device?
+      options:
+        - Compute
+        - Storage
+        - Network
+        - Wireless
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference Images
+      description: Share links to product images or photos that show what the device looks like
+      placeholder: |
+        - https://example.com/product-image.jpg
+        - Or drag and drop images here
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: How would you use this icon in your network diagram?
+      placeholder: Describe your use case...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to create and submit this icon myself
+          required: false
