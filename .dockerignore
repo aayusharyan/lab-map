@@ -1,0 +1,29 @@
+# Files to exclude from Docker build context (speeds up builds, reduces image size).
+
+# Dependencies & build output (generated in container)
+node_modules
+dist
+
+# Version control
+.git
+.gitignore
+
+# IDE & editors
+.vscode
+
+# OS generated
+.DS_Store
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Docker configs (not needed inside container)
+docker-compose*.yml
+Dockerfile*
+
+# Documentation & misc
+.claude
+*.md
+LICENSE
+examples
