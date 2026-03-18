@@ -1,79 +1,28 @@
-# ----------------------------------------------------------------------------
-# Dependencies
-# ----------------------------------------------------------------------------
-# Node.js package manager directories - reinstall with `pnpm install`
+# Files and directories to exclude from version control.
+
+# Dependencies - reinstall with `pnpm install`
 node_modules/
 
-# ----------------------------------------------------------------------------
-# Build Output
-# ----------------------------------------------------------------------------
-# Production build - regenerate with `pnpm build`
+# Build output - regenerate with `pnpm build`
 dist/
-
-# Vite build cache
 .vite/
-
-# TypeScript incremental compilation cache
 *.tsbuildinfo
 
-# ----------------------------------------------------------------------------
-# Environment & Secrets
-# ----------------------------------------------------------------------------
-# Local environment variables - NEVER commit secrets
-.env
-.env.local
-.env.*.local
-.env.development
-.env.production
-
-# ----------------------------------------------------------------------------
-# IDE & Editor
-# ----------------------------------------------------------------------------
-# VS Code
+# IDE & editors
 .vscode/
 
-# JetBrains (WebStorm, IntelliJ)
-.idea/
-
-# Vim/Neovim
-*.swp
-*.swo
-*~
-
-# Sublime Text
-*.sublime-workspace
-*.sublime-project
-
-# ----------------------------------------------------------------------------
-# Operating System
-# ----------------------------------------------------------------------------
-# macOS
+# OS generated
 .DS_Store
 
-# Windows
-Thumbs.db
-Desktop.ini
-
-# ----------------------------------------------------------------------------
-# Logs & Debug
-# ----------------------------------------------------------------------------
+# Logs
 *.log
-npm-debug.log*
 pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# ----------------------------------------------------------------------------
-# Testing
-# ----------------------------------------------------------------------------
-coverage/
+# User data - copy from examples/ directory
+data/
+public/data/
 
-# ----------------------------------------------------------------------------
-# Miscellaneous
-# ----------------------------------------------------------------------------
-# Claude Code local configuration
+# Misc
 .claude/
-
-# Temporary files
 *.tmp
 *.temp
