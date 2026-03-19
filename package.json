@@ -3,7 +3,6 @@
   "version": "0.2.0",
   "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
   "type": "module",
-  "main": "validate.js",
   "homepage": "https://yush.dev/lab-map",
   "repository": {
     "type": "git",
