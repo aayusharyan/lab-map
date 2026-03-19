@@ -1,20 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 35" width="380" height="35">
-  <!-- 1U rack NAS - 4 landscape drive bays, single row (light) -->
+<!--
+  server-rack-1u-nas-hdd-1/light.svg
 
-  <!-- Rack ears -->
+  1U Rack-Mount NAS with 3.5" HDD Bays (Light Theme)
+  Dimensions: 380x35px (19" rack width at 1U height, ~10.9:1 aspect ratio)
+
+  Design: Compact storage server with 4 front hot-swap drive bays
+  Color scheme: Green tones (#2e7d32 accent, #e8f5e9 chassis) - storage category
+
+  Layout:
+  - Rack ears (0-10px, 370-380px): mounting brackets with screw holes at y=8, y=27
+  - 4x drive bays: single row of landscape-oriented 3.5" HDD caddies (84x27px each)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 35" width="380" height="35">
+
+  <!-- ==================== RACK EARS ==================== -->
+  <!-- Left rack ear with screw holes -->
   <rect x="0" y="0" width="10" height="35" rx="2" fill="#dcedc8" stroke="#2e7d32" stroke-width="1.2"/>
   <circle cx="5" cy="8" r="2" fill="none" stroke="#2e7d32" stroke-width="1"/>
   <circle cx="5" cy="27" r="2" fill="none" stroke="#2e7d32" stroke-width="1"/>
+  <!-- Right rack ear with screw holes -->
   <rect x="370" y="0" width="10" height="35" rx="2" fill="#dcedc8" stroke="#2e7d32" stroke-width="1.2"/>
   <circle cx="375" cy="8" r="2" fill="none" stroke="#2e7d32" stroke-width="1"/>
   <circle cx="375" cy="27" r="2" fill="none" stroke="#2e7d32" stroke-width="1"/>
 
-  <!-- Chassis body -->
+  <!-- ==================== CHASSIS BODY ==================== -->
   <rect x="10" y="0" width="360" height="35" rx="1" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
 
-  <!-- Single row: 4 landscape drive bays -->
-  <rect x="14" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/>
-  <rect x="103" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/>
-  <rect x="192" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/>
-  <rect x="281" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/>
+  <!-- ==================== DRIVE BAYS ==================== -->
+  <!-- Single row: 4x landscape 3.5" HDD hot-swap bays (84x27px each) -->
+  <rect x="14" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/>   <!-- Bay 1 -->
+  <rect x="103" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/> <!-- Bay 2 -->
+  <rect x="192" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/> <!-- Bay 3 -->
+  <rect x="281" y="4" width="84" height="27" rx="2" fill="#c8e6c9" stroke="#2e7d32" stroke-width="1.2"/> <!-- Bay 4 -->
 </svg>
