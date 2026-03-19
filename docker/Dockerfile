@@ -30,7 +30,7 @@ RUN pnpm run build
 # Serves static files via nginx Alpine (~40MB vs ~1GB with Node.js).
 FROM nginx:alpine AS production
 
-LABEL version="0.1.0"
+LABEL version="0.2.0"
 
 # SPA routing configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
