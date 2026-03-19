@@ -1,0 +1,40 @@
+/**
+ * @file reset.css
+ * @description CSS reset and base element styles
+ *
+ * Minimal reset to establish consistent box-sizing and remove default margins.
+ * Also includes base styles for html, body, and common elements.
+ */
+
+/* ============================================================================
+ * CSS RESET
+ * ============================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ============================================================================
+ * BASE STYLES
+ * Global styles for html, body, and base elements.
+ * ============================================================================ */
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  /* Base body size scales with --ui-scale so all em/rem values follow.
+     Elements with explicit px sizes also use calc(Npx * var(--ui-scale)). */
+  font-size: calc(14px * var(--ui-scale));
+  overflow: hidden; /* Prevent body scroll; app manages its own scrolling */
+}
+
+/* Inline code styling */
+code {
+  font-family: 'Fira Code', 'Cascadia Code', monospace;
+  font-size: calc(12px * var(--ui-scale));
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  word-break: break-all; /* Allow long code to wrap */
+}
