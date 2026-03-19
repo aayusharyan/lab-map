@@ -1,0 +1,36 @@
+<!--
+  desktop-router-1/light.svg
+
+  4-Antenna Access Point Front View (Light Theme)
+  Dimensions: 96x96px
+
+  Design: Thin faceplate base with 4 external antennas
+  Color scheme: Purple tones (#7b1fa2 accent, #f3e5f5 chassis) - wireless category
+
+  Layout:
+  - Faceplate: thin horizontal rectangle at bottom (72x12px)
+  - 4 antennas: evenly spaced, extending upward
+    - Outer pair: angled outward
+    - Inner pair: straight vertical
+  - Status LED: single indicator on faceplate
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+
+  <!-- ==================== FACEPLATE BASE ==================== -->
+  <!-- Thin rectangular base unit -->
+  <rect x="12" y="78" width="72" height="12" rx="2" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1.5"/>
+  <!-- Status LED -->
+  <circle cx="48" cy="84" r="2" fill="#7b1fa2"/>
+
+  <!-- ==================== ANTENNAS ==================== -->
+  <!-- 4 antennas extending upward from faceplate -->
+  <!-- Left outer antenna (angled outward) -->
+  <rect x="16" y="10" width="4" height="68" rx="2" fill="#ede0f7" stroke="#7b1fa2" stroke-width="1" transform="rotate(-8 18 78)"/>
+  <!-- Left inner antenna (vertical) -->
+  <rect x="34" y="10" width="4" height="68" rx="2" fill="#ede0f7" stroke="#7b1fa2" stroke-width="1"/>
+  <!-- Right inner antenna (vertical) -->
+  <rect x="58" y="10" width="4" height="68" rx="2" fill="#ede0f7" stroke="#7b1fa2" stroke-width="1"/>
+  <!-- Right outer antenna (angled outward) -->
+  <rect x="76" y="10" width="4" height="68" rx="2" fill="#ede0f7" stroke="#7b1fa2" stroke-width="1" transform="rotate(8 78 78)"/>
+
+</svg>
