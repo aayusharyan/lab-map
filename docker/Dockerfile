@@ -3,12 +3,10 @@
 # @description Multi-stage Docker build for Lab Map application
 #
 # Multi-stage build with integrated watcher for real-time validation.
-#
-# Build:   docker build -f docker/Dockerfile -t lab-map .
-# Run:     docker run -p 8080:80 -v /path/to/data:/app/data lab-map
-#
 # The watcher validates data on startup and monitors /app/data for changes.
 # Keeps last valid data when new data is invalid, shows warnings in UI.
+#
+# Images are built by CI/CD and published to ghcr.io/aayusharyan/lab-map
 
 # -----------------------------------------------------------------------------
 # Stage 1: Build React App
