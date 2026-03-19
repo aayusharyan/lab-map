@@ -1,0 +1,39 @@
+<!--
+  generic-internet-3/light.svg
+
+  WAN (Wide Area Network) Icon (Light Theme)
+  Dimensions: 24x24px (standard icon size)
+
+  Design: Three interconnected nodes representing wide network connectivity
+  Color scheme: Blue tones (#1d4ed8 stroke/accent, #dbeafe fill) - network/internet category
+
+  Usage: Represents WAN, wide-area connectivity, distributed network
+  Structure:
+  - Central node: main connection hub (larger, filled)
+  - Left/right nodes: remote network endpoints
+  - Connecting lines: network links between nodes
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Connection lines (drawn first, behind nodes) -->
+  <line x1="6" y1="12" x2="12" y2="8" stroke="#1d4ed8" stroke-width="0.35" stroke-linecap="round"/>
+  <line x1="18" y1="12" x2="12" y2="8" stroke="#1d4ed8" stroke-width="0.35" stroke-linecap="round"/>
+  <line x1="6" y1="12" x2="12" y2="18" stroke="#1d4ed8" stroke-width="0.35" stroke-linecap="round"/>
+  <line x1="18" y1="12" x2="12" y2="18" stroke="#1d4ed8" stroke-width="0.35" stroke-linecap="round"/>
+  <line x1="12" y1="8" x2="12" y2="18" stroke="#1d4ed8" stroke-width="0.35" stroke-linecap="round"/>
+
+  <!-- Top node (primary hub) -->
+  <circle cx="12" cy="8" r="3.5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+  <circle cx="12" cy="8" r="1.5" fill="#1d4ed8"/>
+
+  <!-- Left node (remote endpoint) -->
+  <circle cx="6" cy="12" r="3" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.35"/>
+  <circle cx="6" cy="12" r="1.2" fill="#1d4ed8"/>
+
+  <!-- Right node (remote endpoint) -->
+  <circle cx="18" cy="12" r="3" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.35"/>
+  <circle cx="18" cy="12" r="1.2" fill="#1d4ed8"/>
+
+  <!-- Bottom node (local endpoint) -->
+  <circle cx="12" cy="18" r="3" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.35"/>
+  <circle cx="12" cy="18" r="1.2" fill="#1d4ed8"/>
+</svg>
