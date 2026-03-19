@@ -1,16 +1,21 @@
-# Automated Release Workflow
+# =============================================================================
+# @file release.yml
+# @description Automated release workflow with Docker image publishing
 #
 # Creates versioned releases with Docker images on GitHub Container Registry.
 # Uses semantic versioning (MAJOR.MINOR.PATCH) with Git tags as source of truth.
 #
-# Usage: Actions tab → Create Release → Run workflow → Select version bump type
+# Usage:
+#   Actions tab → Create Release → Run workflow → Select version bump type
 #
-# Flow: Calculate version → Update files → Commit → Tag → Build Docker → Release
+# Flow:
+#   Calculate version → Update files → Commit → Tag → Build Docker → Release
 #
 # Customization:
 #   - Change default bump type in workflow_dispatch.inputs.version_bump.default
 #   - Modify Docker tags in the "Extract metadata" step
 #   - Edit release notes template in "Generate changelog" step
+# =============================================================================
 
 name: Create Release
 
