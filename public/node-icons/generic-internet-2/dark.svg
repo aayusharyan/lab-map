@@ -1,0 +1,32 @@
+<!--
+  generic-internet-2/dark.svg
+
+  Globe Internet Icon (Dark Theme)
+  Dimensions: 24x24px (standard icon size)
+
+  Design: Classic globe with latitude/longitude grid lines
+  Color scheme: Blue tones (#38bdf8 stroke, #0a1e3d fill) - network/internet category
+
+  Usage: Represents internet connectivity, global network access
+  Structure:
+  - Outer circle: globe outline
+  - Vertical ellipse: center meridian
+  - Horizontal line: equator
+  - Curved lines: latitude parallels
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Globe outline -->
+  <circle cx="12" cy="12" r="9.5" fill="#0a1e3d" stroke="#38bdf8" stroke-width="0.4"/>
+
+  <!-- Center meridian (vertical ellipse) -->
+  <ellipse cx="12" cy="12" rx="4" ry="9.5" fill="none" stroke="#38bdf8" stroke-width="0.25"/>
+
+  <!-- Equator (horizontal line) -->
+  <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="#38bdf8" stroke-width="0.25"/>
+
+  <!-- Upper latitude line -->
+  <path d="M 3.5 7.5 Q 12 5 20.5 7.5" fill="none" stroke="#38bdf8" stroke-width="0.25"/>
+
+  <!-- Lower latitude line -->
+  <path d="M 3.5 16.5 Q 12 19 20.5 16.5" fill="none" stroke="#38bdf8" stroke-width="0.25"/>
+</svg>
