@@ -1,33 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 70" width="380" height="70">
-  <!-- 2U rack server — 19":3.5" = ~5.4:1 ratio -->
+<!--
+  server-rack-2u-compute-1/dark.svg
 
-  <!-- Rack ears -->
+  2U Rack-Mount Compute Server (Dark Theme)
+  Dimensions: 380x70px (19" rack width at 2U height, ~5.4:1 aspect ratio)
+
+  Design: Enterprise server with 4 drive bays, front I/O, and status LEDs
+  Color scheme: Blue tones (#38bdf8 accent, #0c2340 chassis) - compute category
+
+  Layout (left to right):
+  - Rack ears (0-10px, 370-380px): mounting brackets with screw holes
+  - Top row: 4x landscape drive/expansion bays (84x28px each)
+  - Bottom strip (left to right):
+    - 2x USB-A ports (20x12px each)
+    - Status LEDs: power (blue), activity (green x2), warning (yellow)
+    - Power button with IEC symbol (r=10)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 70" width="380" height="70">
+
+  <!-- ==================== RACK EARS ==================== -->
+  <!-- Left rack ear with screw holes at y=13, y=57 -->
   <rect x="0"   y="0" width="10" height="70" rx="2" fill="#0c2340" stroke="#38bdf8" stroke-width="1.2"/>
   <circle cx="5" cy="13" r="2.5" fill="none" stroke="#38bdf8" stroke-width="1"/>
   <circle cx="5" cy="57" r="2.5" fill="none" stroke="#38bdf8" stroke-width="1"/>
+  <!-- Right rack ear with screw holes -->
   <rect x="370" y="0"  width="10" height="70" rx="2" fill="#0c2340" stroke="#38bdf8" stroke-width="1.2"/>
   <circle cx="375" cy="13" r="2.5" fill="none" stroke="#38bdf8" stroke-width="1"/>
   <circle cx="375" cy="57" r="2.5" fill="none" stroke="#38bdf8" stroke-width="1"/>
 
-  <!-- Chassis -->
+  <!-- ==================== CHASSIS BODY ==================== -->
   <rect x="10" y="0" width="360" height="70" rx="1" fill="#0c2340" stroke="#38bdf8" stroke-width="1.5"/>
 
-  <!-- Top row: 4 landscape drive bays -->
-  <rect x="14"  y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>
-  <rect x="103" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>
-  <rect x="192" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>
-  <rect x="281" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>
+  <!-- ==================== DRIVE BAYS ==================== -->
+  <!-- Top row: 4x landscape drive/expansion bays -->
+  <rect x="14"  y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>  <!-- Bay 1 -->
+  <rect x="103" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>  <!-- Bay 2 -->
+  <rect x="192" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>  <!-- Bay 3 -->
+  <rect x="281" y="4"  width="84" height="28" rx="1" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1"/>  <!-- Bay 4 -->
 
-  <!-- Bottom strip: USB + LEDs + power -->
+  <!-- ==================== FRONT I/O PANEL ==================== -->
+  <!-- USB-A port 1 -->
   <rect x="16"  y="38" width="20" height="12" rx="1" fill="#0a1e3a" stroke="#7dd3fc" stroke-width="0.9"/>
+  <!-- USB-A port 2 -->
   <rect x="40"  y="38" width="20" height="12" rx="1" fill="#0a1e3a" stroke="#7dd3fc" stroke-width="0.9"/>
-  <circle cx="80"  cy="57" r="3"   fill="#38bdf8"/>
-  <circle cx="94"  cy="57" r="3"   fill="#27ae60"/>
-  <circle cx="108" cy="57" r="3"   fill="#27ae60"/>
-  <circle cx="122" cy="57" r="3"   fill="#f1c40f"/>
 
-  <!-- Power button -->
+  <!-- ==================== STATUS LEDs ==================== -->
+  <!-- Power LED (blue) -->
+  <circle cx="80"  cy="57" r="3" fill="#38bdf8"/>
+  <!-- Activity LED 1 (green) -->
+  <circle cx="94"  cy="57" r="3" fill="#27ae60"/>
+  <!-- Activity LED 2 (green) -->
+  <circle cx="108" cy="57" r="3" fill="#27ae60"/>
+  <!-- Warning LED (yellow) -->
+  <circle cx="122" cy="57" r="3" fill="#f1c40f"/>
+
+  <!-- ==================== POWER BUTTON ==================== -->
+  <!-- Circular power button with IEC power symbol -->
   <circle cx="355" cy="52" r="10" fill="#0a1e3a" stroke="#38bdf8" stroke-width="1.4"/>
+  <!-- Power symbol arc (bottom semicircle) -->
   <path d="M 357.5 47.7 A 5 5 0 1 1 352.5 47.7" fill="none" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- Power symbol line (vertical bar at top) -->
   <line x1="355" y1="45" x2="355" y2="50" stroke="#38bdf8" stroke-width="1.4" stroke-linecap="round"/>
 </svg>
