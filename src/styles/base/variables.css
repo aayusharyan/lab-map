@@ -1,0 +1,93 @@
+/**
+ * @file variables.css
+ * @description CSS custom properties for theming and UI scaling
+ *
+ * Defines all color variables for light (default) and dark themes.
+ * Theme is toggled by setting data-theme="dark" on :root.
+ *
+ * Color Categories:
+ * - bg/surface: Background layers (darkest to lightest)
+ * - border: Divider and border colors
+ * - accent/accent2: Brand colors for highlights
+ * - text/text-muted: Typography colors
+ * - danger/success/warn: Semantic status colors
+ * - tt-*: Tooltip-specific colors (separate for theme override)
+ */
+
+/* ============================================================================
+ * LIGHT THEME (DEFAULT)
+ * ============================================================================ */
+
+:root {
+  /* Background layers - light mode */
+  --bg:           #f0f2f7;    /* App background (light gray) */
+  --surface:      #ffffff;    /* Card/panel backgrounds (white) */
+  --surface2:     #e8ecf4;    /* Elevated surface */
+  --border:       #c8cedf;    /* Borders (darker for contrast) */
+
+  /* Brand accent colors - adjusted for light bg */
+  --accent:       #2563eb;    /* Primary accent (deeper blue) */
+  --accent2:      #7c3aed;    /* Secondary accent (purple) */
+
+  /* Typography colors - dark text on light bg */
+  --text:         #111827;    /* Primary text (near black) */
+  --text-muted:   #6b7280;    /* Secondary/hint text */
+
+  /* UI state colors */
+  --tab-active:   #2563eb;    /* Active tab background */
+  --danger:       #dc2626;    /* Error/destructive actions */
+  --success:      #16a34a;    /* Success/positive states */
+  --warn:         #d97706;    /* Warning/caution states */
+
+  /* Typography stack */
+  --font:         'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Global UI scale factor for accessibility
+     JS increments/decrements this to resize all UI text proportionally.
+     1 = default (14px body). Canvas labels scale separately. */
+  --ui-scale: 1;
+
+  /* Tooltip colors for light mode */
+  --tt-bg:         #ffffff;   /* Tooltip background */
+  --tt-surface:    #f3f4f6;   /* Tooltip header background */
+  --tt-border:     #d1d5db;   /* Tooltip border */
+  --tt-text:       #111827;   /* Tooltip primary text */
+  --tt-muted:      #6b7280;   /* Tooltip secondary text */
+  --tt-row-border: #e5e7eb;   /* Tooltip row separator */
+}
+
+/* ============================================================================
+ * DARK THEME
+ * Applied when JS sets data-theme="dark" on :root.
+ * Only color variables are overridden; structure/sizing remains unchanged.
+ * ============================================================================ */
+
+:root[data-theme="dark"] {
+  /* Background layers - progressively lighter for depth */
+  --bg:           #0f1117;    /* App background (darkest) */
+  --surface:      #1a1d27;    /* Card/panel backgrounds */
+  --surface2:     #222636;    /* Elevated surface (inputs, hover) */
+  --border:       #2e3250;    /* Borders and dividers */
+
+  /* Brand accent colors */
+  --accent:       #4c7eff;    /* Primary accent (blue) */
+  --accent2:      #7c55ff;    /* Secondary accent (purple) */
+
+  /* Typography colors */
+  --text:         #e8eaf0;    /* Primary text (high contrast) */
+  --text-muted:   #7a80a0;    /* Secondary/hint text */
+
+  /* UI state colors */
+  --tab-active:   #4c7eff;
+  --danger:       #e74c3c;
+  --success:      #27ae60;
+  --warn:         #d97706;
+
+  /* Tooltip colors — dark theme overrides */
+  --tt-bg:         #0f1117;   /* Tooltip background */
+  --tt-surface:    #1a1d27;   /* Tooltip header background */
+  --tt-border:     #2e3250;   /* Tooltip border */
+  --tt-text:       #e8eaf0;   /* Tooltip primary text */
+  --tt-muted:      #7a80a0;   /* Tooltip secondary text */
+  --tt-row-border: #1a1d27;   /* Tooltip row separator */
+}
