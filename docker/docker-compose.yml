@@ -1,5 +1,5 @@
 # =============================================================================
-# @file docker-compose.example.yml
+# @file docker-compose.yml
 # @description Docker Compose example configuration for Lab Map
 #
 # Lab Map - An interactive canvas-based visualizer for datacenter and lab infrastructure.
@@ -8,7 +8,7 @@
 # The watcher monitors /app/data for changes and validates against schemas.
 # Keeps last valid data when new data is invalid, shows warnings in UI.
 #
-# Usage: docker compose -f docker/docker-compose.example.yml up -d
+# Usage: docker compose -f docker/docker-compose.yml up -d
 # Access: http://localhost:8080
 
 services:

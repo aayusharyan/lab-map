@@ -15,7 +15,7 @@ Run Lab Map with integrated data validation and real-time monitoring.
 ### Using Docker Compose (Recommended)
 
 ```bash
-docker compose -f docker/docker-compose.example.yml up -d
+docker compose -f docker/docker-compose.yml up -d
 ```
 
 ### Using Docker CLI
