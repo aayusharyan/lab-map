@@ -1,0 +1,23 @@
+# =============================================================================
+# @file docker-compose.example.yml
+# @description Docker Compose example configuration for Lab Map
+#
+# Lab Map - An interactive canvas-based visualizer for datacenter and lab infrastructure.
+#
+# Includes real-time data validation with hash-based change detection.
+# The watcher monitors /app/data for changes and validates against schemas.
+# Keeps last valid data when new data is invalid, shows warnings in UI.
+#
+# Usage: docker compose -f docker/docker-compose.example.yml up -d
+# Access: http://localhost:8080
+
+services:
+  lab-map:
+    image: ghcr.io/aayusharyan/lab-map:latest
+    container_name: lab-map
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount your data directory (required for watcher to monitor changes)
+      - ./data:/app/data
+    restart: unless-stopped
