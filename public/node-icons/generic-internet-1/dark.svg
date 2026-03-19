@@ -1,0 +1,22 @@
+<!--
+  generic-internet-1/dark.svg
+
+  Cloud / CDN Icon (Dark Theme)
+  Dimensions: 24x24px (standard icon size)
+
+  Design: Fluffy cloud shape representing internet/cloud services
+  Color scheme: Blue tones (#38bdf8 stroke, #0a1e3d fill) - network/internet category
+
+  Usage: Represents external cloud services (Cloudflare, AWS, etc.)
+  Path: Single bezier curve forming classic cumulus cloud silhouette
+
+  The path creates a cloud with:
+  - Left small bump (bottom-left of cloud)
+  - Central large bump (top of cloud)
+  - Right bump (bottom-right of cloud)
+  - Flat bottom connecting all sections
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Cloud shape: single path with curves forming cumulus cloud -->
+  <path d="M6.5 20Q4.22 20 2.61 18.43 1 16.85 1 14.58q0-1.95 1.17-3.48 1.17-1.52 3.08-1.95.51-2.26 2.29-3.70Q9.32 4 11.5 4q2.93 0 4.96 2.04Q18.5 8.07 18.5 11q1.78.2 2.89 1.48Q22.5 13.75 22.5 15.5q0 1.88-1.31 3.19Q19.88 20 18 20z" fill="#0a1e3d" stroke="#38bdf8" stroke-width="0.4" stroke-linejoin="round"/>
+</svg>
