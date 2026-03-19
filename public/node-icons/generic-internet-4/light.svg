@@ -1,0 +1,28 @@
+<!--
+  generic-internet-4/light.svg
+
+  WWW Globe Internet Icon (Light Theme)
+  Dimensions: 24x24px (standard icon size)
+
+  Design: Globe outline with "www" text in center
+  Color scheme: Blue tones (#1d4ed8 stroke/text, #dbeafe fill) - network/internet category
+
+  Usage: Represents world wide web, internet browser, web services
+  Structure:
+  - Outer circle: globe outline
+  - Simplified meridian lines: globe texture
+  - Center text: "www" label
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Globe outline -->
+  <circle cx="12" cy="12" r="9.5" fill="#dbeafe" stroke="#1d4ed8" stroke-width="0.4"/>
+
+  <!-- Center meridian (vertical ellipse) -->
+  <ellipse cx="12" cy="12" rx="4" ry="9.5" fill="none" stroke="#1d4ed8" stroke-width="0.2" opacity="0.5"/>
+
+  <!-- Equator (horizontal line) -->
+  <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="#1d4ed8" stroke-width="0.2" opacity="0.5"/>
+
+  <!-- WWW text -->
+  <text x="12" y="13.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="5.5" font-weight="bold" fill="#1d4ed8">www</text>
+</svg>
