@@ -23,6 +23,13 @@
  */
 
 /* ============================================================================
+ * STYLES
+ * Global CSS must be imported FIRST to ensure correct Vite processing
+ * ============================================================================ */
+
+import './styles/index.css';
+
+/* ============================================================================
  * IMPORTS
  * ============================================================================ */
 
@@ -33,13 +40,6 @@ import { AppProvider } from '@/context/AppContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 
 import App from './App';
-
-/* ============================================================================
- * STYLES
- * Global CSS must be imported at the entry point to ensure it's loaded first
- * ============================================================================ */
-
-import './styles/style.css';
 
 /* ============================================================================
  * APPLICATION BOOTSTRAP
