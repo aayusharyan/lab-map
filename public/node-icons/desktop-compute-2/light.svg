@@ -1,14 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 100" width="256" height="100">
-  <!-- Compact SFF desktop (light): ~10% narrower than desktop-compute-1 -->
+<!--
+  desktop-compute-2/light.svg
 
-  <!-- Outer chassis -->
+  Compact Small Form Factor Desktop PC (Light Theme)
+  Dimensions: 256x100px (~10% narrower than desktop-compute-1, ~2.56:1 aspect ratio)
+
+  Design: Corporate compact SFF desktop with diagonal vent slats and reduced front I/O
+  Color scheme: Neutral gray tones (#e5e5e5 chassis, #888 accents) - workstation category
+
+  Layout (top to bottom):
+  - Vent area (y=0-68): diagonal slat pattern for CPU/GPU airflow
+  - ODD bay (x=116-232, y=26-40): optical drive slot (DVD/BD)
+  - Bottom I/O strip (y=69-100): front panel ports and power button
+
+  Front I/O (left to right):
+  - SD card slot (x=75): memory card reader
+  - USB-C port (x=111): USB 3.1 Type-C
+  - 2x USB-A ports (x=129-165): USB 3.0 Type-A (reduced from 4)
+  - Headset jack (x=175): 3.5mm combo audio
+  - Power LED (x=195): blue indicator
+  - Power button (x=222-246): with power symbol
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 100" width="256" height="100">
+
+  <!-- ==================== OUTER CHASSIS ==================== -->
   <rect x="0" y="0" width="256" height="100" rx="3" fill="#e5e5e5" stroke="#888" stroke-width="1.5"/>
 
-  <!-- Vent slat area -->
+  <!-- ==================== VENTILATION AREA ==================== -->
+  <!-- Diagonal slat pattern (top 68px) for airflow -->
   <clipPath id="vcl2">
     <rect x="1" y="1" width="254" height="67" rx="2"/>
   </clipPath>
   <rect x="1" y="1" width="254" height="67" rx="2" fill="#d4d4d4"/>
+  <!-- Diagonal lines creating slat pattern (8px spacing) -->
   <g clip-path="url(#vcl2)" stroke="#999" stroke-width="2.8">
     <line x1="-40" y1="0"  x2="60"  y2="120"/>
     <line x1="-32" y1="0"  x2="68"  y2="120"/>
@@ -49,27 +72,38 @@
     <line x1="248" y1="0"  x2="348" y2="120"/>
   </g>
 
-  <!-- ODD bay recess -->
+  <!-- ==================== OPTICAL DRIVE BAY ==================== -->
+  <!-- Slim ODD slot (DVD/BD drive recess) -->
   <rect x="116" y="26" width="116" height="14" rx="1" fill="#c0c0c0" stroke="#888" stroke-width="0.8"/>
+  <!-- Eject slot lines -->
   <line x1="118" y1="31"  x2="230" y2="31"  stroke="#aaa" stroke-width="0.8"/>
   <line x1="118" y1="37"  x2="230" y2="37"  stroke="#aaa" stroke-width="0.8"/>
 
-  <!-- Bottom strip (flat color, no gradient) -->
+  <!-- ==================== FRONT I/O STRIP ==================== -->
+  <!-- Bottom panel with ports -->
   <rect x="0" y="69" width="256" height="31" fill="#f0f0f0" stroke="#888" stroke-width="0.8"/>
 
   <!-- SD card slot -->
   <rect x="75" y="78" width="28" height="4" rx="1" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>
-  <!-- USB-C -->
+
+  <!-- USB-C port (rounded ends) -->
   <rect x="111" y="76" width="12" height="8" rx="4" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>
-  <!-- 2x USB-A -->
-  <rect x="129" y="76" width="16" height="8" rx="1" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>
-  <rect x="149" y="76" width="16" height="8" rx="1" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>
-  <!-- Headset jack -->
+
+  <!-- 2x USB-A ports -->
+  <rect x="129" y="76" width="16" height="8" rx="1" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>  <!-- USB-A 1 -->
+  <rect x="149" y="76" width="16" height="8" rx="1" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>  <!-- USB-A 2 -->
+
+  <!-- Headset jack (3.5mm combo audio) -->
   <circle cx="175" cy="80" r="4.5" fill="#d4d4d4" stroke="#888" stroke-width="0.7"/>
-  <!-- Power LED -->
+
+  <!-- Power LED (blue) -->
   <circle cx="195" cy="80" r="2.5" fill="#0277bd"/>
-  <!-- Power button: rounded rect, power symbol centered inside -->
+
+  <!-- ==================== POWER BUTTON ==================== -->
+  <!-- Rounded rectangle button with IEC power symbol -->
   <rect x="222" y="74" width="24" height="14" rx="3" fill="#e8e8e8" stroke="#888" stroke-width="0.9"/>
+  <!-- Power symbol: vertical line -->
   <line x1="234" y1="76.5" x2="234" y2="79.5" stroke="#666" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- Power symbol: arc -->
   <path d="M231,79 A3.2,3.2 0 1,0 237,79" fill="none" stroke="#666" stroke-width="1.4" stroke-linecap="round"/>
 </svg>
