@@ -1,64 +1,84 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 70" width="380" height="70">
-  <!-- 2U rack NAS SSD: single row of 24 tall portrait drives spanning full width -->
+<!--
+  server-rack-2u-nas-ssd-1/dark.svg
 
-  <!-- Rack ears -->
+  2U Rack-Mount NAS with 2.5" SSD Bays (Dark Theme)
+  Dimensions: 380x70px (19" rack width at 2U height, ~5.4:1 aspect ratio)
+
+  Design: High-density SSD storage array with 23 vertical drive slots
+  Color scheme: Green tones (#4ade80 accent, #0d1f0d chassis) - storage category
+
+  Layout:
+  - Rack ears (0-10px, 370-380px): mounting brackets with screw holes
+  - 23 drive bays spanning full width: portrait orientation (14x62px each)
+  - Green handle tabs at top of each drive for hot-swap indicator
+
+  Drive spacing: 15.5px between drives (14px drive + 1.5px gap)
+  Handle tabs: bright green (#16a34a) at top 7px of each drive
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 70" width="380" height="70">
+
+  <!-- ==================== RACK EARS ==================== -->
+  <!-- Left rack ear with screw holes at y=13, y=57 -->
   <rect x="0"   y="0" width="10" height="70" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
   <circle cx="5" cy="13" r="2.5" fill="none" stroke="#4ade80" stroke-width="1"/>
   <circle cx="5" cy="57" r="2.5" fill="none" stroke="#4ade80" stroke-width="1"/>
+  <!-- Right rack ear with screw holes -->
   <rect x="370" y="0" width="10" height="70" rx="2" fill="#0a150a" stroke="#4ade80" stroke-width="1.2"/>
   <circle cx="375" cy="13" r="2.5" fill="none" stroke="#4ade80" stroke-width="1"/>
   <circle cx="375" cy="57" r="2.5" fill="none" stroke="#4ade80" stroke-width="1"/>
 
-  <!-- Chassis body -->
+  <!-- ==================== CHASSIS BODY ==================== -->
   <rect x="10" y="0" width="360" height="70" rx="1" fill="#0d1f0d" stroke="#4ade80" stroke-width="1.5"/>
 
-  <!-- 23 tall portrait drives, each 14px wide, 62px tall, evenly spaced -->
-  <rect x="12"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="27.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="43"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="58.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="74"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="89.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="105"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="120.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="136"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="151.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="167"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="182.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="198"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="213.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="229"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="244.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="260"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="275.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="291"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="306.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="322"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="337.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
-  <rect x="353"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>
+  <!-- ==================== SSD DRIVE BAYS ==================== -->
+  <!-- 23 portrait-orientation 2.5" SSD bays (14px wide, 62px tall) -->
+  <rect x="12"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 1 -->
+  <rect x="27.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 2 -->
+  <rect x="43"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 3 -->
+  <rect x="58.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 4 -->
+  <rect x="74"    y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 5 -->
+  <rect x="89.5"  y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 6 -->
+  <rect x="105"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 7 -->
+  <rect x="120.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 8 -->
+  <rect x="136"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 9 -->
+  <rect x="151.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 10 -->
+  <rect x="167"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 11 -->
+  <rect x="182.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 12 -->
+  <rect x="198"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 13 -->
+  <rect x="213.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 14 -->
+  <rect x="229"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 15 -->
+  <rect x="244.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 16 -->
+  <rect x="260"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 17 -->
+  <rect x="275.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 18 -->
+  <rect x="291"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 19 -->
+  <rect x="306.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 20 -->
+  <rect x="322"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 21 -->
+  <rect x="337.5" y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 22 -->
+  <rect x="353"   y="4" width="14" height="62" rx="1" fill="#0a150a" stroke="#4ade80" stroke-width="0.8"/>  <!-- Bay 23 -->
 
-  <!-- Green handle tab at top of each drive -->
-  <rect x="12"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="27.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="43"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="58.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="74"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="89.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="105"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="120.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="136"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="151.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="167"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="182.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="198"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="213.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="229"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="244.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="260"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="275.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="291"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="306.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="322"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="337.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>
-  <rect x="353"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>
+  <!-- ==================== HOT-SWAP HANDLE TABS ==================== -->
+  <!-- Green release tabs at top of each drive bay (7px height) -->
+  <rect x="12"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 1 -->
+  <rect x="27.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 2 -->
+  <rect x="43"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 3 -->
+  <rect x="58.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 4 -->
+  <rect x="74"    y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 5 -->
+  <rect x="89.5"  y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 6 -->
+  <rect x="105"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 7 -->
+  <rect x="120.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 8 -->
+  <rect x="136"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 9 -->
+  <rect x="151.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 10 -->
+  <rect x="167"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 11 -->
+  <rect x="182.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 12 -->
+  <rect x="198"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 13 -->
+  <rect x="213.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 14 -->
+  <rect x="229"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 15 -->
+  <rect x="244.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 16 -->
+  <rect x="260"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 17 -->
+  <rect x="275.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 18 -->
+  <rect x="291"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 19 -->
+  <rect x="306.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 20 -->
+  <rect x="322"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 21 -->
+  <rect x="337.5" y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 22 -->
+  <rect x="353"   y="4" width="14" height="7" rx="1" fill="#16a34a"/>  <!-- Handle 23 -->
 </svg>
