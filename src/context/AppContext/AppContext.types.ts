@@ -19,7 +19,7 @@
  * via useAppContext() hook and modify it by dispatching actions to the reducer.
  *
  * Note: User preferences (theme, font size, scroll-to-zoom) are managed
- * separately by SettingsContext for persistence via localStorage/settings.json.
+ * separately by SettingsContext for persistence via localStorage/default_settings.json.
  *
  * @see AppContext.tsx - Provider component and reducer implementation
  * @see useAppContext.ts - Hook for consuming the context
@@ -45,9 +45,9 @@ import type { ValidationWarning, ValidationWarningInput } from '@/utils/validati
  * State is immutable and can only be modified by dispatching actions
  * to the reducer.
  *
- * Note: Active layer is derived from URL via useActiveLayer hook.
- * Layer data (nodes, edges, flows) and selection state are managed
- * locally by each layer component via useLocalLayerData and useSelection hooks.
+ * Note: Active page is derived from URL via useActivePage hook.
+ * Page data (nodes, edges, flows) and selection state are managed
+ * locally by each page component via useLocalPageData and useSelection hooks.
  * User preferences (theme, font size, scroll-to-zoom) are managed by SettingsContext.
  *
  * @property {ValidationWarning[]} validationWarnings - Current validation warnings

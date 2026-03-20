@@ -14,8 +14,8 @@
  * State Categories:
  * - Validation warnings: Normalized UI warnings with message, trace, and hash
  *
- * Note: Active layer and selection state are derived from URL via
- * useActiveLayer and useSelection hooks in components.
+ * Note: Active page and selection state are derived from URL via
+ * useActivePage and useSelection hooks in components.
  * User preferences (theme, font size, scroll-to-zoom) are managed by SettingsContext.
  *
  * @example
@@ -59,9 +59,9 @@ import { AppContext } from './AppContext.types';
  * Shape of the global validation warning state.
  * Components read from this state via useAppContext().
  *
- * Note: Active layer is derived from URL via useActiveLayer hook.
- * Layer data (nodes, edges, flows) and selection state are managed
- * locally by each layer component via useLocalLayerData and useSelection hooks.
+ * Note: Active page is derived from URL via useActivePage hook.
+ * Page data (nodes, edges, flows) and selection state are managed
+ * locally by each page component via useLocalPageData and useSelection hooks.
  * User preferences (theme, font size, scroll-to-zoom) are managed by SettingsContext.
  *
  * @see AppContext.types.ts for detailed property documentation
@@ -89,8 +89,8 @@ export type AppAction =
 /**
  * Default validation warning state on app startup.
  *
- * Active layer is derived from URL via useActiveLayer hook.
- * Layer data (nodes, edges) is managed locally by each layer component.
+ * Active page is derived from URL via useActivePage hook.
+ * Page data (nodes, edges) is managed locally by each page component.
  * User preferences are managed by SettingsContext.
  */
 const initialState: AppState = {
