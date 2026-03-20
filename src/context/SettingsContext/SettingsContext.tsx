@@ -3,7 +3,7 @@
  * @description Settings state management for application preferences
  *
  * This file implements settings state management for the Lab Map application.
- * Settings use a bootstrap flow: localStorage first, then settings.json,
+ * Settings use a bootstrap flow: localStorage first, then default_settings.json,
  * then hardcoded defaults.
  *
  * Settings Managed:
@@ -18,11 +18,11 @@
  *
  * Data Flow:
  * 1. Read settings from localStorage synchronously on startup
- * 2. If no stored settings exist, bootstrap from settings.json
- * 3. If settings.json is unavailable, fall back to hardcoded defaults
+ * 2. If no stored settings exist, bootstrap from default_settings.json
+ * 3. If default_settings.json is unavailable, fall back to hardcoded defaults
  * 4. Persist the resolved settings to localStorage for future visits
  *
- * This allows settings.json to act as a first-run bootstrap source while
+ * This allows default_settings.json to act as a first-run bootstrap source while
  * localStorage remains the long-term source of truth for returning users.
  *
  * @example
@@ -57,7 +57,7 @@ import { isThemeId, resolveTheme } from '@/utils/theme';
  * ============================================================================ */
 
 /**
- * Default settings used as fallback when neither localStorage nor settings.json
+ * Default settings used as fallback when neither localStorage nor default_settings.json
  * provide a value.
  *
  * These defaults provide a reasonable out-of-the-box experience:
@@ -187,11 +187,11 @@ function saveUserPreferences(settings: Partial<AppSettings>): void {
  *
  * For each setting key, uses the first available value in this order:
  * 1. localStorage (persisted settings)
- * 2. settings.json (bootstrap defaults)
+ * 2. default_settings.json (bootstrap defaults)
  * 3. DEFAULT_SETTINGS (hardcoded fallback)
  *
  * @param {Partial<AppSettings>} userPrefs - Settings from localStorage
- * @param {Partial<AppSettings>} fileDefaults - Settings from settings.json
+ * @param {Partial<AppSettings>} fileDefaults - Settings from default_settings.json
  * @returns {AppSettings} Complete merged settings object
  */
 function mergeSettings(
@@ -229,10 +229,10 @@ function coerceFontSize(value: unknown): FontSize {
  * This keeps the first render in sync with the last persisted settings while
  * hiding the bootstrap phase from context consumers.
  *
- * Note: This function only loads from localStorage, not settings.json,
+ * Note: This function only loads from localStorage, not default_settings.json,
  * because it's called synchronously during useState initialization.
  * File loading requires fetch() which is async and cannot be used here.
- * The async settings.json bootstrap happens in the useEffect inside
+ * The async default_settings.json bootstrap happens in the useEffect inside
  * SettingsProvider for first-time visitors without localStorage data.
  *
  * @returns {object} Initial reducer state plus bootstrap metadata
@@ -372,7 +372,7 @@ function reducer(state: SettingsState, action: SettingsAction): SettingsState {
  * Provider component that wraps the app.
  *
  * Initializes settings from localStorage when available and otherwise
- * bootstraps them from settings.json before rendering children.
+ * bootstraps them from default_settings.json before rendering children.
  *
  * @param {object} props - Component props
  * @param {ReactNode} props.children - Child components to wrap
@@ -403,12 +403,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [isBootstrapping, setIsBootstrapping] = useState(!hasStoredSettings);
 
   /**
-   * Bootstrap settings.json only for first-run visits without localStorage.
+   * Bootstrap default_settings.json only for first-run visits without localStorage.
    */
   useEffect(() => {
     if (hasStoredSettings) return;
 
-    fetch('/data/settings.json')
+    fetch('/data/default_settings.json')
       .then((res) => res.json())
       .then((fileDefaults) => {
         const merged = mergeSettings({}, fileDefaults);
