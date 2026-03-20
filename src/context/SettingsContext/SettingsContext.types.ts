@@ -27,11 +27,19 @@
 
 import { createContext } from 'react';
 
-import type { PageId, ThemeId } from '@/types/topology';
+import type { PageId } from '@/types/page';
+import type { ThemeId } from '@/types/topology';
 
-export const NODE_FONT_SIZES = [11, 13, 15, 17, 19] as const;
+/**
+ * Valid font size values in pixels.
+ * Used for app-wide UI scaling (labels, buttons, headers, canvas text).
+ */
+export const FONT_SIZES = [11, 13, 15, 17, 19] as const;
 
-export type NodeFontSize = (typeof NODE_FONT_SIZES)[number];
+/**
+ * Font size type (restricted to valid values).
+ */
+export type FontSize = (typeof FONT_SIZES)[number];
 
 /**
  * User preferences resolved by SettingsContext.
@@ -40,7 +48,7 @@ export type NodeFontSize = (typeof NODE_FONT_SIZES)[number];
  *
  * @property {PageId} defaultPage - Page shown on app load
  * @property {ThemeId} theme - Color theme preference
- * @property {NodeFontSize} nodeFontSize - Font size for node labels (pixels)
+ * @property {FontSize} fontSize - App-wide font size for UI scaling (pixels)
  * @property {boolean} scrollToZoom - Enable scroll-to-zoom on canvas
  * @property {boolean} showNodeLabels - Show labels on nodes
  * @property {boolean} showLegend - Show the legend panel
@@ -50,7 +58,7 @@ export type NodeFontSize = (typeof NODE_FONT_SIZES)[number];
 export interface AppSettings {
   defaultPage: PageId;
   theme: ThemeId;
-  nodeFontSize: NodeFontSize;
+  fontSize: FontSize;
   scrollToZoom: boolean;
   showNodeLabels: boolean;
   showLegend: boolean;
@@ -92,7 +100,7 @@ export interface SettingsState {
  * Setting Updates:
  * - SET_THEME: Change color theme preference
  * - SET_DEFAULT_PAGE: Change default page shown on app load
- * - SET_NODE_FONT_SIZE: Change node label font size
+ * - SET_FONT_SIZE: Change app-wide font size
  * - SET_SCROLL_TO_ZOOM: Toggle scroll-to-zoom behavior
  * - SET_NODE_LABEL_VISIBILITY: Toggle node label visibility
  * - SET_LEGEND_VISIBILITY: Toggle legend visibility
@@ -107,7 +115,7 @@ export type SettingsAction =
   | { type: 'LOAD_SETTINGS'; settings: Partial<AppSettings> }
   | { type: 'SET_THEME'; theme: ThemeId }
   | { type: 'SET_DEFAULT_PAGE'; page: PageId }
-  | { type: 'SET_NODE_FONT_SIZE'; size: NodeFontSize }
+  | { type: 'SET_FONT_SIZE'; size: FontSize }
   | { type: 'SET_SCROLL_TO_ZOOM'; enabled: boolean }
   | { type: 'SET_NODE_LABEL_VISIBILITY'; visible: boolean }
   | { type: 'SET_LEGEND_VISIBILITY'; visible: boolean }
