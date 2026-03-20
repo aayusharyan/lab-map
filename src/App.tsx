@@ -25,7 +25,7 @@
  *
  * Refs:
  * - graphRef: Allows AppHeader to control GraphView (fit, zoom, export)
- * - layoutRef: Allows AppHeader to control RackView (fit, zoom, export)
+ * - layoutRef: Allows AppHeader to control LayoutView (fit, zoom, export)
  */
 
 /* ============================================================================
@@ -42,7 +42,7 @@ import { VlanLayer } from '@/components/layers/VlanLayer';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { LoadingOverlay } from '@/components/layout/LoadingOverlay';
 import { ValidationWarning } from '@/components/layout/ValidationWarning';
-import { LayoutViewHandle } from '@/components/rack/RackView';
+import { LayoutViewHandle } from '@/components/layout-view/LayoutView';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { useAppContext } from '@/hooks/useAppContext';
 import { useRouter } from '@/hooks/useRouter';
@@ -89,7 +89,7 @@ export default function App() {
   const graphRef = useRef<GraphViewHandle>(null);
 
   /**
-   * Reference to RackView component (used by Rack layer).
+   * Reference to LayoutView component (used by Rack layer).
    * Exposes methods: fitToScreen(), zoomIn(), zoomOut(), exportAsImage()
    */
   const layoutRef = useRef<LayoutViewHandle>(null);
