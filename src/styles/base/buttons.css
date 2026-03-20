@@ -1,0 +1,25 @@
+/**
+ * @file buttons.css
+ * @description Generic button primitive shared across the entire application
+ *
+ * Only truly reusable button styles belong here. Component-specific buttons
+ * (theme toggle, font size control, etc.) live in components/*.css.
+ */
+
+/* ============================================================================
+ * ICON BUTTON
+ * Generic small icon button used throughout the UI.
+ * ============================================================================ */
+
+.btn-icon {
+  padding: 4px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: calc(12px * var(--ui-scale));
+  cursor: pointer;
+}
+.btn-icon:hover { color: var(--text); background: var(--border); }
+.btn-icon:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-icon:disabled:hover { color: var(--text-muted); background: var(--surface2); }
