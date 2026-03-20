@@ -58,7 +58,7 @@ React app shows validation warnings when data is invalid
   ├── traffic.json
   ├── vlan.json
   ├── rack.json
-  └── settings.json
+  └── default_settings.json
 
 /usr/share/nginx/html/data/  # Validated data served by nginx
   ├── physical.json           # Validated data
