@@ -8,4 +8,4 @@
  */
 
 export { getValidationWarningHash } from './validationWarning';
-export type { ValidationWarning } from './validationWarning.types';
+export type { ValidationWarning, ValidationWarningInput } from './validationWarning.types';
