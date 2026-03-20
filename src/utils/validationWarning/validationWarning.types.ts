@@ -7,12 +7,13 @@
  * warning system in AppContext and the warning banner UI.
  *
  * Type Categories:
- * 1. ValidationWarning - Minimal warning model used throughout the UI
+ * 1. ValidationWarningInput - Caller-provided warning data before hashing
+ * 2. ValidationWarning - Minimal warning model stored throughout the UI
  *
  * Data Flow:
  * 1. ValidationWarningManager reads raw validation metadata
- * 2. Metadata is normalized into ValidationWarning objects
- * 3. Warnings are stored in AppContext
+ * 2. Metadata is normalized into ValidationWarningInput objects
+ * 3. AppContext computes hashes and stores ValidationWarning objects
  * 4. ValidationWarning renders the warnings in the UI
  * 5. Dismissal state uses the computed warning hash
  *
@@ -22,18 +23,39 @@
  */
 
 /* ============================================================================
- * VALIDATION WARNING TYPE
- * Minimal warning model stored in AppContext and rendered in the UI
+ * VALIDATION WARNING INPUT TYPE
+ * Caller-provided warning model before AppContext computes the hash
  * ============================================================================ */
 
 /**
- * Validation warning for UI display.
+ * Validation warning input for UI display.
  *
- * A warning contains exactly the fields required by the UI and dismissal
- * system:
+ * This is the shape callers pass into AppContext when adding warnings.
+ * The caller provides only the user-facing content, and AppContext derives
+ * the stable hash from the trace so hashing logic stays centralized.
+ *
+ * A warning input contains the fields required to derive the stored warning:
  * - message: The human-readable summary shown in the banner
  * - trace: A list of strings describing where the warning came from
- * - hash: A lightweight computed hash derived from the trace
+ *
+ * @property {string} message - Human-readable warning summary
+ * @property {string[]} trace - Ordered trace describing the warning source/path
+ */
+export interface ValidationWarningInput {
+  message: string;
+  trace: string[];
+}
+
+/* ============================================================================
+ * VALIDATION WARNING TYPE
+ * Stored warning model used throughout the UI after hashing
+ * ============================================================================ */
+
+/**
+ * Validation warning stored in AppContext and rendered in the UI.
+ *
+ * This extends ValidationWarningInput with a stable lightweight hash that is
+ * computed inside AppContext from the trace.
  *
  * The hash exists so the app can very quickly check whether a particular
  * warning has already been dismissed. Because the hash is derived from the
@@ -41,8 +63,6 @@
  * This makes it more suitable than a UUID or timestamp, which would create
  * a new identifier even when the underlying warning has not changed.
  *
- * @property {string} message - Human-readable warning summary
- * @property {string[]} trace - Ordered trace describing the warning source/path
  * @property {string} hash - Stable lightweight hash used for quick dismissal checks
  *
  * @example
@@ -52,8 +72,6 @@
  *   hash: 'abc123',
  * };
  */
-export interface ValidationWarning {
-  message: string;
-  trace: string[];
+export interface ValidationWarning extends ValidationWarningInput {
   hash: string;
 }
