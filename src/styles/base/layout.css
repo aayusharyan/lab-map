@@ -1,0 +1,144 @@
+/**
+ * @file layout.css
+ * @description App shell layout structure
+ *
+ * Main application structure: header + body (content + sidebar) + footer.
+ * Full viewport height with flex layout for responsive sizing.
+ *
+ * Layout Structure:
+ * - .app-shell: Full-height flex container (100vh)
+ * - .app-header: Fixed header with tabs and controls
+ * - .app-body: Flexible main content area
+ * - .app-content: Graph canvas + sidebar row
+ * - .app-footer: Footer bar at bottom of canvas area
+ */
+
+/* ============================================================================
+ * APP SHELL
+ * Root flex container spanning full viewport height
+ * ============================================================================ */
+
+.app-shell { display: flex; flex-direction: column; height: 100vh; }
+
+/* ============================================================================
+ * APP HEADER
+ * Fixed header bar with app title, layer tabs, and controls
+ * ============================================================================ */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 20px;
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;  /* Prevent header from shrinking */
+  z-index: 10;     /* Above graph canvas */
+}
+
+/* App title styling in header */
+.app-header h1 {
+  font-size: calc(15px * var(--ui-scale));
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================================
+ * APP BODY & CONTENT
+ * Main content area below header containing graph and sidebar.
+ * ============================================================================ */
+
+/* Flex container for flow bar + content row */
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Inner row containing graph canvas + sidebar - fills remaining height */
+.app-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================================================
+ * CANVAS AREA
+ * Container for the layer visualization (graph or rack) and footer.
+ * Uses absolute positioning so the canvas gets concrete pixel dimensions.
+ * ============================================================================ */
+
+/* Flex-fill container with relative positioning for absolute children */
+.canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Visualization canvas - absolute fill with space for footer bar.
+   Canvas libraries require concrete pixel dimensions, so we use absolute
+   positioning instead of flex which can cause dimension miscalculation. */
+.canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 30px;      /* Leave space for app-footer */
+  background: var(--bg);
+}
+
+/* ============================================================================
+ * SIDEBAR CONTAINER
+ * Right-side panel macro-layout structure.
+ * 
+ * Note: This class lives in base/layout.css rather than a components/ file 
+ * because it defines the structural "skeleton" of the application. It sets 
+ * the physical constraints, overall dimensions, and boundaries of the panel 
+ * within the main flex view.
+ * 
+ * The actual contents (like forms, buttons, lists, or specific widgets) 
+ * inside the sidebar should be styled in individual component CSS files.
+ * ============================================================================ */
+
+.app-sidebar {
+  width: 320px;
+  min-width: 220px;
+  max-width: 560px;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ============================================================================
+ * APP FOOTER
+ * Macro-layout footer bar structure pinned to bottom of canvas area.
+ *
+ * Note: This class lives in base/layout.css rather than a components/ file
+ * because it defines the structural "skeleton" of the application. It sets
+ * the physical constraints, positioning, and boundaries of the footer
+ * within the main flex view.
+ *
+ * The actual contents (like layer description text, links, or widgets)
+ * inside the footer should be styled in individual component CSS files.
+ * ============================================================================ */
+
+.app-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
