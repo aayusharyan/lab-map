@@ -32,7 +32,7 @@
 
 import { createContext } from 'react';
 
-import type { ValidationWarning } from '@/utils/validationWarning';
+import type { ValidationWarning, ValidationWarningInput } from '@/utils/validationWarning';
 
 /* ============================================================================
  * STATE INTERFACE
@@ -72,11 +72,12 @@ export interface AppState {
  * and optional payload properties.
  *
  * Validation Actions:
- * - SET_VALIDATION_WARNINGS: Replace the current warning list
+ * - ADD_VALIDATION_WARNING: Add one warning at a time from raw warning input
+ *   while computing the hash inside AppContext
  * - DISMISS_VALIDATION_WARNING: Hide one warning until its trace changes
  */
 export type AppAction =
-  | { type: 'SET_VALIDATION_WARNINGS'; warnings: ValidationWarning[] }
+  | { type: 'ADD_VALIDATION_WARNING'; warning: ValidationWarningInput }
   | { type: 'DISMISS_VALIDATION_WARNING'; hash: string };
 
 /* ============================================================================
@@ -97,12 +98,11 @@ export type AppAction =
  * // In a component (use the hook instead of direct context access)
  * const { state, dispatch } = useAppContext();
  * dispatch({
- *   type: 'SET_VALIDATION_WARNINGS',
- *   warnings: [{
+ *   type: 'ADD_VALIDATION_WARNING',
+ *   warning: {
  *     message: 'Current file has validation errors.',
  *     trace: ['traffic.json', '/flows/0'],
- *     hash: 'abc123',
- *   }],
+ *   },
  * });
  */
 export const AppContext = createContext<{
