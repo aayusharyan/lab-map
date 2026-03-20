@@ -27,7 +27,7 @@
 
 import { createContext } from 'react';
 
-import type { LayerId, ThemeId } from '@/types/topology';
+import type { PageId, ThemeId } from '@/types/topology';
 
 export const NODE_FONT_SIZES = [11, 13, 15, 17, 19] as const;
 
@@ -38,7 +38,7 @@ export type NodeFontSize = (typeof NODE_FONT_SIZES)[number];
  *
  * These settings control application behavior and appearance.
  *
- * @property {LayerId} defaultLayer - Layer shown on app load
+ * @property {PageId} defaultPage - Page shown on app load
  * @property {ThemeId} theme - Color theme preference
  * @property {NodeFontSize} nodeFontSize - Font size for node labels (pixels)
  * @property {boolean} scrollToZoom - Enable scroll-to-zoom on canvas
@@ -48,7 +48,7 @@ export type NodeFontSize = (typeof NODE_FONT_SIZES)[number];
  * @property {boolean} nodeAnimation - Enable animated node movement
  */
 export interface AppSettings {
-  defaultLayer: LayerId;
+  defaultPage: PageId;
   theme: ThemeId;
   nodeFontSize: NodeFontSize;
   scrollToZoom: boolean;
@@ -91,7 +91,7 @@ export interface SettingsState {
  *
  * Setting Updates:
  * - SET_THEME: Change color theme preference
- * - SET_DEFAULT_LAYER: Change default layer shown on app load
+ * - SET_DEFAULT_PAGE: Change default page shown on app load
  * - SET_NODE_FONT_SIZE: Change node label font size
  * - SET_SCROLL_TO_ZOOM: Toggle scroll-to-zoom behavior
  * - SET_NODE_LABEL_VISIBILITY: Toggle node label visibility
@@ -106,7 +106,7 @@ export interface SettingsState {
 export type SettingsAction =
   | { type: 'LOAD_SETTINGS'; settings: Partial<AppSettings> }
   | { type: 'SET_THEME'; theme: ThemeId }
-  | { type: 'SET_DEFAULT_LAYER'; layer: LayerId }
+  | { type: 'SET_DEFAULT_PAGE'; page: PageId }
   | { type: 'SET_NODE_FONT_SIZE'; size: NodeFontSize }
   | { type: 'SET_SCROLL_TO_ZOOM'; enabled: boolean }
   | { type: 'SET_NODE_LABEL_VISIBILITY'; visible: boolean }
