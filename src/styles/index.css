@@ -1,0 +1,12 @@
+/**
+ * @file index.css
+ * @description Main CSS entry point - imports base/foundational styles only
+ *
+ * Component styles are imported by their respective component files.
+ */
+
+@import './base/fonts.css';
+@import './base/variables.css';
+@import './base/reset.css';
+@import './base/layout.css';
+@import './base/buttons.css';
