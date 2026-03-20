@@ -14,7 +14,7 @@
  * - SettingsContext: React Context instance for settings distribution
  *
  * Settings vs App State:
- * - Settings: User preferences resolved from localStorage/settings.json
+ * - Settings: User preferences resolved from localStorage/default_settings.json
  * - App State: Runtime UI state like the settings panel visibility
  *
  * @see SettingsContext.tsx - Provider component and reducer implementation
@@ -28,7 +28,7 @@
 import { createContext } from 'react';
 
 import type { PageId } from '@/types/page';
-import type { ThemeId } from '@/types/topology';
+import type { ThemeId } from '@/types/theme';
 
 /**
  * Valid font size values in pixels.
