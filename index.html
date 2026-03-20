@@ -58,7 +58,7 @@
     body {
       margin: 0;
       /* Use theme-aware background immediately */
-      background: var(--initial-bg, #0f1117);
+      background: var(--initial-bg, #f0f2f7);
     }
   </style>
 </head>
@@ -67,7 +67,7 @@
   <div id="root">
     <!-- Loading fallback: shown until React mounts, then replaced -->
     <div id="fallback"
-      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: var(--initial-bg, #0f1117); color: var(--initial-text, #e8eaf0); text-align: center; padding: 2rem;">
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: var(--initial-bg, #f0f2f7); color: var(--initial-text, #111827); text-align: center; padding: 2rem;">
       <img src="/favicon-192.png" alt="Lab Map" style="width: 64px; height: 64px; margin-bottom: 1.5rem;" />
       <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Loading Lab Map...</h1>
       <p style="opacity: 0.7; max-width: 400px;">If this message persists, please ensure JavaScript is enabled in your
@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <!-- Noscript fallback: shown when JavaScript is disabled (uses dark theme as default) -->
+  <!-- Noscript fallback: shown when JavaScript is disabled (uses light theme as default) -->
   <noscript>
     <style>
       #fallback {
@@ -86,7 +86,7 @@
       }
     </style>
     <div
-      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: #0f1117; color: #e8eaf0; text-align: center; padding: 2rem;">
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif; background: #f0f2f7; color: #111827; text-align: center; padding: 2rem;">
       <img src="/favicon-192.png" alt="Lab Map" style="width: 64px; height: 64px; margin-bottom: 1.5rem;" />
       <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">JavaScript Required</h1>
       <p style="opacity: 0.7; max-width: 400px;">Lab Map requires JavaScript to run. Please enable JavaScript in your
