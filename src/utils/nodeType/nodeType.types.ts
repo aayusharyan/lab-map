@@ -13,7 +13,7 @@
  *
  * Data Flow:
  * 1. NODE_TYPES stores `Record<string, NodeType>`
- * 2. Raw nodes resolve a type key (e.g., "server-rack-1u-compute")
+ * 2. Raw nodes resolve a type key (e.g., "server-rack-1u-compute-1")
  * 3. page.ts maps that type to vis-network image/color/scale/font values
  * 4. Sidebar/Legend reuse the same type for labels/icons
  *
@@ -37,16 +37,19 @@
  * Keeping both in one model ensures a single source of truth for
  * graph rendering and sidebar/legend display.
  *
- * @property {string} type - Node type identifier (e.g., "desktop-router")
+ * @property {string} type - Node type identifier (e.g., "desktop-router-1")
  * @property {string} label - Human-readable name (e.g., "Desktop Router")
- * @property {string} iconURL - URL path to the node icon asset
+ * @property {{ dark: string; light: string }} iconURL - Theme-specific icon asset paths
  * @property {{ dark: string; light: string }} color - Theme-specific accent colors
  * @property {number} iconSizeScale - Per-type icon size scale for vis-network
  */
 export interface NodeType {
   type: string;
   label: string;
-  iconURL: string;
+  iconURL: {
+    dark: string;
+    light: string;
+  };
   color: {
     dark: string;
     light: string;
