@@ -1,0 +1,191 @@
+/**
+ * @file Legend.module.css
+ * @description Styles for legend panel component
+ *
+ * Collapsible legend at bottom of sidebar showing node/edge types.
+ * Supports drag-to-resize height.
+ */
+
+/* ============================================================================
+ * LEGEND CONTAINER
+ * ============================================================================ */
+
+.legend {
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  flex-shrink: 0;
+  background: var(--surface);
+  position: relative;
+}
+
+/* ============================================================================
+ * RESIZE HANDLE
+ * ============================================================================ */
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Grip indicator visibility on hover/active */
+.resizeHandle:hover .resizeGrip,
+.resizeHandle:active .resizeGrip {
+  opacity: 1;
+}
+
+/* Visual grip element */
+.resizeGrip {
+  width: 32px;
+  height: 3px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  opacity: 0.3;
+  transition: opacity 0.15s;
+}
+
+/* ============================================================================
+ * HEADER
+ * Clickable header row — title + chevron
+ * ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  user-select: none;
+}
+
+.header:hover .title { color: var(--text); }
+
+/* Legend title text */
+.title {
+  font-size: calc(11px * var(--ui-scale));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+/* Collapse/expand chevron indicator */
+.chevron {
+  font-size: calc(13px * var(--ui-scale));
+  color: var(--text-muted);
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.chevronClosed { transform: rotate(-90deg); }
+
+/* ============================================================================
+ * ITEMS CONTAINER
+ * Scrollable area containing legend entries with collapse animation.
+ * ============================================================================ */
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 200px;
+  margin-top: 8px;
+  transition: max-height 0.25s ease, margin-top 0.2s ease, opacity 0.2s ease;
+  opacity: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
+}
+
+/* Webkit scrollbar styling */
+.items::-webkit-scrollbar {
+  width: 4px;
+}
+.items::-webkit-scrollbar-track {
+  background: transparent;
+}
+.items::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 2px;
+  opacity: 0.5;
+}
+
+/* Collapsed state */
+.itemsCollapsed {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* Responsive legend height adjustments */
+@media (max-height: 600px) {
+  .items { max-height: 100px; }
+}
+@media (max-height: 500px) {
+  .items { max-height: 80px; }
+}
+
+/* ============================================================================
+ * GROUPS AND ITEMS
+ * Individual legend entries with shape icons and labels.
+ * ============================================================================ */
+
+/* Group container (Nodes, Connections) */
+.group { display: flex; flex-direction: column; gap: 4px; }
+
+/* Group label (uppercase accent) */
+.groupLabel {
+  font-size: calc(10px * var(--ui-scale));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent2);
+  margin-bottom: 2px;
+}
+
+/* Individual legend item */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(11px * var(--ui-scale));
+  color: var(--text-muted);
+}
+
+/* Ensure icons remain vivid (not muted like text) */
+.item img,
+.item svg {
+  opacity: 1;
+  filter: none;
+}
+
+/* Line indicator for edge types */
+.line {
+  width: 24px;
+  height: 2px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Dashed line variant */
+.lineDashed {
+  background: transparent !important;
+  border-bottom: 2px dashed;
+}
