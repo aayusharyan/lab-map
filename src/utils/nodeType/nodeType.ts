@@ -31,6 +31,8 @@
  * ============================================================================ */
 
 import type { NodeType } from './nodeType.types';
+import type { ThemeId } from '@/types/theme';
+import { getSystemTheme } from '@/utils/theme';
 
 /* ============================================================================
  * CONSTANTS
@@ -215,16 +217,17 @@ export function resolveNodeType(type: string | undefined): NodeType | undefined 
  * Resolve a node theme color for the active theme.
  *
  * @param {NodeType | undefined} nodeType - Resolved node type config
- * @param {'dark' | 'light'} theme - Active resolved theme
- * @param {string} [fallback='#888'] - Fallback color when missing
+ * @param {ThemeId} theme - Active theme preference (dark, light, or system)
+ * @param {string} [fallbackColor='#888'] - Fallback color when missing
  * @returns {string} Theme-specific accent color
  */
 export function getNodeThemeColor(
   nodeType: NodeType | undefined,
-  theme: 'dark' | 'light',
-  fallback = '#888'
+  theme: ThemeId,
+  fallbackColor = '#888'
 ) {
-  return nodeType?.color?.[theme] ?? fallback;
+  const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
+  return nodeType?.color?.[resolvedTheme] ?? fallbackColor;
 }
 
 /**
