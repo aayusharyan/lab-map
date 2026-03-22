@@ -1,0 +1,33 @@
+/**
+ * @file PageTabs.module.css
+ * @description Styles for page navigation tabs
+ *
+ * Horizontal tab buttons for switching between network pages.
+ * Physical, Traffic, VLAN, and Rack views.
+ */
+
+/* Tab container with small gaps between pills */
+.tabs { display: flex; gap: 4px; }
+
+/* Individual tab button - pill style */
+.tab {
+  padding: 5px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: calc(13px * var(--ui-scale));
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+/* Tab hover state */
+.tab:hover { background: var(--surface2); color: var(--text); }
+
+/* Active tab - filled with accent color */
+.active {
+  background: var(--tab-active);
+  border-color: var(--tab-active);
+  color: #fff;
+}
