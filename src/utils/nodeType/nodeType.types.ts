@@ -12,7 +12,7 @@
  * 1. NodeType - Canonical node definition used across render + UI paths
  *
  * Data Flow:
- * 1. NODE_TYPES stores `Record<string, NodeType>`
+ * 1. NODE_TYPES stores `Record<NodeTypeId, NodeType>`
  * 2. Raw nodes resolve a type key (e.g., "server-rack-1u-compute-1")
  * 3. page.ts maps that type to vis-network image/color/scale/font values
  * 4. Sidebar/Legend reuse the same type for labels/icons
@@ -37,7 +37,7 @@
  * Keeping both in one model ensures a single source of truth for
  * graph rendering and sidebar/legend display.
  *
- * @property {string} type - Node type identifier (e.g., "desktop-router-1")
+ * @property {string} type - Canonical node type identifier matching NODE_TYPES key (e.g., "desktop-router-1")
  * @property {string} label - Human-readable name (e.g., "Desktop Router")
  * @property {{ dark: string; light: string }} iconURL - Theme-specific icon asset paths
  * @property {{ dark: string; light: string }} color - Theme-specific accent colors
