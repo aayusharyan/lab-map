@@ -14,6 +14,9 @@
  * - Types:
  *   - EdgeType
  *   - EdgeTypeId
+ *
+ * Import style:
+ * import { EDGE_TYPES, isEdgeType, type EdgeType } from '@/utils/edgeType';
  */
 
 export {
