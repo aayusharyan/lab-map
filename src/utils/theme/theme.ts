@@ -1,13 +1,17 @@
 /**
  * @file theme.ts
- * @description Canonical theme helpers for runtime theme resolution
+ * @description Canonical theme registry and runtime resolution helpers
  *
  * This module provides the core runtime logic for converting user theme
  * preferences into concrete theme values used by rendering and styling code.
  *
  * Exports:
- * - THEME_IDS: Canonical list of all valid theme preference identifiers
+ * - THEMES: Canonical theme registry keyed by theme ID
+ * - THEME_IDS: Canonical list of all registry keys
+ * - ThemeId: Union of canonical theme IDs
+ * - ResolvedTheme: Concrete runtime theme (`dark | light`)
  * - isThemeId: Type guard for validating unknown theme values
+ * - getThemeOrThrow: Resolve a raw key and throw on unknown type
  * - getSystemTheme: Browser/OS color-scheme resolver with SSR-safe fallback
  * - resolveTheme: Bridge from persisted `ThemeId` to concrete `ResolvedTheme`
  *
@@ -15,7 +19,6 @@
  * - `ThemeId` represents persisted user preference (`dark | light | system`)
  * - `ResolvedTheme` is concrete runtime theme (`dark | light`)
  *
- * @see theme.types.ts - Shared ThemeId and ResolvedTheme model
  * @see edgeType.ts - Theme-aware edge color resolution
  * @see nodeType.ts - Theme-aware node color resolution
  */
@@ -24,19 +27,28 @@
  * IMPORTS
  * ============================================================================ */
 
-import type { ThemeId, ResolvedTheme } from './theme.types';
+import type { Theme, ThemeId, ResolvedTheme } from './theme.types';
+
+const defineThemes = <T extends Record<ThemeId, Theme>>(themes: T) => themes;
 
 /* ============================================================================
- * THEME IDENTIFIERS
+ * THEME REGISTRY
  * ============================================================================ */
 
 /**
- * Canonical theme preference identifiers.
- *
- * Keep this aligned with `ThemeId` in `theme.types.ts`.
- * Used by settings UIs, validation helpers, and persistence boundaries.
+ * Canonical theme registry keyed by theme ID.
  */
-export const THEME_IDS: ThemeId[] = ['dark', 'light', 'system'];
+const THEMES_MAP = defineThemes({
+  dark: { id: 'dark', label: 'Dark' },
+  light: { id: 'light', label: 'Light' },
+  system: { id: 'system', label: 'System Defined' },
+});
+
+/**
+ * Canonical theme IDs and registry exports.
+ */
+export const THEMES: Record<ThemeId, Theme> = THEMES_MAP;
+export const THEME_IDS = Object.keys(THEMES_MAP) as ThemeId[];
 
 /* ============================================================================
  * TYPE GUARDS
@@ -52,7 +64,21 @@ export const THEME_IDS: ThemeId[] = ['dark', 'light', 'system'];
  * @returns {boolean} True when value is a canonical ThemeId
  */
 export function isThemeId(value: string): value is ThemeId {
-  return THEME_IDS.includes(value as ThemeId);
+  return Object.prototype.hasOwnProperty.call(THEMES_MAP, value);
+}
+
+/**
+ * Resolve a raw theme key and throw when the type is unknown.
+ *
+ * @param {string | undefined} type - Raw theme key
+ * @returns {Theme} Canonical theme metadata
+ */
+export function getThemeOrThrow(type: string | undefined): Theme {
+  const resolved = type && isThemeId(type) ? THEMES[type] : undefined;
+  if (!resolved) {
+    throw new Error(`Unknown theme type: "${type ?? '(missing)'}"`);
+  }
+  return resolved;
 }
 
 /* ============================================================================
@@ -96,4 +122,3 @@ export function resolveTheme(
 ): ResolvedTheme {
   return theme === 'system' ? systemTheme : theme;
 }
-
