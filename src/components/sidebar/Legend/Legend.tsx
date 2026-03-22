@@ -2,25 +2,38 @@
  * @file Legend.tsx
  * @description Collapsible legend component showing node/edge types
  *
- * This component renders a collapsible legend panel in the sidebar
- * showing the node and edge types available in the current page.
- * Each type is displayed with its themed icon and label.
+ * This is a fully modular display component that receives pre-built
+ * legend items from the parent (Sidebar). It has no direct dependencies
+ * on style configurations - all display data comes via props.
  *
  * Features:
  * - Collapsible panel with toggle button
  * - Drag-to-resize height
- * - Page-aware type display
- * - Themed image icons for nodes (all nodes are image-based)
- * - Line style indicators for edges
- *
- * Node icons are loaded from public/node-icons/{type}/ with dark.svg
- * or light.svg variants based on the current theme.
+ * - Persisted open/height state via localStorage
+ * - Image icons for nodes
+ * - Line style indicators for edges (solid/dashed)
  *
  * @example
- * <Legend />
+ * const nodeItems = [
+ *   {
+ *     type: 'desktop-router-1',
+ *     label: 'Desktop Router/Firewall - Variant 1',
+ *     iconURL: {
+ *       dark: '/node-icons/desktop-router-1/dark.svg',
+ *       light: '/node-icons/desktop-router-1/light.svg',
+ *     },
+ *     color: { dark: '#e74c3c', light: '#c62828' },
+ *     iconSizeScale: 36,
+ *   },
+ * ];
+ * const edgeItems = [
+ *   { type: 'wan', label: 'WAN Uplink', color: { dark: '#38bdf8', light: '#0277bd' }, width: 1.5, dashes: false },
+ *   { type: 'trunk', label: 'Trunk (multi-VLAN)', color: { dark: '#e67e22', light: '#d35400' }, width: 1.5, dashes: [6, 3] },
+ * ];
  *
- * @see Sidebar.tsx - Parent component
- * @see config.ts - NODE_STYLES, EDGE_STYLES, PAGES
+ * <Legend nodeItems={nodeItems} edgeItems={edgeItems} />
+ *
+ * @see Sidebar.tsx - Parent component (builds legend items)
  */
 
 /* ============================================================================
@@ -29,10 +42,9 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-import { useActivePage } from '@/hooks/useActivePage';
 import { useTheme } from '@/hooks/useTheme';
-import { PAGES, NODE_STYLES, EDGE_STYLES, TYPE_LABELS } from '@/utils/config';
-import { getThemedImagePath } from '@/utils/theme';
+import type { EdgeType } from '@/utils/edgeType';
+import type { NodeType } from '@/utils/nodeType';
 
 import styles from './Legend.module.css';
 
@@ -40,7 +52,7 @@ import styles from './Legend.module.css';
  * CONSTANTS
  * ============================================================================ */
 
-/** localStorage key for persisting legend state */
+/** localStorage key for persisting legend state. */
 const STORAGE_KEY = 'lab-map-legend-state';
 
 /** Height bounds for legend panel (in pixels) */
@@ -52,13 +64,24 @@ const MAX_HEIGHT = 400;
  * ============================================================================ */
 
 /**
+ * Props for Legend component.
+ *
+ * @property {NodeType[]} nodeItems - Node type display info
+ * @property {EdgeType[]} edgeItems - Edge type display info
+ */
+interface Props {
+  nodeItems: NodeType[];
+  edgeItems: EdgeType[];
+}
+
+/**
  * Persisted legend state stored in localStorage.
  *
- * @property {boolean} open - Whether the legend panel is expanded
+ * @property {boolean} isOpen - Whether the legend panel is expanded
  * @property {number | null} height - Custom height in pixels, or null for default
  */
 interface LegendPersistedState {
-  open: boolean;
+  isOpen: boolean;
   height: number | null;
 }
 
@@ -75,10 +98,10 @@ interface LegendPersistedState {
 function loadPersistedState(): LegendPersistedState {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return { open: true, height: null };
+    if (!stored) return { isOpen: true, height: null };
 
     const parsed = JSON.parse(stored) as Partial<LegendPersistedState>;
-    const open = typeof parsed.open === 'boolean' ? parsed.open : true;
+    const isOpen = typeof parsed.isOpen === 'boolean' ? parsed.isOpen : true;
 
     /* Validate height is within bounds (browser window may have changed) */
     let height: number | null = null;
@@ -86,9 +109,9 @@ function loadPersistedState(): LegendPersistedState {
       height = parsed.height;
     }
 
-    return { open, height };
+    return { isOpen, height };
   } catch {
-    return { open: true, height: null };
+    return { isOpen: true, height: null };
   }
 }
 
@@ -110,20 +133,20 @@ function savePersistedState(state: LegendPersistedState): void {
  * ============================================================================ */
 
 /**
- * Render node icon from themed SVG image.
+ * Render node icon from themed SVG iconURL.
  *
- * All nodes in Lab Map are image-based. Icons are loaded from
+ * All nodes in Lab Map are iconURL-based. Icons are loaded from
  * public/node-icons/{type}/ with dark.svg or light.svg variants.
  *
  * @param {object} props - Component props
- * @param {string} props.image - Path to the themed icon image
+ * @param {string} props.iconURL - Path to the themed icon iconURL
  * @returns {JSX.Element} Image element for the node icon
  */
-function NodeIcon({ image }: { image: string }) {
+function NodeIcon({ iconURL }: { iconURL: string }) {
   const S = 18;
   return (
     <img
-      src={image}
+      src={iconURL}
       alt=""
       aria-hidden="true"
       width="28"
@@ -140,14 +163,16 @@ function NodeIcon({ image }: { image: string }) {
 /**
  * Legend component - collapsible panel showing node/edge types.
  *
- * Displays types available in the current page with themed image
+ * Displays types available in the current page with themed iconURL
  * icons for nodes and line styles for edges. Panel can be collapsed
  * and resized via drag handle.
  *
- * @returns {JSX.Element | null} Legend element or null if no page config
+ * @param {Props} props - Component props
+ * @param {NodeType[]} props.nodeItems - Canonical node type items
+ * @param {EdgeType[]} props.edgeItems - Canonical edge type items
+ * @returns {JSX.Element} Legend element
  */
-export function Legend() {
-  const activePage = useActivePage();
+export function Legend({ nodeItems, edgeItems }: Props) {
   const { resolvedTheme } = useTheme();
 
   /** Load persisted state once on mount */
@@ -157,20 +182,20 @@ export function Legend() {
   }
 
   /** Open/closed state for collapsible panel */
-  const [open, setOpen] = useState(initialState.current.open);
+  const [isOpen, setIsOpen] = useState(initialState.current.isOpen);
 
   /** Ref for container element (used for resize) */
   const containerRef = useRef<HTMLDivElement>(null);
 
   /** Drag state for resize */
-  const dragging = useRef(false);
+  const isDragging = useRef(false);
   const startY = useRef(0);
   const startH = useRef(0);
   const customHeight = useRef<number | null>(initialState.current.height);
 
   /** Apply persisted height on mount */
   useEffect(() => {
-    if (containerRef.current && customHeight.current !== null && open) {
+    if (containerRef.current && customHeight.current !== null && isOpen) {
       containerRef.current.style.maxHeight = customHeight.current + 'px';
     }
   }, []);
@@ -180,18 +205,18 @@ export function Legend() {
    * Restores custom height when reopening and persists state.
    */
   const handleToggle = useCallback(() => {
-    setOpen(prev => {
-      const next = !prev;
+    setIsOpen(prev => {
+      const isNextOpen = !prev;
       if (containerRef.current) {
-        if (next && customHeight.current) {
+        if (isNextOpen && customHeight.current) {
           containerRef.current.style.maxHeight = customHeight.current + 'px';
-        } else if (!next) {
+        } else if (!isNextOpen) {
           containerRef.current.style.maxHeight = '';
         }
       }
       /* Persist state to localStorage */
-      savePersistedState({ open: next, height: customHeight.current });
-      return next;
+      savePersistedState({ isOpen: isNextOpen, height: customHeight.current });
+      return isNextOpen;
     });
   }, []);
 
@@ -202,7 +227,7 @@ export function Legend() {
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!containerRef.current) return;
     e.preventDefault();
-    dragging.current = true;
+    isDragging.current = true;
     startY.current = e.clientY;
     startH.current = containerRef.current.offsetHeight;
     document.body.style.cursor = 'ns-resize';
@@ -210,7 +235,7 @@ export function Legend() {
     containerRef.current.style.transition = 'none';
 
     const onMove = (ev: MouseEvent) => {
-      if (!dragging.current || !containerRef.current) return;
+      if (!isDragging.current || !containerRef.current) return;
       const delta = startY.current - ev.clientY;
       const newH = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startH.current + delta));
       containerRef.current.style.maxHeight = newH + 'px';
@@ -218,14 +243,14 @@ export function Legend() {
     };
 
     const onUp = () => {
-      dragging.current = false;
+      isDragging.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
       if (containerRef.current) {
         containerRef.current.style.transition = '';
       }
       /* Persist height to localStorage after drag ends */
-      savePersistedState({ open: true, height: customHeight.current });
+      savePersistedState({ isOpen: true, height: customHeight.current });
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
     };
@@ -234,14 +259,10 @@ export function Legend() {
     document.addEventListener('mouseup', onUp);
   }, []);
 
-  /* Get page config */
-  const pageConfig = PAGES[activePage];
-  if (!pageConfig) return null;
-
   return (
     <div className={styles.legend}>
       {/* Resize handle (only shown when open) */}
-      {open && (
+      {isOpen && (
         <div className={styles.resizeHandle} onMouseDown={handleMouseDown}>
           <span className={styles.resizeGrip} />
         </div>
@@ -250,42 +271,35 @@ export function Legend() {
       {/* Toggle header button */}
       <button className={styles.header} onClick={handleToggle}>
         <span className={styles.title}>Legend</span>
-        <span className={`${styles.chevron}${open ? '' : ` ${styles.chevronClosed}`}`}>▾</span>
+        <span className={`${styles.chevron}${isOpen ? '' : ` ${styles.chevronClosed}`}`}>▾</span>
       </button>
 
       {/* Collapsible content area */}
       <div
         ref={containerRef}
-        className={`${styles.items}${open ? '' : ` ${styles.itemsCollapsed}`}`}
+        className={`${styles.items}${isOpen ? '' : ` ${styles.itemsCollapsed}`}`}
       >
-        {/* Node types group - all nodes are image-based */}
+        {/* Node types group - all nodes are iconURL-based */}
         <div className={styles.group}>
           <span className={styles.groupLabel}>Nodes</span>
-          {pageConfig.nodeTypes.map(type => {
-            const style = NODE_STYLES[type];
-            if (!style?.image) return null;
-            const image = getThemedImagePath(style.image, resolvedTheme);
-            return (
-              <div key={type} className={styles.item}>
-                <NodeIcon image={image} />
-                <span>{TYPE_LABELS.node[type] || type}</span>
-              </div>
-            );
-          })}
+          {nodeItems.map((item, index) => (
+            <div key={index} className={styles.item}>
+              <NodeIcon iconURL={resolvedTheme === 'dark' ? item.iconURL.dark : item.iconURL.light} />
+              <span>{item.label}</span>
+            </div>
+          ))}
         </div>
 
         {/* Edge types group */}
         <div className={styles.group}>
           <span className={styles.groupLabel}>Connections</span>
-          {pageConfig.edgeTypes.map(type => {
-            const style = EDGE_STYLES[type];
-            if (!style) return null;
-            const color = style.color?.color || '#666';
-            const isDashed = style.dashes;
+          {edgeItems.map((item, index) => {
+            const isDashed = item.dashes !== false;
+            const edgeColor = resolvedTheme === 'dark' ? item.color.dark : item.color.light;
             return (
-              <div key={type} className={styles.item}>
-                <span className={`${styles.line}${isDashed ? ` ${styles.lineDashed}` : ''}`} style={{ background: color, borderColor: color }} />
-                <span>{TYPE_LABELS.edge[type] || type}</span>
+              <div key={index} className={styles.item}>
+                <span className={`${styles.line}${isDashed ? ` ${styles.lineDashed}` : ''}`} style={{ background: edgeColor, borderColor: edgeColor }} />
+                <span>{item.label}</span>
               </div>
             );
           })}
