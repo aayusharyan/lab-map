@@ -29,8 +29,7 @@
  * ============================================================================ */
 
 import { useActivePage } from '@/hooks/useActivePage';
-import type { PageId } from '@/types/page';
-import { PAGE_TABS } from '@/utils/page';
+import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
 import { navigateTo } from '@/utils/routing';
 
 import styles from './PageTabs.module.css';
@@ -62,16 +61,16 @@ export function PageTabs() {
 
   return (
     <nav className={styles.tabs} role="tablist">
-      {PAGE_TABS.map(tab => (
+      {PAGE_IDS.map((pageId) => (
         <button
-          key={tab.id}
-          className={`${styles.tab}${activePage === tab.id ? ` ${styles.active}` : ''}`}
+          key={pageId}
+          className={`${styles.tab}${activePage === pageId ? ` ${styles.active}` : ''}`}
           role="tab"
-          aria-selected={activePage === tab.id}
-          title={tab.title}
-          onClick={() => handleClick(tab.id)}
+          aria-selected={activePage === pageId}
+          title={PAGES[pageId].title}
+          onClick={() => handleClick(pageId)}
         >
-          {tab.label}
+          {PAGES[pageId].label}
         </button>
       ))}
     </nav>
