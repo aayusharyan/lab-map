@@ -61,7 +61,8 @@ import { isThemeId, resolveTheme } from '@/utils/theme';
  * provide a value.
  *
  * These defaults provide a reasonable out-of-the-box experience:
- * - Light theme (clean default for broad compatibility)
+ * - System theme (clean default for broad compatibility, if the system theme is not available
+ *   it will fall back to light theme)
  * - Physical page as default (most common starting point)
  * - Moderate font size
  * - All features enabled
@@ -138,14 +139,14 @@ function loadUserPreferences(): Partial<AppSettings> {
     const scrollToZoom = localStorage.getItem(STORAGE_KEYS.scrollToZoom);
     if (scrollToZoom) prefs.scrollToZoom = scrollToZoom === 'true';
 
-    const showNodeLabels = localStorage.getItem(STORAGE_KEYS.showNodeLabels);
-    if (showNodeLabels) prefs.showNodeLabels = showNodeLabels === 'true';
+    const storedNodeLabelVisibility = localStorage.getItem(STORAGE_KEYS.showNodeLabels);
+    if (storedNodeLabelVisibility) prefs.showNodeLabels = storedNodeLabelVisibility === 'true';
 
-    const showLegend = localStorage.getItem(STORAGE_KEYS.showLegend);
-    if (showLegend) prefs.showLegend = showLegend === 'true';
+    const storedLegendVisibility = localStorage.getItem(STORAGE_KEYS.showLegend);
+    if (storedLegendVisibility) prefs.showLegend = storedLegendVisibility === 'true';
 
-    const showEdgeLabels = localStorage.getItem(STORAGE_KEYS.showEdgeLabels);
-    if (showEdgeLabels) prefs.showEdgeLabels = showEdgeLabels === 'true';
+    const storedEdgeLabelVisibility = localStorage.getItem(STORAGE_KEYS.showEdgeLabels);
+    if (storedEdgeLabelVisibility) prefs.showEdgeLabels = storedEdgeLabelVisibility === 'true';
 
     const nodeAnimation = localStorage.getItem(STORAGE_KEYS.nodeAnimation);
     if (nodeAnimation) prefs.nodeAnimation = nodeAnimation === 'true';
@@ -239,17 +240,17 @@ function coerceFontSize(value: unknown): FontSize {
  */
 function createInitialSettingsState(): {
   state: SettingsState;
-  hasStoredSettings: boolean;
+  isStoredSettingsAvailable: boolean;
 } {
   const userPrefs = loadUserPreferences();
-  const hasStoredSettings = Object.keys(userPrefs).length > 0;
+  const isStoredSettingsAvailable = Object.keys(userPrefs).length > 0;
 
   return {
     state: {
       settings: mergeSettings(userPrefs, {}),
       isPanelOpen: false,
     },
-    hasStoredSettings,
+    isStoredSettingsAvailable,
   };
 }
 
@@ -308,25 +309,25 @@ function reducer(state: SettingsState, action: SettingsAction): SettingsState {
      * Toggle scroll-to-zoom behavior.
      */
     case 'SET_SCROLL_TO_ZOOM':
-      return { ...state, settings: { ...state.settings, scrollToZoom: action.enabled } };
+      return { ...state, settings: { ...state.settings, scrollToZoom: action.isEnabled } };
 
     /**
      * Toggle node label visibility.
      */
     case 'SET_NODE_LABEL_VISIBILITY':
-      return { ...state, settings: { ...state.settings, showNodeLabels: action.visible } };
+      return { ...state, settings: { ...state.settings, showNodeLabels: action.isVisible } };
 
     /**
      * Toggle legend visibility.
      */
     case 'SET_LEGEND_VISIBILITY':
-      return { ...state, settings: { ...state.settings, showLegend: action.visible } };
+      return { ...state, settings: { ...state.settings, showLegend: action.isVisible } };
 
     /**
      * Toggle edge label visibility.
      */
     case 'SET_EDGE_LABEL_VISIBILITY':
-      return { ...state, settings: { ...state.settings, showEdgeLabels: action.visible } };
+      return { ...state, settings: { ...state.settings, showEdgeLabels: action.isVisible } };
 
     /**
      * Toggle animated node movement in graph view.
@@ -336,7 +337,7 @@ function reducer(state: SettingsState, action: SettingsAction): SettingsState {
         ...state,
         settings: {
           ...state.settings,
-          nodeAnimation: action.enabled,
+          nodeAnimation: action.isEnabled,
         },
       };
 
@@ -390,7 +391,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   /**
    * Compute the startup snapshot once for this provider instance.
    */
-  const [{ state: initialState, hasStoredSettings }] = useState(createInitialSettingsState);
+  const [{ state: initialState, isStoredSettingsAvailable }] = useState(createInitialSettingsState);
 
   /**
    * Initialize reducer with the resolved startup state.
@@ -400,13 +401,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   /**
    * Internal bootstrap flag used to hide async initialization from consumers.
    */
-  const [isBootstrapping, setIsBootstrapping] = useState(!hasStoredSettings);
+  const [isBootstrapping, setIsBootstrapping] = useState(!isStoredSettingsAvailable);
 
   /**
    * Bootstrap default_settings.json only for first-run visits without localStorage.
    */
   useEffect(() => {
-    if (hasStoredSettings) return;
+    if (isStoredSettingsAvailable) return;
 
     fetch('/data/default_settings.json')
       .then((res) => res.json())
@@ -421,7 +422,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       .finally(() => {
         setIsBootstrapping(false);
       });
-  }, [hasStoredSettings]);
+  }, [isStoredSettingsAvailable]);
 
   /**
    * Sync theme to DOM once bootstrap is complete.
