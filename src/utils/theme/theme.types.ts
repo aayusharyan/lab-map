@@ -1,36 +1,54 @@
 /**
  * @file theme.types.ts
- * @description Shared theme identity types for styling, settings, and theme-aware utilities
+ * @description Theme type definitions for preference and runtime resolution
  *
- * Theme model overview:
- * - `ThemeId` is the user preference persisted in settings (`dark | light | system`).
- * - A separate runtime type (`ResolvedTheme`) is used in render/styling paths where
- *   only concrete values are valid (`dark | light`).
+ * This file defines canonical theme models shared by:
+ * - Theme registry constants (`THEMES`, `THEME_IDS`)
+ * - Settings state and persistence (`SettingsContext`)
+ * - Runtime resolution logic (`useTheme`, `resolveTheme`)
+ * - Theme-aware style helpers (`nodeType`, `edgeType`)
  *
- * Why both exist:
- * - `system` is meaningful as a saved preference, but not as a final CSS/runtime value.
- * - Rendering code must branch on concrete themes only.
+ * Type Categories:
+ * 1. Theme - Canonical display metadata for a theme option
+ * 2. ThemeId - Persisted preference value (`dark | light | system`)
+ * 3. ResolvedTheme - Concrete runtime value (`dark | light`)
+ *
+ * Data Flow:
+ * 1. UI/settings persist `ThemeId` (can include `system`)
+ * 2. Runtime resolves `ThemeId` + system preference into `ResolvedTheme`
+ * 3. Rendering/styling consumes only `ResolvedTheme`
+ *
+ * @see theme.ts - Theme registry and runtime helpers
+ * @see useTheme.ts - Hook that resolves system + user preference
+ * @see SettingsContext.types.ts - Settings model using ThemeId
  */
 
+/* ============================================================================
+ * THEME MODELS
+ * Shared between settings persistence and runtime styling
+ * ============================================================================ */
+
 /**
- * Valid theme identifiers.
+ * Canonical theme metadata used by settings UI and selectors.
  *
- * The application supports three theme preferences:
- * - dark: Dark background with light text
- * - light: Light background with dark text
- * - system: Follow the operating system theme (resolved at runtime)
+ * @property {string} id - Theme option identifier (e.g., "dark", "system")
+ * @property {string} label - Human-readable option label (e.g., "Dark")
+ */
+export interface Theme {
+  id: string;
+  label: string;
+}
+
+/**
+ * Theme preference key stored in settings and localStorage.
  *
- * Use `ThemeId` for:
- * - Settings state
- * - Persistence (localStorage / config)
- * - User-facing theme controls
+ * Includes `system` because user intent can defer to OS preference.
  */
 export type ThemeId = 'dark' | 'light' | 'system';
 
 /**
- * Concrete runtime theme used by rendering and styling logic.
+ * Concrete runtime theme used by rendering/styling branches.
  *
- * Unlike `ThemeId`, this cannot be `system` because UI code needs a
- * concrete value for CSS variables, icon variants, and conditional styles.
+ * This type excludes `system` because runtime code needs a resolved value.
  */
 export type ResolvedTheme = 'dark' | 'light';
