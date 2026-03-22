@@ -16,9 +16,18 @@
 }
 
 .title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: calc(15px * var(--ui-scale));
   font-weight: 700;
   white-space: nowrap;
   color: var(--accent);
   letter-spacing: 0.04em;
+}
+
+.logo {
+  width: calc(18px * var(--ui-scale));
+  height: calc(18px * var(--ui-scale));
+  flex-shrink: 0;
 }
