@@ -6,6 +6,20 @@
  * Instead of storing activePage in AppContext, components use this hook
  * to derive the current page from the URL pathname.
  *
+ * Hook Type: Browser API
+ * This hook reads directly from browser APIs (window.location, history).
+ * It does NOT require any React Context provider.
+ *
+ * Error Handling:
+ * This hook does NOT throw errors because:
+ * - It reads from window.location which always exists in a browser
+ * - There's no provider that could be missing
+ * - The browser environment guarantees these APIs are available
+ *
+ * This differs from context-based hooks (useAppContext, useSettings) which
+ * throw errors when used outside their providers. Context hooks throw because
+ * useContext returns undefined outside a provider, leading to cryptic errors.
+ *
  * URL Structure:
  * - /{page}                 - Page only (e.g., /physical, /traffic)
  * - /{page}/n/{nodeId}      - Page with selected node
