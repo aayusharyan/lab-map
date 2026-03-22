@@ -25,6 +25,7 @@
 
 import { HeaderActions } from './HeaderActions';
 import { PageTabs } from './PageTabs';
+import { useSettingsValue } from '@/hooks/useSettings';
 import styles from './AppHeader.module.css';
 
 /* ============================================================================
@@ -42,10 +43,21 @@ import styles from './AppHeader.module.css';
  * @returns {JSX.Element} Header element
  */
 export function AppHeader() {
+  const { appName } = useSettingsValue();
+  const displayAppName = appName || 'Lab Map';
+
   return (
     <header className={styles.header}>
       {/* Application title */}
-      <h1 className={styles.title}>Lab Map</h1>
+      <h1 className={styles.title}>
+        <img
+          className={styles.logo}
+          src="/favicon-192.png"
+          alt=""
+          aria-hidden="true"
+        />
+        <span>{displayAppName}</span>
+      </h1>
 
       {/* Page navigation tabs */}
       <PageTabs />
