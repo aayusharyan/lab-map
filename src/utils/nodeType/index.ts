@@ -27,7 +27,7 @@ export {
   getNodeTypeOrThrow,
   getNodeThemeColor,
   toVisNodeColor,
-  buildNodeFont
+  buildNodeFont,
 } from './nodeType';
 export type { NodeType } from './nodeType.types';
 export type { NodeTypeId } from './nodeType';
