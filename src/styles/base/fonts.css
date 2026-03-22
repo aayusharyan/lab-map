@@ -7,6 +7,12 @@
  * font-display: swap ensures text renders immediately with fallback.
  */
 
+/* ============================================================================
+ * JETBRAINS MONO
+ * Self-hosted font-face declarations used by --font in variables.css.
+ * ============================================================================ */
+
+/* Regular (400) */
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
@@ -15,6 +21,7 @@
   src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
 }
 
+/* SemiBold (600) */
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
@@ -23,6 +30,7 @@
   src: url('/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
 }
 
+/* Bold (700) */
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
