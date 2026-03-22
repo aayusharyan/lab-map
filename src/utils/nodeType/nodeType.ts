@@ -6,9 +6,11 @@
  * across graph rendering, legends, sidebars, and rack layout icon loading.
  *
  * Exports:
- * - DEFAULT_NODE_TYPE_KEY: Stable fallback key for unknown/invalid type values
  * - NODE_TYPES: Canonical node registry keyed by real icon folder names
- * - resolveNodeType: Resolve a raw key to a NodeType config (no aliasing)
+ * - NODE_TYPE_IDS: Canonical list of all registry keys
+ * - NodeTypeId: Union of canonical node type keys
+ * - isNodeType: Type guard for validating unknown string values
+ * - getNodeTypeOrThrow: Resolve a raw key and throw on unknown type
  * - getNodeThemeColor: Select theme-specific accent color for a NodeType
  * - toVisNodeColor: Convert accent color to vis-network color object
  * - buildNodeFont: Build shared vis-network font object for node labels
@@ -31,15 +33,13 @@
  * ============================================================================ */
 
 import type { NodeType } from './nodeType.types';
-import type { ThemeId } from '@/types/theme';
-import { getSystemTheme } from '@/utils/theme';
+import { getSystemTheme, type ThemeId } from '@/utils/theme';
 
-/* ============================================================================
- * CONSTANTS
- * ============================================================================ */
-
-/** Default canonical node type key used as the hard fallback. */
-export const DEFAULT_NODE_TYPE_KEY = 'server-rack-1u-compute-1';
+/**
+ * Using string as a key here because this is base, the NodeTypeId is derived later.
+ * We cannot use NodeTypeId as key here otherwise it will become circular dependency.
+ */
+const defineNodeTypes = <T extends Record<string, NodeType>>(types: T) => types;
 
 /* ============================================================================
  * NODE TYPE REGISTRY
@@ -53,7 +53,7 @@ export const DEFAULT_NODE_TYPE_KEY = 'server-rack-1u-compute-1';
  * - Keys must be concrete icon folder names in `public/node-icons`.
  * - Values include iconURL paths, theme colors, display label, and visual scale.
  */
-export const NODE_TYPES: Record<string, NodeType> = {
+const NODE_TYPES_MAP = defineNodeTypes({
   /* ==========================================================================
    * GENERIC ICONS
    * ========================================================================== */
@@ -192,21 +192,42 @@ export const NODE_TYPES: Record<string, NodeType> = {
     color: { dark: '#4ade80', light: '#2e7d32' },
     iconSizeScale: 7,
   },
-};
+});
+
+/** Canonical node type keys derived from NODE_TYPES. */
+export type NodeTypeId = keyof typeof NODE_TYPES_MAP;
+export const NODE_TYPES: Record<NodeTypeId, NodeType> = NODE_TYPES_MAP;
+export const NODE_TYPE_IDS = Object.keys(NODE_TYPES_MAP) as NodeTypeId[];
+
+/**
+ * Type guard for validating canonical node type IDs.
+ *
+ * @param {string} value - Raw node type value to validate
+ * @returns {boolean} True when the value maps to a canonical node type
+ */
+export function isNodeType(value: string): value is NodeTypeId {
+  return Object.prototype.hasOwnProperty.call(NODE_TYPES_MAP, value);
+}
 
 /* ============================================================================
  * RESOLUTION HELPERS
  * ============================================================================ */
 
 /**
- * Resolve a raw node type key to its canonical NodeType config.
+ * Resolve a raw node type key and throw when the type is unknown.
  *
- * @param {string | undefined} type - Raw node type key
- * @returns {NodeType | undefined} NodeType config if present
+ * Use this after narrowing unknown input with `isNodeType()`, or in strict
+ * render paths where invalid data should fail fast.
+ *
+ * @param {NodeTypeId} type - Canonical node type key
+ * @returns {NodeType} NodeType config
  */
-export function resolveNodeType(type: string | undefined): NodeType | undefined {
-  if (!type) return undefined;
-  return NODE_TYPES[type];
+export function getNodeTypeOrThrow(type: NodeTypeId): NodeType {
+  const resolved = NODE_TYPES[type];
+  if (!resolved) {
+    throw new Error(`Unknown node type: "${type ?? '(missing)'}"`);
+  }
+  return resolved;
 }
 
 /* ============================================================================
@@ -216,18 +237,16 @@ export function resolveNodeType(type: string | undefined): NodeType | undefined 
 /**
  * Resolve a node theme color for the active theme.
  *
- * @param {NodeType | undefined} nodeType - Resolved node type config
+ * @param {NodeType} nodeType - Resolved node type config
  * @param {ThemeId} theme - Active theme preference (dark, light, or system)
- * @param {string} [fallbackColor='#888'] - Fallback color when missing
  * @returns {string} Theme-specific accent color
  */
 export function getNodeThemeColor(
-  nodeType: NodeType | undefined,
-  theme: ThemeId,
-  fallbackColor = '#888'
+  nodeType: NodeType,
+  theme: ThemeId
 ) {
   const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
-  return nodeType?.color?.[resolvedTheme] ?? fallbackColor;
+  return nodeType.color[resolvedTheme];
 }
 
 /**
