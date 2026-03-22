@@ -1,0 +1,28 @@
+/**
+ * @file index.ts
+ * @description Barrel export for edge type utilities
+ *
+ * Public API:
+ * - Constants:
+ *   - EDGE_TYPES
+ *   - EDGE_TYPE_IDS
+ * - Helpers:
+ *   - isEdgeType
+ *   - getEdgeTypeOrThrow
+ *   - getEdgeThemeColor
+ *   - toVisEdgeColor
+ * - Types:
+ *   - EdgeType
+ *   - EdgeTypeId
+ */
+
+export {
+  EDGE_TYPES,
+  EDGE_TYPE_IDS,
+  isEdgeType,
+  getEdgeTypeOrThrow,
+  getEdgeThemeColor,
+  toVisEdgeColor,
+} from './edgeType';
+export type { EdgeType } from './edgeType.types';
+export type { EdgeTypeId } from './edgeType';
