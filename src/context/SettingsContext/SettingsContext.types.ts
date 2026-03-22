@@ -116,11 +116,11 @@ export type SettingsAction =
   | { type: 'SET_THEME'; theme: ThemeId }
   | { type: 'SET_DEFAULT_PAGE'; page: PageId }
   | { type: 'SET_FONT_SIZE'; size: FontSize }
-  | { type: 'SET_SCROLL_TO_ZOOM'; enabled: boolean }
-  | { type: 'SET_NODE_LABEL_VISIBILITY'; visible: boolean }
-  | { type: 'SET_LEGEND_VISIBILITY'; visible: boolean }
-  | { type: 'SET_EDGE_LABEL_VISIBILITY'; visible: boolean }
-  | { type: 'SET_NODE_ANIMATION'; enabled: boolean }
+  | { type: 'SET_SCROLL_TO_ZOOM'; isEnabled: boolean }
+  | { type: 'SET_NODE_LABEL_VISIBILITY'; isVisible: boolean }
+  | { type: 'SET_LEGEND_VISIBILITY'; isVisible: boolean }
+  | { type: 'SET_EDGE_LABEL_VISIBILITY'; isVisible: boolean }
+  | { type: 'SET_NODE_ANIMATION'; isEnabled: boolean }
   | { type: 'OPEN_PANEL' }
   | { type: 'CLOSE_PANEL' };
 
