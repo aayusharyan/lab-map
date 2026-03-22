@@ -44,7 +44,7 @@ import styles from './AppHeader.module.css';
  */
 export function AppHeader() {
   const { appName } = useSettingsValue();
-  const displayAppName = appName || 'Lab Map';
+  const displayAppName = appName.trim() || 'Lab Map';
 
   return (
     <header className={styles.header}>
