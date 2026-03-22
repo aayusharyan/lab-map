@@ -216,14 +216,11 @@ export function isNodeType(value: string): value is NodeTypeId {
 /**
  * Resolve a raw node type key and throw when the type is unknown.
  *
- * Use this after narrowing unknown input with `isNodeType()`, or in strict
- * render paths where invalid data should fail fast.
- *
- * @param {NodeTypeId} type - Canonical node type key
+ * @param {string | undefined} type - Raw node type key
  * @returns {NodeType} NodeType config
  */
-export function getNodeTypeOrThrow(type: NodeTypeId): NodeType {
-  const resolved = NODE_TYPES[type];
+export function getNodeTypeOrThrow(type: string | undefined): NodeType {
+  const resolved = type && isNodeType(type) ? NODE_TYPES[type] : undefined;
   if (!resolved) {
     throw new Error(`Unknown node type: "${type ?? '(missing)'}"`);
   }
@@ -238,15 +235,15 @@ export function getNodeTypeOrThrow(type: NodeTypeId): NodeType {
  * Resolve a node theme color for the active theme.
  *
  * @param {NodeType} nodeType - Resolved node type config
- * @param {ThemeId} theme - Active theme preference (dark, light, or system)
+ * @param {ThemeId} [theme='system'] - Active theme preference (dark, light, or system)
  * @returns {string} Theme-specific accent color
  */
 export function getNodeThemeColor(
   nodeType: NodeType,
-  theme: ThemeId
-) {
+  theme: ThemeId = 'system'
+): string {
   const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
-  return nodeType.color[resolvedTheme];
+  return resolvedTheme === 'dark' ? nodeType.color.dark : nodeType.color.light;
 }
 
 /**
