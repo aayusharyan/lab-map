@@ -48,7 +48,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
-import type { PageId } from '@/types/page';
+import type { PageId } from '@/utils/page';
 import { parseRoute } from '@/utils/routing';
 
 /* ============================================================================
