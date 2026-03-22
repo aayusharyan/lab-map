@@ -1,0 +1,33 @@
+/**
+ * @file HeaderActions.module.css
+ * @description Styles for the right-side control area in the app header
+ *
+ * Contains layout styles for header action controls and the local
+ * settings button variant used by HeaderActions.tsx.
+ */
+
+/* ============================================================================
+ * ACTIONS CONTAINER
+ * Right-aligned group of header controls (currently only settings).
+ * ============================================================================ */
+.actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ============================================================================
+ * SETTINGS BUTTON
+ * Local size override layered on top of the global .btn-icon primitive.
+ * ============================================================================ */
+.settingsButton {
+  font-size: calc(14px * var(--ui-scale));
+}
+
+/* Keep gear icon dimensions in sync with button scale */
+.settingsButton svg {
+  width: calc(14px * var(--ui-scale));
+  height: calc(14px * var(--ui-scale));
+  display: block;
+}
