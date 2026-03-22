@@ -1,8 +1,14 @@
 /**
  * @file AppHeader.module.css
- * @description Styles for the top application header
+ * @description Styles for the top application header container and branding
+ *
+ * Defines header shell layout, app title typography, and logo sizing.
  */
 
+/* ============================================================================
+ * HEADER SHELL
+ * Main horizontal bar containing title, tabs, and action controls.
+ * ============================================================================ */
 .header {
   display: flex;
   align-items: center;
@@ -15,6 +21,10 @@
   z-index: 10;
 }
 
+/* ============================================================================
+ * BRAND TITLE
+ * App name and icon grouping on the left side of the header.
+ * ============================================================================ */
 .title {
   display: inline-flex;
   align-items: center;
@@ -26,6 +36,7 @@
   letter-spacing: 0.04em;
 }
 
+/* App logo icon next to title text */
 .logo {
   width: calc(18px * var(--ui-scale));
   height: calc(18px * var(--ui-scale));
