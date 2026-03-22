@@ -159,42 +159,6 @@
   margin-bottom: 0;
 }
 
-/* Toggle button group (e.g., Dark/Light, Enable/Disable) */
-.toggleGroup {
-  display: flex;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* Individual toggle button */
-.toggle {
-  flex: 1;
-  padding: 8px 12px;
-  border: none;
-  background: var(--surface2);
-  color: var(--text-muted);
-  font-family: var(--font);
-  font-size: calc(12px * var(--ui-scale));
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.toggle:not(:last-child) {
-  border-right: 1px solid var(--border);
-}
-
-.toggle:hover {
-  background: var(--border);
-  color: var(--text);
-}
-
-.toggleActive {
-  background: var(--accent);
-  color: #fff;
-}
-
 .switchControl {
   display: inline-flex;
   align-items: center;
@@ -305,37 +269,4 @@
   min-width: 32px;
   padding: 0 8px;
   line-height: 1;
-}
-
-/* ============================================================================
- * LOCKED STATE
- * Styles for settings controlled by default_settings.json (read-only)
- * ============================================================================ */
-
-/* Lock icon displayed next to locked setting labels */
-.lockIcon {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 6px;
-  color: var(--text-muted);
-  vertical-align: middle;
-  cursor: help;
-}
-
-/* Locked control group - visually muted and non-interactive */
-.locked {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* Disabled toggle button */
-.toggle:disabled {
-  cursor: not-allowed;
-}
-
-/* Disabled select dropdown */
-.select:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  background-image: none;
 }
