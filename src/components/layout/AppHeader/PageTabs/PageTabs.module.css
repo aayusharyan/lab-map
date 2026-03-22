@@ -1,15 +1,24 @@
 /**
  * @file PageTabs.module.css
- * @description Styles for page navigation tabs
+ * @description Styles for header page-navigation tabs
  *
- * Horizontal tab buttons for switching between network pages.
+ * Defines the tab row and button states used to switch between
  * Physical, Traffic, VLAN, and Rack views.
  */
 
-/* Tab container with small gaps between pills */
-.tabs { display: flex; gap: 4px; }
+/* ============================================================================
+ * TABS CONTAINER
+ * Horizontal row of compact tab pills in the app header.
+ * ============================================================================ */
+.tabs {
+  display: flex;
+  gap: 4px;
+}
 
-/* Individual tab button - pill style */
+/* ============================================================================
+ * TAB BUTTON
+ * Base visual style for each page switcher button.
+ * ============================================================================ */
 .tab {
   padding: 5px 16px;
   border-radius: 6px;
@@ -22,10 +31,13 @@
   transition: all 0.15s;
 }
 
-/* Tab hover state */
+/* Hover emphasis for discoverability */
 .tab:hover { background: var(--surface2); color: var(--text); }
 
-/* Active tab - filled with accent color */
+/* ============================================================================
+ * ACTIVE STATE
+ * Selected page tab with accent fill.
+ * ============================================================================ */
 .active {
   background: var(--tab-active);
   border-color: var(--tab-active);
