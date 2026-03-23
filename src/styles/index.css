@@ -5,6 +5,10 @@
  * Component styles are imported by their respective component files.
  */
 
+/* ============================================================================
+ * BASE STYLE IMPORTS
+ * Load order: fonts -> variables -> reset -> layout -> shared primitives.
+ * ============================================================================ */
 @import './base/fonts.css';
 @import './base/variables.css';
 @import './base/reset.css';
