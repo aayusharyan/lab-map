@@ -16,7 +16,7 @@
  * State Management Pattern:
  * This application uses the useReducer + Context pattern for validation
  * warnings that need to be shared across components. Components access state
- * via useAppContext() hook and modify it by dispatching actions to the reducer.
+ * via useAppContextOrThrow() hook and modify it by dispatching actions to the reducer.
  *
  * Note: User preferences (theme, font size, scroll-to-zoom) are managed
  * separately by SettingsContext for persistence via localStorage/default_settings.json.
@@ -41,7 +41,7 @@ import type { ValidationWarning, ValidationWarningInput } from '@/utils/validati
 /**
  * Shape of the shared validation warning state.
  *
- * Components read from this state via the useAppContext() hook.
+ * Components read from this state via the useAppContextOrThrow() hook.
  * State is immutable and can only be modified by dispatching actions
  * to the reducer.
  *
@@ -92,11 +92,11 @@ export type AppAction =
  * - dispatch: Function to dispatch AppAction to modify state
  *
  * Default value is null to enforce usage within AppProvider.
- * The useAppContext() hook throws an error if used outside the provider.
+ * The useAppContextOrThrow() hook throws an error if used outside the provider.
  *
  * @example
  * // In a component (use the hook instead of direct context access)
- * const { state, dispatch } = useAppContext();
+ * const { state, dispatch } = useAppContextOrThrow();
  * dispatch({
  *   type: 'ADD_VALIDATION_WARNING',
  *   warning: {
