@@ -87,8 +87,14 @@
   font-size: calc(13px * var(--ui-scale));
   color: var(--text-muted);
   line-height: 1;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   transition: transform 0.2s ease;
+}
+
+.chevron svg {
+  width: calc(13px * var(--ui-scale));
+  height: calc(13px * var(--ui-scale));
 }
 
 .chevronClosed { transform: rotate(-90deg); }
