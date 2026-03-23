@@ -27,8 +27,8 @@
  *   },
  * ];
  * const edgeItems = [
- *   { type: 'wan', label: 'WAN Uplink', color: { dark: '#38bdf8', light: '#0277bd' }, width: 1.5, dashes: false },
- *   { type: 'trunk', label: 'Trunk (multi-VLAN)', color: { dark: '#e67e22', light: '#d35400' }, width: 1.5, dashes: [6, 3] },
+ *   { type: 'wan', label: 'WAN Uplink', color: { dark: '#38bdf8', light: '#0277bd' }, dashes: false },
+ *   { type: 'trunk', label: 'Trunk (multi-VLAN)', color: { dark: '#e67e22', light: '#d35400' }, dashes: [6, 3] },
  * ];
  *
  * <Legend nodeItems={nodeItems} edgeItems={edgeItems} />
@@ -41,6 +41,7 @@
  * ============================================================================ */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { IconChevronDown } from '@tabler/icons-react';
 
 import { useTheme } from '@/hooks/useTheme';
 import type { EdgeType } from '@/utils/edgeType';
@@ -271,7 +272,9 @@ export function Legend({ nodeItems, edgeItems }: Props) {
       {/* Toggle header button */}
       <button className={styles.header} onClick={handleToggle}>
         <span className={styles.title}>Legend</span>
-        <span className={`${styles.chevron}${isOpen ? '' : ` ${styles.chevronClosed}`}`}>▾</span>
+        <span className={`${styles.chevron}${isOpen ? '' : ` ${styles.chevronClosed}`}`}>
+          <IconChevronDown aria-hidden="true" stroke={2.2} />
+        </span>
       </button>
 
       {/* Collapsible content area */}
