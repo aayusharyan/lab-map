@@ -2,10 +2,16 @@
  * @file index.ts
  * @description Barrel export for AppContext module
  *
- * Re-exports public API for the AppContext module:
- * - AppProvider: Provider component for shared validation warnings
- * - AppContext: React context instance (used by hooks)
- * - Types: AppState, AppAction
+ * Public API:
+ * - Context:
+ *   - AppProvider
+ *   - AppContext
+ * - Types:
+ *   - AppState
+ *   - AppAction
+ *
+ * Import style:
+ * import { AppProvider, AppContext, type AppState } from '@/context/AppContext';
  */
 
 export { AppProvider } from './AppContext';
