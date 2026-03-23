@@ -7,7 +7,6 @@
  *
  * Layout Structure:
  * - .app-shell: Full-height flex container (100vh)
- * - .app-header: Fixed header with tabs and controls
  * - .app-body: Flexible main content area
  * - .app-content: Graph canvas + sidebar row
  * - .app-footer: Footer bar at bottom of canvas area
@@ -19,32 +18,6 @@
  * ============================================================================ */
 
 .app-shell { display: flex; flex-direction: column; height: 100vh; }
-
-/* ============================================================================
- * APP HEADER
- * Fixed header bar with app title, layer tabs, and controls
- * ============================================================================ */
-
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 0 20px;
-  height: 52px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;  /* Prevent header from shrinking */
-  z-index: 10;     /* Above graph canvas */
-}
-
-/* App title styling in header */
-.app-header h1 {
-  font-size: calc(15px * var(--ui-scale));
-  font-weight: 700;
-  white-space: nowrap;
-  color: var(--accent);
-  letter-spacing: 0.04em;
-}
 
 /* ============================================================================
  * APP BODY & CONTENT
@@ -68,7 +41,7 @@
 
 /* ============================================================================
  * CANVAS AREA
- * Container for the layer visualization (graph or rack) and footer.
+ * Container for the page visualization (graph or rack) and footer.
  * Uses absolute positioning so the canvas gets concrete pixel dimensions.
  * ============================================================================ */
 
@@ -126,7 +99,7 @@
  * the physical constraints, positioning, and boundaries of the footer
  * within the main flex view.
  *
- * The actual contents (like layer description text, links, or widgets)
+ * The actual contents (like page description text, links, or widgets)
  * inside the footer should be styled in individual component CSS files.
  * ============================================================================ */
 
