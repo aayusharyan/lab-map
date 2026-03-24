@@ -3,12 +3,12 @@
  * @description Node attribute helpers for lookup and UI rendering
  *
  * This module contains small, reusable helpers for working with the
- * `Node.attributes` and `Node.sections[*].attributes` arrays defined in
+ * `Node.attributes`, `Node.subSections[*].attributes`, `Node.sections[*].attributes`,
+ * and `Node.sections[*].subSections[*].attributes` arrays defined in
  * `node.types.ts`.
  *
- * Responsibilities:
- * 1. Read a single attribute value by key from node-level/section-level bags
- * 2. Flatten attribute bags into stable key/value rows for UI components
+ * Responsibility:
+ * 1. Flatten attribute bags into stable key/value rows for UI components
  *
  * Non-goals:
  * - No schema validation
