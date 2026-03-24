@@ -8,6 +8,7 @@
  * - Types:
  *   - Node
  *   - NodeAttribute
+ *   - NodeSubSection
  *   - NodeSection
  *
  * Import style:
@@ -15,4 +16,4 @@
  */
 
 export { flattenAttributes } from './node';
-export type { Node, NodeAttribute, NodeSection } from './node.types';
+export type { Node, NodeAttribute, NodeSubSection, NodeSection } from './node.types';
