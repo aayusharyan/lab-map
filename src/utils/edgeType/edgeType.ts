@@ -31,6 +31,10 @@
 import type { EdgeType } from './edgeType.types';
 import { getSystemTheme, type ThemeId } from '@/utils/theme';
 
+/**
+ * Keep this base registry keyed by string; EdgeTypeId is derived from the map below.
+ * Using EdgeTypeId here would create a self-referential/circular type dependency.
+ */
 const defineEdgeTypes = <T extends Record<string, EdgeType>>(types: T) => types;
 
 /* ============================================================================
