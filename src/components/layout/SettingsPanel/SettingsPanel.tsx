@@ -153,7 +153,8 @@ export function SettingsPanel() {
         <div className={styles.body}>
           {/* Settings info notice */}
           <p className={styles.note}>
-            Settings persist in this browser, including page refreshes. For global defaults, edit `settings.json`.
+            Settings persist in this browser, including page refreshes. For global defaults, edit
+            `default_settings.json`.
           </p>
 
           {/* App name input */}
