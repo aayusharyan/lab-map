@@ -1,0 +1,252 @@
+/**
+ * @file NotificationItem.css
+ * @description Styles for individual notification cards
+ *
+ * Provides styling for a single notification item including its shell,
+ * card surface, content layout, and animations. Supports stack-based
+ * transforms controlled via CSS custom properties.
+ */
+
+/* ============================================================================
+ * NOTIFICATION SHELL
+ * Individual shell used to control stack ordering and fade lifecycle.
+ * ============================================================================ */
+.notification-shell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  opacity: 1;
+  z-index: var(--stack-z, 1);
+  transition:
+    opacity 260ms ease;
+}
+
+/* ============================================================================
+ * NOTIFICATION CARD
+ * Core notification surface with depth-based transform/opacity.
+ * ============================================================================ */
+.notification-card {
+  position: relative;
+  width: calc(100% - (var(--stack-depth, 0) * 24px));
+  max-width: 100%;
+  background: color-mix(in srgb, var(--notification-bg, #fff7e6) 95%, #ffffff);
+  border: 1px solid var(--notification-border, #f59e0b);
+  border-radius: 14px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  pointer-events: auto;
+  transform:
+    translateY(calc(var(--stack-depth, 0) * 10px))
+    scale(calc(1 - (var(--stack-depth, 0) * 0.04)));
+  transform-origin: top center;
+  opacity: calc(1 - (var(--stack-depth, 0) * 0.08));
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.65, 0.2, 1),
+    opacity 250ms ease,
+    box-shadow 250ms ease;
+  animation: notificationSlideIn 300ms cubic-bezier(0.2, 0.75, 0.25, 1) var(--stack-delay, 0ms) backwards;
+}
+
+/* Entry animation for newly added notification cards */
+@keyframes notificationSlideIn {
+  from {
+    transform:
+      translateY(calc((var(--stack-depth, 0) * 10px) - 18px))
+      scale(calc(1 - (var(--stack-depth, 0) * 0.04)));
+    opacity: 0;
+  }
+  to {
+    transform:
+      translateY(calc(var(--stack-depth, 0) * 10px))
+      scale(calc(1 - (var(--stack-depth, 0) * 0.04)));
+    opacity: calc(1 - (var(--stack-depth, 0) * 0.08));
+  }
+}
+
+/* Exit helpers applied while notification is being dismissed */
+.notification-shell-exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.notification-card-exit {
+  transform:
+    translateY(calc((var(--stack-depth, 0) * 10px) - 24px))
+    scale(calc(1 - (var(--stack-depth, 0) * 0.04)));
+  opacity: 0;
+}
+
+/* ============================================================================
+ * NOTIFICATION CONTENT
+ * Icon, title/message copy, trace link, and dismiss control.
+ * ============================================================================ */
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.notification-icon {
+  font-size: calc(20px * var(--ui-scale));
+  line-height: 1;
+  flex-shrink: 0;
+  color: var(--notification-text, #8a4b00);
+}
+
+.notification-icon svg {
+  width: calc(20px * var(--ui-scale));
+  height: calc(20px * var(--ui-scale));
+  display: block;
+}
+
+.notification-message {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-message strong {
+  display: block;
+  font-size: calc(13px * var(--ui-scale));
+  font-weight: 700;
+  color: var(--notification-text, #8a4b00);
+  margin-bottom: 3px;
+}
+
+.notification-message p {
+  margin: 0;
+  font-size: calc(12px * var(--ui-scale));
+  color: var(--notification-text-muted, #9a5b00);
+  line-height: 1.45;
+}
+
+.notification-trace-link {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: calc(12px * var(--ui-scale));
+  font-weight: 600;
+  color: var(--notification-text, #8a4b00);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.notification-trace-link:hover {
+  opacity: 0.85;
+}
+
+/* Dismiss button for each notification card */
+.notification-close {
+  background: none;
+  border: none;
+  font-size: calc(18px * var(--ui-scale));
+  color: var(--notification-text, #8a4b00);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: opacity 180ms ease;
+  flex-shrink: 0;
+}
+
+.notification-close svg {
+  width: calc(18px * var(--ui-scale));
+  height: calc(18px * var(--ui-scale));
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+.notification-close:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+/* ============================================================================
+ * NOTIFICATION TYPE COLOR SCHEMES
+ * Each notification type has distinct colors for both light and dark themes.
+ * ============================================================================ */
+
+/* Warning (Yellow/Amber) - Default */
+.notification-card[data-type="warning"] {
+  --notification-bg: #fff7e6;
+  --notification-border: #f59e0b;
+  --notification-text: #8a4b00;
+  --notification-text-muted: #9a5b00;
+}
+
+/* Info (Blue) */
+.notification-card[data-type="info"] {
+  --notification-bg: #eff6ff;
+  --notification-border: #3b82f6;
+  --notification-text: #1e40af;
+  --notification-text-muted: #1d4ed8;
+}
+
+/* Error (Red) */
+.notification-card[data-type="error"] {
+  --notification-bg: #fef2f2;
+  --notification-border: #ef4444;
+  --notification-text: #991b1b;
+  --notification-text-muted: #b91c1c;
+}
+
+/* Success (Green) */
+.notification-card[data-type="success"] {
+  --notification-bg: #f0fdf4;
+  --notification-border: #22c55e;
+  --notification-text: #166534;
+  --notification-text-muted: #15803d;
+}
+
+/* ============================================================================
+ * DARK THEME OVERRIDES
+ * ============================================================================ */
+[data-theme="dark"] .notification-card[data-type="warning"] {
+  --notification-bg: #2a2419;
+  --notification-border: #d97706;
+  --notification-text: #fbbf24;
+  --notification-text-muted: #f59e0b;
+}
+
+[data-theme="dark"] .notification-card[data-type="info"] {
+  --notification-bg: #172554;
+  --notification-border: #3b82f6;
+  --notification-text: #93c5fd;
+  --notification-text-muted: #60a5fa;
+}
+
+[data-theme="dark"] .notification-card[data-type="error"] {
+  --notification-bg: #2c1515;
+  --notification-border: #dc2626;
+  --notification-text: #fca5a5;
+  --notification-text-muted: #f87171;
+}
+
+[data-theme="dark"] .notification-card[data-type="success"] {
+  --notification-bg: #14261d;
+  --notification-border: #16a34a;
+  --notification-text: #86efac;
+  --notification-text-muted: #4ade80;
+}
+
+/* ============================================================================
+ * RESPONSIVE + ACCESSIBILITY OVERRIDES
+ * ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .notification-shell,
+  .notification-card,
+  .notification-card-exit {
+    animation: none;
+    transition-duration: 1ms;
+  }
+}
