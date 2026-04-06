@@ -1,0 +1,105 @@
+/**
+ * @file graph-view.css
+ * @description Styles for the GraphView component (vis-network tooltips)
+ *
+ * Custom tooltip styling for vis-network graph nodes. Must be global CSS
+ * (not CSS modules) because vis-network generates these elements internally.
+ */
+
+/* ============================================================================
+ * NOTIFICATION STACK POSITIONING
+ * Top-right region for notification toasts within GraphView.
+ * ============================================================================ */
+
+.notification-stack {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: min(100% - 24px, clamp(260px, 34vw, 440px));
+  min-height: 1px;
+  z-index: 20;
+}
+
+@media (max-width: 960px) {
+  .notification-stack {
+    right: 10px;
+    top: 10px;
+    width: min(100% - 20px, clamp(240px, 68vw, 360px));
+  }
+}
+
+/* ============================================================================
+ * VIS-NETWORK TOOLTIP
+ * Overrides default vis-network tooltip styles.
+ * ============================================================================ */
+
+.vis-tooltip {
+  background: var(--tt-bg) !important;
+  border: 1px solid var(--tt-border) !important;
+  border-radius: 8px !important;
+  padding: 0 !important;
+  color: var(--tt-text) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: calc(12px * var(--ui-scale)) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+  /* Scale max-width with font so content never overflows at larger sizes */
+  max-width: calc(320px * var(--ui-scale)) !important;
+  width: max-content !important;
+  white-space: normal !important;
+  pointer-events: none !important;
+}
+
+/* Tooltip inner container */
+.vis-tt { padding: 0; }
+
+/* Tooltip header with node name */
+.vis-tt-head {
+  font-size: calc(12px * var(--ui-scale));
+  font-weight: 700;
+  color: var(--tt-text);
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid var(--tt-border);
+  border-left: 3px solid #555;   /* Type color indicator */
+  border-radius: 7px 7px 0 0;
+  background: var(--tt-surface);
+  white-space: nowrap;
+}
+
+/* Tooltip property row */
+.vis-tt-row {
+  display: flex;
+  gap: 8px;
+  padding: 3px 12px;
+  border-bottom: 1px solid var(--tt-row-border);
+  align-items: baseline;
+}
+
+.vis-tt-row:last-child { border-bottom: none; }
+
+/* Tooltip property key */
+.vis-tt-k {
+  color: var(--tt-muted);
+  font-size: calc(11px * var(--ui-scale));
+  min-width: calc(72px * var(--ui-scale));
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Tooltip property value */
+.vis-tt-v {
+  color: var(--tt-text);
+  font-size: calc(11px * var(--ui-scale));
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Tooltip note footer */
+.vis-tt-note {
+  padding: 4px 12px 6px;
+  font-size: calc(10px * var(--ui-scale));
+  color: var(--tt-muted);
+  font-style: italic;
+  line-height: 1.5;
+  border-top: 1px solid var(--tt-row-border);
+  word-break: break-word;
+}
