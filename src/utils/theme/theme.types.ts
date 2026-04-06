@@ -35,6 +35,11 @@
  * @property {string} label - Human-readable option label (e.g., "Dark")
  */
 export interface Theme {
+  /**
+   * Keep this as string in the base model.
+   * ThemeId is a derived/consumer-facing union, and we avoid coupling base
+   * display metadata to derived ID unions to prevent circular type pressure.
+   */
   id: string;
   label: string;
 }
