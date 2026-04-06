@@ -29,6 +29,10 @@
 
 import type { Theme, ThemeId, ResolvedTheme } from './theme.types';
 
+/**
+ * Keep the registry as the base and derive ThemeId-facing helpers from it.
+ * This avoids making the base map depend on derived ID unions.
+ */
 const defineThemes = <T extends Record<ThemeId, Theme>>(themes: T) => themes;
 
 /* ============================================================================
