@@ -1,0 +1,96 @@
+/**
+ * @file Tabs.module.css
+ * @description Styles for generic Tabs component with multiple visual variants
+ *
+ * Provides two visual styles:
+ * - Header tabs: Rectangular buttons for page navigation (AppHeader)
+ * - Pill tabs: Rounded pills for filters (AppSubHeader)
+ */
+
+/* ============================================================================
+ * HEADER VARIANT
+ * Rectangular tabs used in AppHeader for page navigation.
+ * ============================================================================ */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 5px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: calc(13px * var(--ui-scale));
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* Active header tab - solid accent fill */
+.tab.active {
+  background: var(--tab-active);
+  border-color: var(--tab-active);
+  color: #fff;
+}
+
+/* ============================================================================
+ * PILL VARIANT
+ * Rounded pills used in AppSubHeader for flow filtering.
+ * ============================================================================ */
+
+.pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: calc(11px * var(--ui-scale));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  user-select: none;
+}
+
+.pill:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Active pill - accent-tinted transparent background */
+.pill.active {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* "All" pill - slightly different styling */
+.pillAll {
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.pillAll.active {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
