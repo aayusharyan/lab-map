@@ -8,14 +8,14 @@
  *
  * Component Structure:
  *   AppHeader
- *   ├─ <h1> "Lab Map" (app title)
- *   ├─ PageTabs (page navigation)
+ *   ├─ <h1> App title (from settings)
+ *   ├─ Tabs (page navigation)
  *   └─ HeaderActions (controls and status)
  *
  * @example
  * <AppHeader />
  *
- * @see PageTabs.tsx - Page navigation tabs
+ * @see Tabs - Generic tabs component
  * @see HeaderActions.tsx - Header controls and status
  */
 
@@ -23,9 +23,18 @@
  * IMPORTS
  * ============================================================================ */
 
-import { HeaderActions } from './HeaderActions';
-import { PageTabs } from './PageTabs';
+import { useMemo } from 'react';
+
+import { Tabs } from '@/components/Tabs';
+import { useActivePage } from '@/hooks/useActivePage';
 import { useSettingsValue } from '@/hooks/useSettings';
+import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
+import { navigateTo } from '@/utils/routing';
+
+import { HeaderActions } from './HeaderActions';
+
+import type { TabItem } from '@/components/Tabs';
+
 import styles from './AppHeader.module.css';
 
 /* ============================================================================
@@ -36,15 +45,40 @@ import styles from './AppHeader.module.css';
  * Main application header component.
  *
  * Renders the top navigation bar with:
- * - App title ("Lab Map")
+ * - App title (from settings, defaults to "Lab Map")
  * - Page navigation tabs (Physical, Traffic, VLAN, Rack)
  * - Header actions section (settings)
  *
- * @returns {JSX.Element} Header element
+ * @returns Header element
  */
 export function AppHeader() {
   const { appName } = useSettingsValue();
+  const activePage = useActivePage();
   const displayAppName = appName.trim() || 'Lab Map';
+
+  /**
+   * Convert page configuration to tab items.
+   * Memoized since PAGES config is static.
+   */
+  const pageItems = useMemo<TabItem<PageId>[]>(
+    () =>
+      PAGE_IDS.map((pageId) => ({
+        id: pageId,
+        label: PAGES[pageId].label,
+        title: PAGES[pageId].title,
+      })),
+    []
+  );
+
+  /**
+   * Handle page tab selection.
+   * Navigates via URL, clearing flow and selection when changing pages.
+   */
+  function handlePageSelect(pageId: PageId | null) {
+    if (pageId) {
+      navigateTo(pageId, null, null, null);
+    }
+  }
 
   return (
     <header className={styles.header}>
@@ -60,7 +94,12 @@ export function AppHeader() {
       </h1>
 
       {/* Page navigation tabs */}
-      <PageTabs />
+      <Tabs<PageId>
+        items={pageItems}
+        activeId={activePage}
+        onSelect={handlePageSelect}
+        variant="header"
+      />
 
       {/* Controls and status display */}
       <HeaderActions />
