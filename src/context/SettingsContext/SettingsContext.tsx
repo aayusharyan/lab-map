@@ -7,10 +7,11 @@
  * then hardcoded defaults.
  *
  * Settings Managed:
+ * - appName: Custom application name shown in the header
  * - theme: Color theme (dark/light/system)
  * - defaultPage: Initial page shown on app load
  * - fontSize: App-wide font size for UI scaling
- * - scrollToZoom: Whether scroll wheel zooms the canvas
+ * - scrollBehavior: Scroll wheel behavior mode on canvas (zoom/pan)
  * - showNodeLabels: Whether to display labels on nodes
  * - showLegend: Whether to display the legend
  * - showEdgeLabels: Whether to display labels on edges
@@ -42,13 +43,13 @@
 import { useReducer, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import {
-  FONT_SIZES,
   SettingsContext,
   type AppSettings,
-  type FontSize,
   type SettingsState,
   type SettingsAction,
 } from './SettingsContext.types';
+import { FONT_SIZES, type FontSize } from '@/types/font';
+import type { ScrollBehavior } from '@/types/scroll';
 import { isPageId } from '@/utils/page';
 import { isThemeId, resolveTheme } from '@/utils/theme';
 
@@ -71,14 +72,17 @@ const DEFAULT_SETTINGS: AppSettings = {
   /** Default visualization page to show on app load */
   defaultPage: 'physical',
 
+  /** App title shown in the header */
+  appName: 'Lab Map',
+
   /** Color theme: 'dark', 'light', or 'system' */
   theme: 'system',
 
   /** App-wide font size in pixels (scales UI elements) */
   fontSize: 15,
 
-  /** Enable scroll-to-zoom on canvas */
-  scrollToZoom: true,
+  /** Scroll wheel behavior on canvas */
+  scrollBehavior: 'zoom',
 
   /** Show labels on graph and layout nodes */
   showNodeLabels: true,
@@ -99,10 +103,11 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 /** localStorage keys for individual user preferences */
 const STORAGE_KEYS: Record<keyof AppSettings, string> = {
+  appName: 'lab-map-app-name',
   theme: 'lab-map-theme',
   defaultPage: 'lab-map-default-page',
   fontSize: 'lab-map-font-size',
-  scrollToZoom: 'lab-map-scroll-to-zoom',
+  scrollBehavior: 'lab-map-scroll-behavior',
   showNodeLabels: 'lab-map-show-node-labels',
   showLegend: 'lab-map-show-legend',
   showEdgeLabels: 'lab-map-show-edge-labels',
@@ -118,6 +123,11 @@ function loadUserPreferences(): Partial<AppSettings> {
   const prefs: Partial<AppSettings> = {};
 
   try {
+    const appName = localStorage.getItem(STORAGE_KEYS.appName);
+    if (appName !== null) {
+      prefs.appName = sanitizeAppName(appName);
+    }
+
     const theme = localStorage.getItem(STORAGE_KEYS.theme);
     if (theme && isThemeId(theme)) {
       prefs.theme = theme;
@@ -136,8 +146,8 @@ function loadUserPreferences(): Partial<AppSettings> {
       }
     }
 
-    const scrollToZoom = localStorage.getItem(STORAGE_KEYS.scrollToZoom);
-    if (scrollToZoom) prefs.scrollToZoom = scrollToZoom === 'true';
+    const scrollBehavior = localStorage.getItem(STORAGE_KEYS.scrollBehavior);
+    if (scrollBehavior) prefs.scrollBehavior = coerceScrollBehavior(scrollBehavior);
 
     const storedNodeLabelVisibility = localStorage.getItem(STORAGE_KEYS.showNodeLabels);
     if (storedNodeLabelVisibility) prefs.showNodeLabels = storedNodeLabelVisibility === 'true';
@@ -164,12 +174,14 @@ function loadUserPreferences(): Partial<AppSettings> {
  */
 function saveUserPreferences(settings: Partial<AppSettings>): void {
   try {
+    if (settings.appName !== undefined)
+      localStorage.setItem(STORAGE_KEYS.appName, sanitizeAppName(settings.appName));
     if (settings.theme) localStorage.setItem(STORAGE_KEYS.theme, settings.theme);
     if (settings.defaultPage) localStorage.setItem(STORAGE_KEYS.defaultPage, settings.defaultPage);
     if (settings.fontSize !== undefined)
       localStorage.setItem(STORAGE_KEYS.fontSize, String(settings.fontSize));
-    if (settings.scrollToZoom !== undefined)
-      localStorage.setItem(STORAGE_KEYS.scrollToZoom, String(settings.scrollToZoom));
+    if (settings.scrollBehavior !== undefined)
+      localStorage.setItem(STORAGE_KEYS.scrollBehavior, settings.scrollBehavior);
     if (settings.showNodeLabels !== undefined)
       localStorage.setItem(STORAGE_KEYS.showNodeLabels, String(settings.showNodeLabels));
     if (settings.showLegend !== undefined)
@@ -201,11 +213,16 @@ function mergeSettings(
 ): AppSettings {
   return {
     defaultPage: userPrefs.defaultPage ?? fileDefaults.defaultPage ?? DEFAULT_SETTINGS.defaultPage,
+    appName: sanitizeAppName(
+      userPrefs.appName ?? fileDefaults.appName ?? DEFAULT_SETTINGS.appName
+    ),
     theme: userPrefs.theme ?? fileDefaults.theme ?? DEFAULT_SETTINGS.theme,
     fontSize: coerceFontSize(
       userPrefs.fontSize ?? fileDefaults.fontSize ?? DEFAULT_SETTINGS.fontSize
     ),
-    scrollToZoom: userPrefs.scrollToZoom ?? fileDefaults.scrollToZoom ?? DEFAULT_SETTINGS.scrollToZoom,
+    scrollBehavior: coerceScrollBehavior(
+      userPrefs.scrollBehavior ?? fileDefaults.scrollBehavior ?? DEFAULT_SETTINGS.scrollBehavior
+    ),
     showNodeLabels: userPrefs.showNodeLabels ?? fileDefaults.showNodeLabels ?? DEFAULT_SETTINGS.showNodeLabels,
     showLegend: userPrefs.showLegend ?? fileDefaults.showLegend ?? DEFAULT_SETTINGS.showLegend,
     showEdgeLabels: userPrefs.showEdgeLabels ?? fileDefaults.showEdgeLabels ?? DEFAULT_SETTINGS.showEdgeLabels,
@@ -214,10 +231,22 @@ function mergeSettings(
   };
 }
 
+function sanitizeAppName(value: unknown): string {
+  const text = typeof value === 'string' ? value : '';
+  const normalized = text.replace(/[\u0000-\u001F\u007F]/g, '');
+  return normalized;
+}
+
 function coerceFontSize(value: unknown): FontSize {
   return FONT_SIZES.includes(value as FontSize)
     ? (value as FontSize)
     : DEFAULT_SETTINGS.fontSize;
+}
+
+function coerceScrollBehavior(value: unknown): ScrollBehavior {
+  return value === 'pan' || value === 'zoom'
+    ? value
+    : DEFAULT_SETTINGS.scrollBehavior;
 }
 
 /* ============================================================================
@@ -280,12 +309,21 @@ function reducer(state: SettingsState, action: SettingsAction): SettingsState {
     case 'LOAD_SETTINGS':
       return {
         ...state,
-        settings: { ...DEFAULT_SETTINGS, ...action.settings },
+        settings: mergeSettings(action.settings, {}),
       };
 
     /* ========================================================================
      * INDIVIDUAL SETTING UPDATES
      * ======================================================================== */
+
+    /**
+     * Change app title shown in the header.
+     */
+    case 'SET_APP_NAME':
+      return {
+        ...state,
+        settings: { ...state.settings, appName: sanitizeAppName(action.appName) },
+      };
 
     /**
      * Change color theme preference.
@@ -306,10 +344,10 @@ function reducer(state: SettingsState, action: SettingsAction): SettingsState {
       return { ...state, settings: { ...state.settings, fontSize: action.size } };
 
     /**
-     * Toggle scroll-to-zoom behavior.
+     * Change scroll wheel behavior mode.
      */
-    case 'SET_SCROLL_TO_ZOOM':
-      return { ...state, settings: { ...state.settings, scrollToZoom: action.isEnabled } };
+    case 'SET_SCROLL_BEHAVIOR':
+      return { ...state, settings: { ...state.settings, scrollBehavior: action.scrollBehavior } };
 
     /**
      * Toggle node label visibility.
@@ -409,8 +447,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isStoredSettingsAvailable) return;
 
-    fetch('/data/default_settings.json')
-      .then((res) => res.json())
+    const loadBootstrapSettings = async () => {
+      const res = await fetch('/data/default_settings.json');
+      if (!res.ok) throw new Error('Failed to load /data/default_settings.json');
+      return res.json();
+    };
+
+    loadBootstrapSettings()
       .then((fileDefaults) => {
         const merged = mergeSettings({}, fileDefaults);
         dispatch({ type: 'LOAD_SETTINGS', settings: merged });
