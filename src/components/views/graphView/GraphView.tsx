@@ -61,7 +61,6 @@ import { navigateTo } from '@/utils/routing';
 import type { GraphPhysics } from './GraphView.types';
 
 import './GraphView.css';
-import './zoom-controls.css';
 
 /* ============================================================================
  * TYPE DEFINITIONS

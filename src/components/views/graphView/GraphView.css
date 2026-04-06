@@ -103,3 +103,64 @@
   border-top: 1px solid var(--tt-row-border);
   word-break: break-word;
 }
+
+/* ============================================================================
+ * ZOOM CONTROLS CONTAINER
+ * Vertical button group positioned in bottom-left of canvas
+ * ============================================================================ */
+
+.zoom-controls {
+  position: absolute;
+  bottom: 48px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 9999;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+/* ============================================================================
+ * ZOOM BUTTON
+ * Individual control button with icon
+ * ============================================================================ */
+
+.zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.zoom-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.zoom-btn:active {
+  background: var(--active);
+}
+
+/* SVG icon sizing */
+.zoom-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.zoom-btn-text {
+  width: auto;
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: calc(11px * var(--ui-scale));
+  font-weight: 600;
+}
