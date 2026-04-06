@@ -1,0 +1,32 @@
+/**
+ * @file AppSubHeader.module.css
+ * @description Styles for secondary header bar container
+ *
+ * Contains only the container styles for AppSubHeader.
+ * Tab/pill styles are in the generic Tabs component.
+ */
+
+/* ============================================================================
+ * SUBHEADER CONTAINER
+ * ============================================================================ */
+
+.bar {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Webkit scrollbar styling */
+.bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.bar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
