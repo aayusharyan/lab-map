@@ -240,7 +240,7 @@
 }
 
 /* ============================================================================
- * RESPONSIVE + ACCESSIBILITY OVERRIDES
+ * ACCESSIBILITY OVERRIDES
  * ============================================================================ */
 @media (prefers-reduced-motion: reduce) {
   .notification-shell,
