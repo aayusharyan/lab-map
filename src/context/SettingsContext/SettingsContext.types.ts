@@ -27,19 +27,10 @@
 
 import { createContext } from 'react';
 
-import type { PageId } from '@/types/page';
-import type { ThemeId } from '@/types/theme';
-
-/**
- * Valid font size values in pixels.
- * Used for app-wide UI scaling (labels, buttons, headers, canvas text).
- */
-export const FONT_SIZES = [11, 13, 15, 17, 19] as const;
-
-/**
- * Font size type (restricted to valid values).
- */
-export type FontSize = (typeof FONT_SIZES)[number];
+import type { PageId } from '@/utils/page';
+import type { ThemeId } from '@/utils/theme';
+import type { FontSize } from '@/types/font';
+import type { ScrollBehavior } from '@/types/scroll';
 
 /**
  * User preferences resolved by SettingsContext.
@@ -47,9 +38,10 @@ export type FontSize = (typeof FONT_SIZES)[number];
  * These settings control application behavior and appearance.
  *
  * @property {PageId} defaultPage - Page shown on app load
+ * @property {string} appName - App title shown in the header
  * @property {ThemeId} theme - Color theme preference
  * @property {FontSize} fontSize - App-wide font size for UI scaling (pixels)
- * @property {boolean} scrollToZoom - Enable scroll-to-zoom on canvas
+ * @property {ScrollBehavior} scrollBehavior - Scroll wheel behavior on canvas
  * @property {boolean} showNodeLabels - Show labels on nodes
  * @property {boolean} showLegend - Show the legend panel
  * @property {boolean} showEdgeLabels - Show labels on edges
@@ -57,9 +49,10 @@ export type FontSize = (typeof FONT_SIZES)[number];
  */
 export interface AppSettings {
   defaultPage: PageId;
+  appName: string;
   theme: ThemeId;
   fontSize: FontSize;
-  scrollToZoom: boolean;
+  scrollBehavior: ScrollBehavior;
   showNodeLabels: boolean;
   showLegend: boolean;
   showEdgeLabels: boolean;
@@ -101,7 +94,7 @@ export interface SettingsState {
  * - SET_THEME: Change color theme preference
  * - SET_DEFAULT_PAGE: Change default page shown on app load
  * - SET_FONT_SIZE: Change app-wide font size
- * - SET_SCROLL_TO_ZOOM: Toggle scroll-to-zoom behavior
+ * - SET_SCROLL_BEHAVIOR: Change scroll wheel behavior
  * - SET_NODE_LABEL_VISIBILITY: Toggle node label visibility
  * - SET_LEGEND_VISIBILITY: Toggle legend visibility
  * - SET_EDGE_LABEL_VISIBILITY: Toggle edge label visibility
@@ -113,10 +106,11 @@ export interface SettingsState {
  */
 export type SettingsAction =
   | { type: 'LOAD_SETTINGS'; settings: Partial<AppSettings> }
+  | { type: 'SET_APP_NAME'; appName: string }
   | { type: 'SET_THEME'; theme: ThemeId }
   | { type: 'SET_DEFAULT_PAGE'; page: PageId }
   | { type: 'SET_FONT_SIZE'; size: FontSize }
-  | { type: 'SET_SCROLL_TO_ZOOM'; isEnabled: boolean }
+  | { type: 'SET_SCROLL_BEHAVIOR'; scrollBehavior: ScrollBehavior }
   | { type: 'SET_NODE_LABEL_VISIBILITY'; isVisible: boolean }
   | { type: 'SET_LEGEND_VISIBILITY'; isVisible: boolean }
   | { type: 'SET_EDGE_LABEL_VISIBILITY'; isVisible: boolean }
@@ -136,11 +130,11 @@ export type SettingsAction =
  * - dispatch: Function to dispatch SettingsAction to modify state
  *
  * Default value is null to enforce usage within SettingsProvider.
- * The useSettings() hook throws an error if used outside the provider.
+ * The useSettingsOrThrow() hook throws an error if used outside the provider.
  *
  * @example
  * // In a component (use the hook instead of direct context access)
- * const { state, dispatch } = useSettings();
+ * const { state, dispatch } = useSettingsOrThrow();
  * dispatch({ type: 'SET_THEME', theme: 'light' });
  */
 export const SettingsContext = createContext<{
