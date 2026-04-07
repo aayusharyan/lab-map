@@ -10,7 +10,7 @@
  * Data Flow:
  * - Loads traffic.json independently for flows list (browser caches request)
  * - Derives active sub-page from URL via useRouter hook
- * - Navigates via navigateTo(), updating URL to change flow filter
+ * - Navigates via navigateToSubPage(), updating URL to change flow filter
  *
  * Component Structure:
  *   AppSubHeader
@@ -31,7 +31,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Tabs } from '@/components/Tabs';
 import { useActivePage } from '@/hooks/useActivePage';
 import { useRouter } from '@/hooks/useRouter';
-import { navigateTo } from '@/utils/routing';
+import { navigateToSubPage } from '@/utils/routing';
 
 import type { TabItem } from '@/components/Tabs';
 import type { Flow } from '@/types/topology';
@@ -100,7 +100,7 @@ export function AppSubHeader() {
    * @param newFlowId - Flow ID to select, or null for "all flows"
    */
   function handleFlowChange(newFlowId: string | null) {
-    navigateTo('traffic', newFlowId, null, null);
+    navigateToSubPage(newFlowId);
   }
 
   return (
