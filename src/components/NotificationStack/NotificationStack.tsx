@@ -47,7 +47,7 @@ import './NotificationStack.css';
  * Shows up to 3 notifications simultaneously with depth-based transforms.
  * Handles dismiss animations, trace modal, and automatic queue replacement.
  *
- * Returns null if no notifications are currently set.
+ * Returns null when there are no visible notifications to display.
  *
  * @returns {JSX.Element | null} Notification stack or null if no notifications
  */
