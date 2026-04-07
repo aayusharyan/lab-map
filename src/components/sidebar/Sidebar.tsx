@@ -33,7 +33,7 @@ import { useRef, useMemo } from 'react';
 
 import type { GraphViewHandle } from '@/components/views/graphView/GraphView';
 import { Legend } from './Legend';
-import { useActivePage } from '@/hooks/useActivePage';
+import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useSidebarResize } from '@/hooks/useSidebarResize';
 import { useTheme } from '@/hooks/useTheme';
@@ -287,7 +287,7 @@ function ConnectionList({ node, allNodes, allEdges, onNodeClick }: {
  * Includes resize handle, page description, and optional legend.
  */
 export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pageLabel, pageDescription, nodeTypes, edgeTypes }: Props) {
-  const activePage = useActivePage();
+  const { page: activePage } = useRoute();
   const { showLegend: isLegendVisible } = useSettingsValue();
 
   /** Ref for sidebar element (used by resize hook) */
