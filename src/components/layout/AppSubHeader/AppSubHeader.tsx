@@ -9,7 +9,7 @@
  *
  * Data Flow:
  * - Loads traffic.json independently for flows list (browser caches request)
- * - Derives active sub-page from URL via useRouter hook
+ * - Derives active sub-page from URL via useRoute hook
  * - Navigates via navigateToSubPage(), updating URL to change flow filter
  *
  * Component Structure:
@@ -17,7 +17,7 @@
  *   └─ bar (container)
  *      └─ Tabs (pill variant with "All flows" option)
  *
- * @see useRouter.ts - Central routing hook for URL state
+ * @see useRoute.ts - Central routing hook for URL state
  * @see routing.ts - Navigation utilities
  * @see Tabs - Generic tabs component used for flow pills
  */
@@ -29,8 +29,7 @@
 import { useState, useEffect, useMemo } from 'react';
 
 import { Tabs } from '@/components/Tabs';
-import { useActivePage } from '@/hooks/useActivePage';
-import { useRouter } from '@/hooks/useRouter';
+import { useRoute } from '@/hooks/useRoute';
 import { navigateToSubPage } from '@/utils/routing';
 
 import type { TabItem } from '@/components/Tabs';
@@ -52,8 +51,7 @@ import styles from './AppSubHeader.module.css';
  * @returns Subheader element or null for non-traffic pages
  */
 export function AppSubHeader() {
-  const activePage = useActivePage();
-  const { subPageId } = useRouter();
+  const { page: activePage, subPageId } = useRoute();
   const [flows, setFlows] = useState<Flow[]>([]);
 
   /**
