@@ -9,7 +9,7 @@
  *
  * Data Flow:
  * - Loads traffic.json independently for flows list (browser caches request)
- * - Derives active flow from URL via useFlowFromUrl hook
+ * - Derives active sub-page from URL via useRouter hook
  * - Navigates via navigateTo(), updating URL to change flow filter
  *
  * Component Structure:
@@ -17,7 +17,7 @@
  *   └─ bar (container)
  *      └─ Tabs (pill variant with "All flows" option)
  *
- * @see useFlowFromUrl.ts - Hook for URL-derived flow state
+ * @see useRouter.ts - Central routing hook for URL state
  * @see routing.ts - Navigation utilities
  * @see Tabs - Generic tabs component used for flow pills
  */
@@ -30,7 +30,7 @@ import { useState, useEffect, useMemo } from 'react';
 
 import { Tabs } from '@/components/Tabs';
 import { useActivePage } from '@/hooks/useActivePage';
-import { useFlowFromUrl } from '@/hooks/useFlowFromUrl';
+import { useRouter } from '@/hooks/useRouter';
 import { navigateTo } from '@/utils/routing';
 
 import type { TabItem } from '@/components/Tabs';
@@ -53,7 +53,7 @@ import styles from './AppSubHeader.module.css';
  */
 export function AppSubHeader() {
   const activePage = useActivePage();
-  const { flowId } = useFlowFromUrl();
+  const { subPageId } = useRouter();
   const [flows, setFlows] = useState<Flow[]>([]);
 
   /**
@@ -107,7 +107,7 @@ export function AppSubHeader() {
     <div className={styles.bar}>
       <Tabs<string>
         items={flowItems}
-        activeId={flowId}
+        activeId={subPageId}
         onSelect={handleFlowChange}
         variant="pill"
         allOption={{ label: 'All flows' }}
