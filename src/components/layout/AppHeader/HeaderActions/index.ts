@@ -1,10 +1,6 @@
 /**
  * @file index.ts
- * @description Barrel export for the HeaderActions module
- *
- * Public API:
- * - Components:
- *   - HeaderActions
+ * @description Barrel export for HeaderActions
  *
  * Import style:
  * import { HeaderActions } from '@/components/layout/AppHeader/HeaderActions';

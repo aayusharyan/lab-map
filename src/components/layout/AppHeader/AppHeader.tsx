@@ -26,7 +26,7 @@
 import { useMemo } from 'react';
 
 import { Tabs } from '@/components/Tabs';
-import { useActivePage } from '@/hooks/useActivePage';
+import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
 import { navigateToPage } from '@/utils/routing';
@@ -53,7 +53,7 @@ import styles from './AppHeader.module.css';
  */
 export function AppHeader() {
   const { appName } = useSettingsValue();
-  const activePage = useActivePage();
+  const { page: activePage } = useRoute();
   const displayAppName = appName.trim() || 'Lab Map';
 
   /**
