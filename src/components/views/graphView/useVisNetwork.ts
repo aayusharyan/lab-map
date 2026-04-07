@@ -11,7 +11,7 @@
  * Features:
  * - Network initialization with shared configuration
  * - Middle mouse button panning
- * - Click selection via URL navigation (selection derived via useSelection hook)
+ * - Click selection via URL navigation (selection derived in page component)
  * - Theme-aware node/edge coloring
  * - Font size synchronization
  * - Degree-based node mass for physics
@@ -43,7 +43,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { Network, DataSet } from 'vis-network/standalone';
 
-import { useFlowFromUrl } from '@/hooks/useFlowFromUrl';
+import { useRouter } from '@/hooks/useRouter';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import type { PageId } from '@/utils/page';
@@ -52,7 +52,7 @@ import type { RawNode, RawEdge } from '@/types/topology';
 import { getNodeTypeOrThrow, getNodeThemeColor, toVisNodeColor } from '@/utils/nodeType';
 import { getEdgeTypeOrThrow, toVisEdgeColor } from '@/utils/edgeType';
 import { buildPageData } from '@/utils/page';
-import { navigateTo } from '@/utils/routing';
+import { navigateToNode, navigateToEdge, clearSelection } from '@/utils/routing';
 
 /* ============================================================================
  * TYPE DEFINITIONS
@@ -209,7 +209,7 @@ export function useVisNetwork({
     fontSize,
   } = useSettingsValue();
   const { resolvedTheme } = useTheme();
-  const { flowId } = useFlowFromUrl();
+  const { subPageId } = useRouter();
 
   /** Ref to track node-label visibility for use in callbacks */
   const isNodeLabelsVisibleRef = useRef(isNodeLabelsVisible);
@@ -302,7 +302,7 @@ export function useVisNetwork({
       net.redraw();
     });
 
-    /* Click handler for node/edge selection (updates URL, selection derived via useSelection) */
+    /* Click handler for node/edge selection (updates URL, selection derived in page) */
     net.on('click', (params: { nodes: string[]; edges: string[] }) => {
       if (params.nodes.length) {
         const nodeId = params.nodes[0];
@@ -312,21 +312,21 @@ export function useVisNetwork({
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           const clusterOpts = (net as any).body.nodes[nodeId]?.options;
           if (clusterOpts?._raw) {
-            navigateTo(pageId, flowId, 'node', clusterOpts._raw.id);
+            navigateToNode(clusterOpts._raw.id);
           }
           return;
         }
 
         /* Handle regular node click */
         const visNode = nodeSetRef.current.get(nodeId);
-        if (visNode?._raw) navigateTo(pageId, flowId, 'node', visNode._raw.id);
+        if (visNode?._raw) navigateToNode(visNode._raw.id);
       } else if (params.edges.length) {
         /* Handle edge click */
         const visEdge = edgeSetRef.current.get(params.edges[0]);
-        if (visEdge?._raw) navigateTo(pageId, flowId, 'edge', visEdge._raw.id);
+        if (visEdge?._raw) navigateToEdge(visEdge._raw.id);
       } else {
         /* Click on empty space - clear selection */
-        navigateTo(pageId, flowId, null, null);
+        clearSelection();
       }
     });
 
