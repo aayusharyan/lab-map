@@ -19,7 +19,7 @@
  *
  * Data Flow:
  * - Nodes, edges, and selection are passed as props from parent page component
- * - Selection is derived from URL via useSelection hook in parent
+ * - Selection is derived from URL in parent page component
  * - Parent handles data loading and selection; this component handles display
  *
  * @see Legend/index.ts - Legend component
@@ -34,7 +34,6 @@ import { useRef, useMemo } from 'react';
 import type { GraphViewHandle } from '@/components/views/graphView/GraphView';
 import { Legend } from './Legend';
 import { useActivePage } from '@/hooks/useActivePage';
-import { useFlowFromUrl } from '@/hooks/useFlowFromUrl';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useSidebarResize } from '@/hooks/useSidebarResize';
 import { useTheme } from '@/hooks/useTheme';
@@ -42,7 +41,7 @@ import type { RawNode, RawEdge } from '@/types/topology';
 import { getNodeTypeOrThrow, type NodeType } from '@/utils/nodeType';
 import { getEdgeTypeOrThrow, toVisEdgeColor, type EdgeType } from '@/utils/edgeType';
 import { flattenAttributes } from '@/utils/node';
-import { navigateTo } from '@/utils/routing';
+import { navigateToNode } from '@/utils/routing';
 
 import '@/styles/components/sidebar.css';
 
@@ -289,7 +288,6 @@ function ConnectionList({ node, allNodes, allEdges, onNodeClick }: {
  */
 export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pageLabel, pageDescription, nodeTypes, edgeTypes }: Props) {
   const activePage = useActivePage();
-  const { flowId } = useFlowFromUrl();
   const { showLegend: isLegendVisible } = useSettingsValue();
 
   /** Ref for sidebar element (used by resize hook) */
@@ -318,7 +316,7 @@ export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pa
   function handleNodeClick(nodeId: string) {
     const n = nodes.find(n => n.id === nodeId);
     if (n) {
-      navigateTo(activePage, flowId, 'node', nodeId);
+      navigateToNode(nodeId);
       graphRef.current?.focusNode(nodeId);
     }
   }
