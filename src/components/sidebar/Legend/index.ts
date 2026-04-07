@@ -1,10 +1,6 @@
 /**
  * @file index.ts
- * @description Barrel export for the Legend module
- *
- * Public API:
- * - Components:
- *   - Legend
+ * @description Barrel export for Legend
  *
  * Import style:
  * import { Legend } from '@/components/sidebar/Legend';
