@@ -1,9 +1,13 @@
 /**
- * @file graph-view.css
- * @description Styles for the GraphView component (vis-network tooltips)
+ * @file GraphView.css
+ * @description Styles for the GraphView component canvas, tooltips, and zoom controls
  *
- * Custom tooltip styling for vis-network graph nodes. Must be global CSS
- * (not CSS modules) because vis-network generates these elements internally.
+ * Covers three concerns: notification stack positioning within the graph canvas,
+ * custom tooltip overrides for vis-network (which injects DOM elements directly),
+ * and the zoom control button group in the canvas corner.
+ *
+ * Must be global CSS (not CSS Modules) because vis-network generates tooltip
+ * elements outside React's control.
  */
 
 /* ============================================================================
