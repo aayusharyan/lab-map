@@ -1,0 +1,147 @@
+/**
+ * @file layout-view.css
+ * @description Styles for the LayoutView (rack visualization) component
+ *
+ * Includes the Konva canvas container and toast notifications
+ * shown after exporting the rack view to PNG.
+ */
+
+/* ============================================================================
+ * NOTIFICATION STACK POSITIONING
+ * Top-right region for notification toasts within LayoutView.
+ * ============================================================================ */
+
+.notification-stack {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: min(100% - 24px, clamp(260px, 34vw, 440px));
+  min-height: 1px;
+  z-index: 20;
+}
+
+@media (max-width: 960px) {
+  .notification-stack {
+    right: 10px;
+    top: 10px;
+    width: min(100% - 20px, clamp(240px, 68vw, 360px));
+  }
+}
+
+/* ============================================================================
+ * RACK CANVAS
+ * ============================================================================ */
+
+#layout-view-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  background: #f4f5f8;     /* Light mode layout-view bg (default) */
+  overflow: hidden;
+  cursor: default;
+}
+
+/* Dark mode layout-view canvas background */
+:root[data-theme="dark"] #layout-view-canvas {
+  background: #0d0e11;
+}
+
+/* ============================================================================
+ * TOAST NOTIFICATION
+ * Temporary notification shown after exporting layout-view view (e.g., to PNG).
+ * ============================================================================ */
+
+.layout-view-toast {
+  position: fixed;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #ffffff;
+  border: 1px solid #e2e5ed;
+  color: #111827;
+  font-family: var(--font);
+  font-size: calc(12px * var(--ui-scale));
+  padding: 6px 18px;
+  border-radius: 20px;      /* Pill shape */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+/* Visible state */
+.layout-view-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Dark mode toast styling */
+:root[data-theme="dark"] .layout-view-toast {
+  background: #1a1c24;
+  border-color: #2e3040;
+  color: #c9d1e0;
+}
+
+/* ============================================================================
+ * ZOOM CONTROLS CONTAINER
+ * Vertical button group positioned in bottom-left of canvas
+ * ============================================================================ */
+
+.zoom-controls {
+  position: absolute;
+  bottom: 48px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 9999;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+/* ============================================================================
+ * ZOOM BUTTON
+ * Individual control button with icon
+ * ============================================================================ */
+
+.zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.zoom-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.zoom-btn:active {
+  background: var(--active);
+}
+
+/* SVG icon sizing */
+.zoom-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.zoom-btn-text {
+  width: auto;
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: calc(11px * var(--ui-scale));
+  font-weight: 600;
+}
