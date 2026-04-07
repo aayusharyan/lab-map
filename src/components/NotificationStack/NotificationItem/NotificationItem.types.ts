@@ -1,6 +1,13 @@
 /**
  * @file NotificationItem.types.ts
- * @description Type definitions for NotificationItem component
+ * @description Props interface for the NotificationItem component
+ *
+ * Defines the props contract between NotificationStack (parent) and
+ * NotificationItem (child). Stack depth and animation state are managed
+ * by NotificationStack and passed down here for CSS variable injection.
+ *
+ * @see NotificationItem.tsx - Component consuming these props
+ * @see NotificationStack.tsx - Parent that computes depth and exit state
  */
 
 import type { NotificationInput } from '@/utils/notification';
