@@ -29,7 +29,7 @@ import { Tabs } from '@/components/Tabs';
 import { useActivePage } from '@/hooks/useActivePage';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
-import { navigateTo } from '@/utils/routing';
+import { navigateToPage } from '@/utils/routing';
 
 import { HeaderActions } from './HeaderActions';
 
@@ -76,7 +76,7 @@ export function AppHeader() {
    */
   function handlePageSelect(pageId: PageId | null) {
     if (pageId) {
-      navigateTo(pageId, null, null, null);
+      navigateToPage(pageId);
     }
   }
 
