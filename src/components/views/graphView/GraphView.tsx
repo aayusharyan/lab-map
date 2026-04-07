@@ -49,14 +49,14 @@ import { Network, DataSet } from 'vis-network/standalone';
 
 import { NotificationStack } from '@/components/NotificationStack/NotificationStack';
 import { useActivePage } from '@/hooks/useActivePage';
-import { useFlowFromUrl } from '@/hooks/useFlowFromUrl';
+import { useRouter } from '@/hooks/useRouter';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import type { RawNode, RawEdge } from '@/types/topology';
 import { getNodeTypeOrThrow, getNodeThemeColor, toVisNodeColor, buildNodeFont } from '@/utils/nodeType';
 import { getEdgeTypeOrThrow, toVisEdgeColor } from '@/utils/edgeType';
 import { buildPageData } from '@/utils/page';
-import { navigateTo } from '@/utils/routing';
+import { navigateToNode, navigateToEdge, clearSelection } from '@/utils/routing';
 
 import type { GraphPhysics } from './GraphView.types';
 
@@ -237,7 +237,7 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
     nodeAnimation: isNodeAnimationEnabled,
   } = useSettingsValue();
   const { resolvedTheme } = useTheme();
-  const { flowId } = useFlowFromUrl();
+  const { subPageId } = useRouter();
 
   /** Ref to track node-label visibility for use in callbacks */
   const isNodeLabelsVisibleRef = useRef(isNodeLabelsVisible);
@@ -248,8 +248,8 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
   /** Ref to track activePage for use in event callbacks */
   const activePageRef = useRef(activePage);
 
-  /** Ref to track flowId for use in event callbacks */
-  const flowIdRef = useRef(flowId);
+  /** Ref to track subPageId for use in event callbacks */
+  const subPageIdRef = useRef(subPageId);
 
   /** Ref to track theme for use in event callbacks */
   const themeRef = useRef(resolvedTheme);
@@ -276,11 +276,11 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
   }, [activePage]);
 
   /**
-   * Keep flowId ref in sync for use in event callbacks.
+   * Keep subPageId ref in sync for use in event callbacks.
    */
   useEffect(() => {
-    flowIdRef.current = flowId;
-  }, [flowId]);
+    subPageIdRef.current = subPageId;
+  }, [subPageId]);
 
   /**
    * Keep theme ref in sync for use in event callbacks.
@@ -403,8 +403,6 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
 
     /* Click handler for node/edge selection */
     net.on('click', (params: { nodes: string[]; edges: string[] }) => {
-      const currentPage = activePageRef.current;
-      const currentFlowId = flowIdRef.current;
       if (params.nodes.length) {
         const nodeId = params.nodes[0];
 
@@ -413,7 +411,7 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           const clusterOpts = (net as any).body.nodes[nodeId]?.options;
           if (clusterOpts?._raw) {
-            navigateTo(currentPage, currentFlowId, 'node', clusterOpts._raw.id);
+            navigateToNode(clusterOpts._raw.id);
           }
           return;
         }
@@ -421,17 +419,17 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
         /* Handle regular node click */
         const visNode = nodeSetRef.current.get(nodeId);
         if (visNode?._raw) {
-          navigateTo(currentPage, currentFlowId, 'node', visNode._raw.id);
+          navigateToNode(visNode._raw.id);
         }
       } else if (params.edges.length) {
         /* Handle edge click */
         const visEdge = edgeSetRef.current.get(params.edges[0]);
         if (visEdge?._raw) {
-          navigateTo(currentPage, currentFlowId, 'edge', visEdge._raw.id);
+          navigateToEdge(visEdge._raw.id);
         }
       } else {
         /* Click on empty space - clear selection */
-        navigateTo(currentPage, currentFlowId, null, null);
+        clearSelection();
       }
     });
 
