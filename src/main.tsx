@@ -9,12 +9,12 @@
  * Provider Hierarchy:
  *   StrictMode (React development checks)
  *     └─ SettingsProvider (theme, font size, UI preferences)
- *         └─ AppProvider (topology data, selected node, active layer)
+ *         └─ NotificationProvider (notifications from any source)
  *             └─ App (root component)
  *
  * This hierarchy ensures that:
  * 1. Settings are available to all components (outermost provider)
- * 2. App state can access settings when needed
+ * 2. Validation warnings are available to any component that needs them
  * 3. StrictMode catches potential issues during development
  *
  * Entry Point:
@@ -36,7 +36,7 @@ import './styles/index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { AppProvider } from '@/context/AppContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 
 import App from './App';
@@ -63,14 +63,14 @@ const root = createRoot(rootElement);
  *
  * Provider order matters:
  * - SettingsProvider: Outermost, provides theme/UI settings to entire app
- * - AppProvider: Inner, provides topology data and selection state
+ * - NotificationProvider: Inner, provides notification state for any source
  */
 root.render(
   <StrictMode>
     <SettingsProvider>
-      <AppProvider>
+      <NotificationProvider>
         <App />
-      </AppProvider>
+      </NotificationProvider>
     </SettingsProvider>
   </StrictMode>
 );
