@@ -43,7 +43,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { Network, DataSet } from 'vis-network/standalone';
 
-import { useRouter } from '@/hooks/useRouter';
+import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import type { PageId } from '@/utils/page';
@@ -209,7 +209,7 @@ export function useVisNetwork({
     fontSize,
   } = useSettingsValue();
   const { resolvedTheme } = useTheme();
-  const { subPageId } = useRouter();
+  const { subPageId } = useRoute();
 
   /** Ref to track node-label visibility for use in callbacks */
   const isNodeLabelsVisibleRef = useRef(isNodeLabelsVisible);
