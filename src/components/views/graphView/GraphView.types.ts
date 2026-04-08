@@ -1,5 +1,5 @@
 /**
- * @file types.ts
+ * @file GraphView.types.ts
  * @description Graph-specific type definitions for vis-network rendering
  *
  * Contains physics simulation configuration interfaces used by GraphView
