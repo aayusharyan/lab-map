@@ -14,7 +14,7 @@
  * - No data loading/parsing side effects
  *
  * @see edge.types.ts - Canonical `Edge` and `EdgeAttribute` contracts
- * @see src/components/sidebar/SidebarEdge.tsx - Edge sidebar attribute display
+ * @see src/components/sidebar/Sidebar.tsx - Edge sidebar attribute display
  */
 
 import type { EdgeAttribute } from './edge.types';
