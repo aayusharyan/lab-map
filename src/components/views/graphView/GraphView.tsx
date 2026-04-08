@@ -48,8 +48,7 @@ import { useRef, useEffect, forwardRef, useImperativeHandle, memo } from 'react'
 import { Network, DataSet } from 'vis-network/standalone';
 
 import { NotificationStack } from '@/components/NotificationStack/NotificationStack';
-import { useActivePage } from '@/hooks/useActivePage';
-import { useRouter } from '@/hooks/useRouter';
+import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import type { RawNode, RawEdge } from '@/types/topology';
@@ -98,6 +97,16 @@ export interface GraphViewProps {
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type VisNetwork = any;
 
+/**
+ * Search a node's attribute bags (top-level, subSections, and sections) for a key.
+ *
+ * Searches in order: node.attributes → node.subSections → node.sections (and their subSections).
+ * Returns the first matching value, or undefined if the key is absent.
+ *
+ * @param {RawNode} node - Node to search
+ * @param {string} key - Attribute key to look up
+ * @returns {string | undefined} First matching attribute value, or undefined
+ */
 function getNodeAttribute(node: RawNode, key: string): string | undefined {
   if (Array.isArray(node.attributes)) {
     for (const bag of node.attributes) {
@@ -228,7 +237,7 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
 
   /* ===== State & Context ===== */
 
-  const activePage = useActivePage();
+  const { page: activePage, subPageId } = useRoute();
   const {
     showNodeLabels: isNodeLabelsVisible,
     showEdgeLabels: isEdgeLabelsVisible,
@@ -237,7 +246,6 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
     nodeAnimation: isNodeAnimationEnabled,
   } = useSettingsValue();
   const { resolvedTheme } = useTheme();
-  const { subPageId } = useRouter();
 
   /** Ref to track node-label visibility for use in callbacks */
   const isNodeLabelsVisibleRef = useRef(isNodeLabelsVisible);
