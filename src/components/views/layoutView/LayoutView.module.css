@@ -1,0 +1,120 @@
+/**
+ * @file LayoutView.module.css
+ * @description Scoped styles for the LayoutView (rack visualization) component
+ *
+ * CSS Module providing component-scoped styles for the Konva-based rack
+ * layout canvas. Uses :global() for overriding shared component positioning.
+ *
+ * Scoped Classes:
+ * - dotGrid: Infinite repeating dot pattern background
+ * - zoomControls: Vertical button group container
+ * - zoomBtn: Individual zoom/action button
+ * - zoomBtnText: Text variant of zoom button (wider)
+ *
+ * Global Overrides:
+ * - .notification-stack: Repositions NotificationStack within this view
+ * - .canvas-container: Combined with dotGrid for background pattern
+ */
+
+/* ============================================================================
+ * NOTIFICATION STACK POSITIONING
+ * Top-right region for notification toasts within LayoutView.
+ * Uses :global() since NotificationStack uses a global class name.
+ * ============================================================================ */
+
+:global(.notification-stack) {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: min(100% - 24px, clamp(260px, 34vw, 440px));
+  min-height: 1px;
+  z-index: 20;
+}
+
+@media (max-width: 960px) {
+  :global(.notification-stack) {
+    right: 10px;
+    top: 10px;
+    width: min(100% - 20px, clamp(240px, 68vw, 360px));
+  }
+}
+
+/* ============================================================================
+ * DOT GRID PATTERN
+ * Infinite repeating dot pattern for canvas backgrounds.
+ * Uses CSS radial-gradient which tiles automatically - no JS drawing needed.
+ * Combines with global .canvas-container class from base/layout.css.
+ * ============================================================================ */
+
+:global(.canvas-container).dotGrid {
+  --dot-size: 1.2px;
+  --dot-spacing: 24px;
+  --dot-color: rgba(0, 0, 0, 0.08);
+  background-image: radial-gradient(circle, var(--dot-color) var(--dot-size), transparent var(--dot-size));
+  background-size: var(--dot-spacing) var(--dot-spacing);
+}
+
+:root[data-theme="dark"] :global(.canvas-container).dotGrid {
+  --dot-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ============================================================================
+ * ZOOM CONTROLS CONTAINER
+ * Vertical button group positioned in bottom-left of canvas
+ * ============================================================================ */
+
+.zoomControls {
+  position: absolute;
+  bottom: 48px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 9999;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+/* ============================================================================
+ * ZOOM BUTTON
+ * Individual control button with icon
+ * ============================================================================ */
+
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.zoomBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.zoomBtn:active {
+  background: var(--active);
+}
+
+/* SVG icon sizing */
+.zoomBtn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.zoomBtnText {
+  width: auto;
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: calc(11px * var(--ui-scale));
+  font-weight: 600;
+}

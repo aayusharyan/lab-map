@@ -45,7 +45,7 @@ import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import { getNodeTypeOrThrow } from '@/utils/nodeType';
 
-import './LayoutView.css';
+import styles from './LayoutView.module.css';
 import '@/styles/components/page-loading.css';
 
 /* ============================================================================
@@ -695,7 +695,7 @@ function buildScene(data: LayoutData, isDarkTheme: boolean, fontSize: number, is
       {/* Konva canvas container with CSS dot grid */}
       <div
         ref={containerRef}
-        className="canvas-container dot-grid"
+        className={`canvas-container ${styles.dotGrid}`}
         style={{
           backgroundColor: isDark ? '#0d0e11' : '#f4f5f8',
           cursor: 'default',
@@ -708,25 +708,25 @@ function buildScene(data: LayoutData, isDarkTheme: boolean, fontSize: number, is
 
       {/* Zoom controls overlay - sibling to avoid being covered by Konva */}
       {!isLoading && (
-        <div className="zoom-controls">
-          <button className="zoom-btn" title="Reset view" onClick={handleFit}>
+        <div className={styles.zoomControls}>
+          <button className={styles.zoomBtn} title="Reset view" onClick={handleFit}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
             </svg>
           </button>
-          <button className="zoom-btn" title="Zoom in" onClick={handleZoomIn}>
+          <button className={styles.zoomBtn} title="Zoom in" onClick={handleZoomIn}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35M11 8v6M8 11h6" />
             </svg>
           </button>
-          <button className="zoom-btn" title="Zoom out" onClick={handleZoomOut}>
+          <button className={styles.zoomBtn} title="Zoom out" onClick={handleZoomOut}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35M8 11h6" />
             </svg>
           </button>
-          <button className="zoom-btn zoom-btn-text" title="Copy rack layout JSON to clipboard" onClick={handleExportJSON}>
+          <button className={`${styles.zoomBtn} ${styles.zoomBtnText}`} title="Copy rack layout JSON to clipboard" onClick={handleExportJSON}>
             Export JSON
           </button>
         </div>
