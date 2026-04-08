@@ -16,8 +16,7 @@
  * - No data loading/parsing side effects
  *
  * @see node.types.ts - Canonical `Node` and `NodeAttribute` contracts
- * @see src/components/sidebar/SidebarNode.tsx - Section/attribute rendering
- * @see src/components/sidebar/SidebarEdge.tsx - Endpoint attribute lookup
+ * @see src/components/sidebar/Sidebar.tsx - Section/attribute rendering
  * @see src/components/views/graphView/GraphView.tsx - VLAN attribute lookups
  */
 
