@@ -3,8 +3,8 @@
  * @description Hook for dark/light/system theme management
  *
  * This hook manages the application's color theme preference.
- * It resolves the selected preference to an actual light/dark theme,
- * synchronizes that value with the DOM, and exposes a convenient toggle.
+ * It resolves the selected preference to an actual light/dark theme
+ * and synchronizes that value with the DOM.
  *
  * Hook Type: Derived (wraps useSettings)
  * This hook calls useSettingsOrThrow() internally, which is a context-based hook.
@@ -32,13 +32,13 @@
  * attribute to apply the appropriate color scheme.
  *
  * @example
- * function ThemeToggle() {
- *   const { theme, resolvedTheme, toggleTheme } = useTheme();
+ * function ThemeDisplay() {
+ *   const { theme, resolvedTheme } = useTheme();
  *
  *   return (
- *     <button onClick={toggleTheme}>
- *       Current: {theme} ({resolvedTheme})
- *     </button>
+ *     <div>
+ *       Preference: {theme} / Active: {resolvedTheme}
+ *     </div>
  *   );
  * }
  *
