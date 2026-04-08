@@ -19,8 +19,8 @@
  * useSettingsValue() and useSettingsPanel() inherit this behavior since they
  * call useSettingsOrThrow() internally.
  *
- * Note: Browser API hooks (useActivePage, useSelection) don't throw because
- * they read from window.location which always exists in a browser environment.
+ * Note: Browser API hooks (useRoute) don't throw because they read from
+ * window.location which always exists in a browser environment.
  * Only context-based hooks need provider validation.
  *
  * Available Hooks:
@@ -43,7 +43,6 @@
  *
  * @see SettingsContext/SettingsContext.tsx - Provider component and reducer implementation
  * @see SettingsContext/SettingsContext.types.ts - Type definitions
- * @see useAppContext.ts - Similar pattern for app-level state
  */
 
 /* ============================================================================
