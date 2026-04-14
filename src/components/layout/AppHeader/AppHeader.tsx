@@ -46,7 +46,7 @@ import styles from './AppHeader.module.css';
  *
  * Renders the top navigation bar with:
  * - App title (from settings, defaults to "Lab Map")
- * - Page navigation tabs (Physical, Traffic, VLAN, Rack)
+ * - Page navigation tabs (Physical, Traffic, VLAN)
  * - Header actions section (settings)
  *
  * @returns Header element
