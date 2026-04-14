@@ -255,18 +255,48 @@
   border-color: var(--accent);
 }
 
-/* Font size control in settings panel */
+/* ============================================================================
+ * FONT SIZE CONTROL
+ * Button group with A-/A+ buttons and value display for UI scale adjustment.
+ * ============================================================================ */
+
+/* Control group wrapper */
 .fontCtrl {
-  width: fit-content;
+  display: flex;
   align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  width: fit-content;
 }
 
-.fontCtrl :global(.font-size-val) {
-  align-self: stretch;
+/* A- and A+ buttons */
+.fontBtn {
+  padding: 4px 9px;
+  border: none;
+  border-radius: 0;
+  font-size: calc(11px * var(--ui-scale));
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Divider lines around the center value display */
+.fontCtrl .fontBtn:first-child { border-right: 1px solid var(--border); }
+.fontCtrl .fontBtn:last-child  { border-left:  1px solid var(--border); }
+
+/* Numeric font-size indicator (e.g., "14") */
+.fontVal {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   padding: 0 8px;
+  text-align: center;
+  font-size: calc(11px * var(--ui-scale));
+  color: var(--text-muted);
+  font-family: "JetBrains Mono", monospace;
+  user-select: none;
+  background: var(--surface2);
   line-height: 1;
 }
