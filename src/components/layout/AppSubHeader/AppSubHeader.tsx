@@ -5,7 +5,7 @@
  * This component renders a subheader bar between AppHeader and page content.
  * Content varies by page:
  * - Traffic: Flow filter pills (URL-driven)
- * - Physical/VLAN/Rack: No subheader (returns null)
+ * - Physical/VLAN: No subheader (returns null)
  *
  * Data Flow:
  * - Loads traffic.json independently for flows list (browser caches request)
@@ -29,11 +29,11 @@
 import { useState, useEffect, useMemo } from 'react';
 
 import { Tabs } from '@/components/Tabs';
+import type { TabItem } from '@/components/Tabs';
 import { useRoute } from '@/hooks/useRoute';
+import type { Flow } from '@/utils/page';
 import { navigateToSubPage } from '@/utils/routing';
 
-import type { TabItem } from '@/components/Tabs';
-import type { Flow } from '@/types/topology';
 
 import styles from './AppSubHeader.module.css';
 
