@@ -34,7 +34,7 @@ import { useEffect } from 'react';
 import { useFontSize } from '@/hooks/useFontSize';
 import { useSettingsOrThrow, useSettingsPanel } from '@/hooks/useSettings';
 import type { ScrollBehavior } from '@/context/SettingsContext';
-import { IconX } from '@tabler/icons-react';
+import { IconTextDecrease, IconTextIncrease, IconX } from '@tabler/icons-react';
 import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
 import { THEMES, THEME_IDS, type ThemeId } from '@/utils/theme';
 
@@ -227,14 +227,14 @@ export function SettingsPanel() {
                 title="Decrease font size"
                 disabled={!isDecrementAllowed}
                 onClick={decrement}
-              >A−</button>
+              ><IconTextDecrease aria-hidden="true" stroke={1.8} /></button>
               <span className={styles.fontVal}>{fontSize}</span>
               <button
                 className={`btn-icon ${styles.fontBtn}`}
                 title="Increase font size"
                 disabled={!isIncrementAllowed}
                 onClick={increment}
-              >A+</button>
+              ><IconTextIncrease aria-hidden="true" stroke={1.8} /></button>
             </div>
           </div>
 
