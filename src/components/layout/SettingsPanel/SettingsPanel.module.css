@@ -271,14 +271,17 @@
   width: fit-content;
 }
 
-/* A- and A+ buttons */
+/* A- and A+ icon buttons */
 .fontBtn {
-  padding: 4px 9px;
+  padding: 4px 6px;
   border: none;
   border-radius: 0;
-  font-size: calc(11px * var(--ui-scale));
-  font-weight: 700;
-  letter-spacing: -0.5px;
+
+  & svg {
+    width: calc(14px * var(--ui-scale));
+    height: calc(14px * var(--ui-scale));
+    display: block;
+  }
 }
 
 /* Divider lines around the center value display */
