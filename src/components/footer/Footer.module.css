@@ -1,0 +1,56 @@
+/**
+ * @file Footer.module.css
+ * @description Styles for application footer component
+ *
+ * Renders a footer bar with optional page description (left)
+ * and GitHub link (right). Extends structural styles from base/layout.css.
+ */
+
+/* ============================================================================
+ * FOOTER CONTAINER
+ * Typography and padding for the footer shell.
+ * ============================================================================ */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  font-size: calc(12px * var(--ui-scale));
+  color: var(--text-muted);
+  line-height: 1.4;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * FOOTER TEXT
+ * Main footer copy with safe ellipsis in narrow widths.
+ * ============================================================================ */
+
+.text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================================================
+ * GITHUB LINK
+ * Right-aligned external link with hover accent feedback.
+ * ============================================================================ */
+
+.link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: calc(11px * var(--ui-scale));
+  flex-shrink: 0;
+  margin-left: 16px;
+  transition: color 0.15s;
+}
+
+.link:hover {
+  color: var(--accent);
+}
