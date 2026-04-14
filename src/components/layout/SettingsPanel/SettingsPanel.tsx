@@ -17,7 +17,7 @@
  * - Legend: Legend panel visibility
  *
  * The panel is displayed as an overlay with a dismissible backdrop.
- * Clicking the backdrop or close button dismisses the panel.
+ * Clicking the backdrop, pressing Escape, or clicking the close button dismisses the panel.
  *
  * @example
  * <SettingsPanel />
@@ -30,6 +30,7 @@
  * IMPORTS
  * ============================================================================ */
 
+import { useEffect } from 'react';
 import { useFontSize } from '@/hooks/useFontSize';
 import { useSettingsOrThrow, useSettingsPanel } from '@/hooks/useSettings';
 import type { ScrollBehavior } from '@/context/SettingsContext';
@@ -37,7 +38,6 @@ import { IconX } from '@tabler/icons-react';
 import { PAGES, PAGE_IDS, type PageId } from '@/utils/page';
 import { THEMES, THEME_IDS, type ThemeId } from '@/utils/theme';
 
-import '@/styles/components/font-size-control.css';
 import styles from './SettingsPanel.module.css';
 
 /* ============================================================================
@@ -63,6 +63,20 @@ export function SettingsPanel() {
    */
   const { settings } = settingsState;
   const { fontSize, increment, decrement, isIncrementAllowed, isDecrementAllowed } = useFontSize();
+
+  /* Close panel on Escape key - mirrors NotificationStack details modal behaviour */
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        close();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [close]);
 
  /**
    * Update the app name shown in the header.
@@ -154,7 +168,7 @@ export function SettingsPanel() {
           {/* Settings info notice */}
           <p className={styles.note}>
             Settings persist in this browser, including page refreshes. For global defaults, edit
-            `default_settings.json`.
+            `settings.json`.
           </p>
 
           {/* App name input */}
@@ -207,16 +221,16 @@ export function SettingsPanel() {
           {/* Font size adjustment */}
           <div className={`${styles.group} ${styles.inlineSetting}`}>
             <label className={styles.label}>Font Size</label>
-            <div className={`font-size-ctrl ${styles.fontCtrl}`}>
+            <div className={styles.fontCtrl}>
               <button
-                className="btn-icon btn-font"
+                className={`btn-icon ${styles.fontBtn}`}
                 title="Decrease font size"
                 disabled={!isDecrementAllowed}
                 onClick={decrement}
               >A−</button>
-              <span className="font-size-val">{fontSize}</span>
+              <span className={styles.fontVal}>{fontSize}</span>
               <button
-                className="btn-icon btn-font"
+                className={`btn-icon ${styles.fontBtn}`}
                 title="Increase font size"
                 disabled={!isIncrementAllowed}
                 onClick={increment}
