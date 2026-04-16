@@ -28,7 +28,7 @@
  *
  * // Ergonomic API (recommended)
  * const { notifications, addNotification, dismissNotification } = useNotification();
- * addNotification({ type: 'info', message: 'Hello', trace: [] });
+ * addNotification({ type: 'info', message: 'Hello', details: [] });
  *
  * // Just the list
  * const notifications = useNotificationList();
@@ -67,7 +67,7 @@ import type { NotificationInput } from '@/utils/notification';
  * // Add notification
  * dispatch({
  *   type: 'ADD_NOTIFICATION',
- *   notification: { type: 'info', message: 'Hello', trace: [] }
+ *   notification: { type: 'info', message: 'Hello', details: [] }
  * });
  *
  * // Dismiss notification
@@ -103,7 +103,7 @@ export function useNotificationOrThrow() {
  * addNotification({
  *   type: 'warning',
  *   message: 'Data file has errors',
- *   trace: ['physical.json', '/nodes/0'],
+ *   details: ['physical.json', '/nodes/0'],
  * });
  *
  * // Dismiss by hash
