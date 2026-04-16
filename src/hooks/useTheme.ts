@@ -54,7 +54,7 @@
 import { useEffect, useState } from 'react';
 
 import { useSettingsOrThrow } from '@/hooks/useSettings';
-import { getSystemTheme, resolveTheme, type ThemeId, type ResolvedTheme } from '@/utils/theme';
+import { getSystemTheme, resolveTheme, type ResolvedTheme } from '@/utils/theme';
 
 /* ============================================================================
  * HOOK IMPLEMENTATION
@@ -72,7 +72,7 @@ import { getSystemTheme, resolveTheme, type ThemeId, type ResolvedTheme } from '
  * @returns {ResolvedTheme} resolvedTheme - Concrete runtime theme (`dark` or `light`)
  */
 export function useTheme() {
-  const { state, dispatch } = useSettingsOrThrow();
+  const { state } = useSettingsOrThrow();
   const { theme } = state.settings;
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme());
 
