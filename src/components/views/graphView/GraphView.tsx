@@ -34,7 +34,6 @@
  * graphRef.current?.fitGraph();
  * graphRef.current?.focusNode('router1');
  *
- * @see useVisNetwork.ts - Reusable hook for vis-network setup
  * @see nodeType.ts - Canonical node type style/source-of-truth definitions
  * @see edgeType.ts - Canonical edge style/source-of-truth definitions
  * @see page.ts - Data transformation for vis-network format
@@ -51,10 +50,12 @@ import { NotificationStack } from '@/components/NotificationStack/NotificationSt
 import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
-import type { RawNode, RawEdge } from '@/types/topology';
-import { getNodeTypeOrThrow, getNodeThemeColor, toVisNodeColor, buildNodeFont } from '@/utils/nodeType';
+import type { RawEdge } from '@/utils/edge';
 import { getEdgeTypeOrThrow, toVisEdgeColor } from '@/utils/edgeType';
-import { buildPageData } from '@/utils/page';
+import type { RawNode } from '@/utils/node';
+import { getNodeTypeOrThrow, getNodeThemeColor, toVisNodeColor, buildNodeFont } from '@/utils/nodeType';
+import { buildPageDataOrThrow } from '@/utils/page';
+import type { PageId } from '@/utils/page';
 import { navigateToNode, navigateToEdge, clearSelection } from '@/utils/routing';
 
 import type { GraphPhysics } from './GraphView.types';
@@ -84,6 +85,7 @@ export interface GraphViewHandle {
  * @property {RawNode[]} nodes - Array of nodes to display
  * @property {RawEdge[]} edges - Array of edges to display
  * @property {GraphPhysics} physics - Physics simulation settings for this page
+ * @property {PageId} activePage - The page this GraphView belongs to (passed from parent)
  */
 export interface GraphViewProps {
   /** Array of nodes to display */
@@ -92,6 +94,12 @@ export interface GraphViewProps {
   edges: RawEdge[];
   /** Physics simulation settings */
   physics: GraphPhysics;
+  /**
+   * The page this GraphView instance belongs to.
+   * Passed as a constant from the parent page component so that data transforms
+   * always use the correct page type — regardless of URL state during transitions.
+   */
+  activePage: PageId;
 }
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -209,7 +217,7 @@ const GRAPH_OPTIONS = {
  * @param {GraphPhysics} props.physics - Physics simulation settings
  * @returns {JSX.Element} Container div with vis-network canvas
  */
-const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, physics }, ref) => {
+const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, physics, activePage }, ref) => {
   /* ===== Refs ===== */
 
   /** Container element for vis-network canvas */
@@ -237,7 +245,7 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
 
   /* ===== State & Context ===== */
 
-  const { page: activePage, subPageId } = useRoute();
+  const { subPageId } = useRoute();
   const {
     showNodeLabels: isNodeLabelsVisible,
     showEdgeLabels: isEdgeLabelsVisible,
@@ -253,7 +261,7 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
   /** Ref to track edge-label visibility for use in callbacks */
   const isEdgeLabelsVisibleRef = useRef(isEdgeLabelsVisible);
 
-  /** Ref to track activePage for use in event callbacks */
+  /** Ref to track activePage for use in event callbacks (synced from prop) */
   const activePageRef = useRef(activePage);
 
   /** Ref to track subPageId for use in event callbacks */
@@ -269,19 +277,21 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
   }, [isNodeLabelsVisible]);
 
   /**
+   * Keep activePage ref in sync with the prop.
+   * activePage is a stable constant from the parent page component,
+   * so this only runs once on mount in practice.
+   */
+  useEffect(() => {
+    activePageRef.current = activePage;
+  }, [activePage]);
+
+  /**
    * Keep edge-label visibility ref in sync with current value.
    * Must be in useEffect, not during render, to avoid stale closure.
    */
   useEffect(() => {
     isEdgeLabelsVisibleRef.current = isEdgeLabelsVisible;
   }, [isEdgeLabelsVisible]);
-
-  /**
-   * Keep activePage ref in sync for use in event callbacks.
-   */
-  useEffect(() => {
-    activePageRef.current = activePage;
-  }, [activePage]);
 
   /**
    * Keep subPageId ref in sync for use in event callbacks.
@@ -349,18 +359,23 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
       mmbRef.current = { startX: e.clientX, startY: e.clientY, viewX: view.x, viewY: view.y, scale: net.getScale() };
       container.style.cursor = 'grabbing';
     });
-    document.addEventListener('mousemove', (e: MouseEvent) => {
+    /* Named references required so document.removeEventListener can target them exactly.
+       Inline arrow functions are not removable — they accumulate on the document
+       across component mounts and cause growing lag. */
+    const handleDocMouseMove = (e: MouseEvent) => {
       if (!mmbRef.current) return;
       const mmb = mmbRef.current;
       const dx = (e.clientX - mmb.startX) / mmb.scale;
       const dy = (e.clientY - mmb.startY) / mmb.scale;
       net.moveTo({ position: { x: mmb.viewX - dx, y: mmb.viewY - dy }, animation: false });
-    });
-    document.addEventListener('mouseup', (e: MouseEvent) => {
+    };
+    const handleDocMouseUp = (e: MouseEvent) => {
       if (e.button !== 1 || !mmbRef.current) return;
       mmbRef.current = null;
       container.style.cursor = '';
-    });
+    };
+    document.addEventListener('mousemove', handleDocMouseMove);
+    document.addEventListener('mouseup', handleDocMouseUp);
 
     /* Window resize handler */
     const onResize = () => {
@@ -441,6 +456,20 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
       }
     });
 
+    /* Hide tooltip during drag by setting very high delay */
+    net.on('dragStart', () => {
+      net.setOptions({ interaction: { tooltipDelay: 999999 } });
+    });
+
+    /* Clear selection and restore tooltip after drag ends.
+       Dragging a node automatically selects it in vis-network, but we don't want
+       the selection to persist after the drag operation completes. */
+    net.on('dragEnd', () => {
+      net.selectNodes([]);
+      net.selectEdges([]);
+      net.setOptions({ interaction: { tooltipDelay: 300 } });
+    });
+
     /* Double-click handler for cluster expand/collapse */
     net.on('doubleClick', (params: { nodes: string[] }) => {
       if (params.nodes.length !== 1) return;
@@ -467,11 +496,13 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
 
       /* Re-cluster node if it belongs to a VLAN */
       const spec = clusterSpecsRef.current.find(s => s.members.has(nodeId));
-      if (spec) applyClusterSpecs([spec], net, themeRef.current, isNodeLabelsVisibleRef.current);
+      if (spec) applyClusterSpecsOrThrow([spec], net, themeRef.current, isNodeLabelsVisibleRef.current);
     });
 
     /* Cleanup */
     return () => {
+      document.removeEventListener('mousemove', handleDocMouseMove);
+      document.removeEventListener('mouseup', handleDocMouseUp);
       window.removeEventListener('resize', onResize);
       container.removeEventListener('wheel', handleWheel, true);
       net.destroy();
@@ -512,11 +543,17 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
    * - Creates VLAN clusters for vlan page
    */
   useEffect(() => {
-    if (activePage === 'rack' || !networkRef.current) return;
+    if (!networkRef.current) return;
     if (nodes.length === 0) return;
 
+    /* Track whether this effect run is still active.
+       Set to false in cleanup so any pending async callbacks (stabilized,
+       fonts.ready, setTimeout) become no-ops if the effect re-runs or the
+       component unmounts before they fire. */
+    let isActive = true;
+
     /* Transform data for vis-network */
-    const { nodes: styledNodes, edges: styledEdges } = buildPageData(nodes, edges, activePage);
+    const { nodes: styledNodes, edges: styledEdges } = buildPageDataOrThrow(nodes, edges, activePage);
 
     /* Assign degree-based mass for physics simulation */
     const degrees = new Map(styledNodes.map((n: { id: string }) => [n.id, 0]));
@@ -524,8 +561,17 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
       if (degrees.has(e.from)) degrees.set(e.from, (degrees.get(e.from) ?? 0) + 1);
       if (degrees.has(e.to)) degrees.set(e.to, (degrees.get(e.to) ?? 0) + 1);
     });
-    styledNodes.forEach((n: { id: string; mass: number }) => {
+    /* Place every node on a tiny circle so the physics simulation always produces
+       the explode-from-center animation consistently.
+       Radius 50 canvas units ≈ 1/10 of the final spread — visually reads as one
+       point, but every pair starts with a distinct non-zero distance, which keeps
+       ForceAtlas2 numerically stable (no d=0 division issues). */
+    const count = styledNodes.length;
+    styledNodes.forEach((n: { id: string; mass: number; x: number; y: number }, i: number) => {
       n.mass = Math.min(2, 1 + (degrees.get(n.id) ?? 0) / 10);
+      const angle = (2 * Math.PI * i) / count;
+      n.x = 50 * Math.cos(angle);
+      n.y = 50 * Math.sin(angle);
     });
 
     /* Update vis-network */
@@ -542,24 +588,37 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
       isEdgeLabelsVisibleRef.current ? styledEdges : styledEdges.map((e: { font?: object }) => ({ ...e, font: { ...e.font, size: 0 } }))
     );
 
-    /* Fit view after initial stabilization */
-    net.once('stabilized', () => {
-      net.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' }, minZoomLevel: 0.3, maxZoomLevel: 3 });
+    /* Fit view after initial stabilization.
+       Named so it can be removed via net.off() in cleanup — prevents multiple
+       simultaneous fit animations if Effect 3 re-runs before stabilization. */
+    const handleStabilized = () => {
+      if (!isActive || !networkRef.current) return;
+      networkRef.current.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' }, minZoomLevel: 0.3, maxZoomLevel: 3 });
       /* Redraw after fonts are loaded to fix any label alignment issues */
       document.fonts.ready.then(() => {
-        networkRef.current?.redraw();
+        if (!isActive || !networkRef.current) return;
+        networkRef.current.redraw();
       });
-    });
+    };
+    net.once('stabilized', handleStabilized);
 
     /* Create VLAN clusters */
+    let vlanTimeoutId: ReturnType<typeof setTimeout> | null = null;
     if (activePage === 'vlan') {
       const vlanNodes = nodes.filter(n => !!getNodeAttribute(n, 'vlanId') && !!getNodeAttribute(n, 'subnet'));
-      setTimeout(() => {
+      vlanTimeoutId = setTimeout(() => {
+        if (!isActive) return;
         const specs = buildVlanClusterSpecs(vlanNodes, edges);
         clusterSpecsRef.current = specs;
-        applyClusterSpecs(specs, net, resolvedTheme, isNodeLabelsVisibleRef.current);
+        applyClusterSpecsOrThrow(specs, net, resolvedTheme, isNodeLabelsVisibleRef.current);
       }, 0);
     }
+
+    return () => {
+      isActive = false;
+      net.off('stabilized', handleStabilized); /* Remove before it fires to prevent double-fit */
+      if (vlanTimeoutId !== null) clearTimeout(vlanTimeoutId);
+    };
   }, [activePage, nodes, edges, physics]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   /* ===== Effect 4: Font Size & Label Visibility ===== */
@@ -749,11 +808,11 @@ export { MemoizedGraphView as GraphView };
  * Build cluster specifications for VLAN grouping.
  *
  * Analyzes edges with type "member" to determine which nodes
- * belong to each VLAN. Returns specifications used by applyClusterSpecs.
+ * belong to each VLAN. Returns specifications used by applyClusterSpecsOrThrow.
  *
- * @param {RawNode[]} vlanNodes - Array of VLAN nodes (type === 'vlan')
- * @param {{ type: string; from: { nodeId: string }; to: { nodeId: string } }[]} rawEdges - All edges in page
- * @returns {{ vn: RawNode; members: Set<string> }[]} Cluster specifications
+ * @param vlanNodes - Array of VLAN nodes (type === 'vlan')
+ * @param rawEdges - All edges in page
+ * @returns Cluster specifications
  */
 function buildVlanClusterSpecs(
   vlanNodes: RawNode[],
@@ -788,7 +847,7 @@ function buildVlanClusterSpecs(
  * @param {'dark' | 'light'} theme - Current resolved theme (falls back to light)
  * @param {boolean} isNodeLabelsVisible - Whether cluster labels should be visible
  */
-function applyClusterSpecs(
+function applyClusterSpecsOrThrow(
   specs: { vn: RawNode; members: Set<string> }[],
   net: VisNetwork,
   theme: string,
