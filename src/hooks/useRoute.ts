@@ -4,8 +4,8 @@
  *
  * This hook is the single source of truth for URL-based routing, providing:
  * - Full route state: page, subPageId, selectionType, selectionId
- * - Root redirect: Redirects "/" to settings.defaultPage
- * - History sync: Responds to browser back/forward navigation
+ * - Root redirect: handled by RouteProvider
+ * - History sync: handled by RouteProvider (patches history exactly once)
  *
  * URL Structure:
  * - /{page}                             - Page only (e.g., /physical, /traffic)
@@ -15,11 +15,6 @@
  * - /traffic/{subPageId}/n/{nodeId}     - Traffic with sub-page + node
  * - /traffic/{subPageId}/e/{edgeId}     - Traffic with sub-page + edge
  *
- * Navigation Detection:
- * The hook listens for:
- * - popstate events (browser back/forward)
- * - pushState/replaceState (programmatic navigation)
- *
  * @example
  * import { useRoute } from '@/hooks/useRoute';
  *
@@ -28,6 +23,7 @@
  *   // Destructure only what you need
  * }
  *
+ * @see RouteContext.tsx - Provider that patches history and exposes route state
  * @see routing.ts - URL parsing and navigation utilities
  */
 
@@ -35,11 +31,10 @@
  * IMPORTS
  * ============================================================================ */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useContext } from 'react';
 
-import { useSettingsOrThrow } from '@/hooks/useSettings';
+import { RouteContext } from '@/context/RouteContext';
 import type { RouteState } from '@/utils/routing';
-import { parseRoute } from '@/utils/routing';
 
 /* ============================================================================
  * HOOK IMPLEMENTATION
@@ -48,13 +43,15 @@ import { parseRoute } from '@/utils/routing';
 /**
  * Central routing hook for URL-based state.
  *
+ * Reads from RouteContext which is updated by a single RouteProvider that
+ * patches history.pushState/replaceState exactly once. All components calling
+ * this hook share the same route state with no duplicate history patches.
+ *
  * Returns the full route state parsed from the URL:
- * - page: Current page (physical, traffic, vlan, rack)
+ * - page: Current page (physical, traffic, vlan)
  * - subPageId: Sub-page filter for traffic page (null = all)
  * - selectionType: Type of selected item (node, edge, or null)
  * - selectionId: ID of selected item (or null)
- *
- * Also handles root URL redirect to default page from settings.
  *
  * @returns {RouteState} Full route state from URL
  *
@@ -75,94 +72,5 @@ import { parseRoute } from '@/utils/routing';
  * }
  */
 export function useRoute(): RouteState {
-  /* ==========================================================================
-   * SETTINGS ACCESS
-   * ========================================================================== */
-
-  const { state: settingsState } = useSettingsOrThrow();
-
-  /* ==========================================================================
-   * URL STATE
-   * ========================================================================== */
-
-  /* Track current pathname to detect changes */
-  const [pathname, setPathname] = useState(window.location.pathname);
-
-  /* ==========================================================================
-   * URL CHANGE LISTENERS
-   * ========================================================================== */
-
-  /**
-   * Set up listeners for URL changes.
-   *
-   * We need to handle:
-   * 1. popstate - fired when user clicks back/forward
-   * 2. pushState/replaceState - NOT fired by browser, so we monkey-patch
-   */
-  useEffect(() => {
-    /**
-     * Handle popstate (browser back/forward navigation).
-     */
-    const handlePopState = () => {
-      setPathname(window.location.pathname);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    /**
-     * Monkey-patch history methods to detect programmatic navigation.
-     * pushState and replaceState don't fire events, so we intercept them.
-     */
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-      originalPushState.apply(this, args);
-      setPathname(window.location.pathname);
-    };
-
-    history.replaceState = function (...args) {
-      originalReplaceState.apply(this, args);
-      setPathname(window.location.pathname);
-    };
-
-    /**
-     * Cleanup: restore original history methods and remove listener.
-     */
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
-    };
-  }, []);
-
-  /* ==========================================================================
-   * ROOT URL REDIRECT
-   * ========================================================================== */
-
-  /**
-   * Redirect root URL to default page on initial load.
-   *
-   * SettingsProvider only renders children after settings are resolved, so
-   * this can safely redirect using the configured default page.
-   */
-  useEffect(() => {
-    if (window.location.pathname === '/') {
-      history.replaceState(null, '', `/${settingsState.settings.defaultPage}`);
-    }
-  }, [settingsState.settings.defaultPage]);
-
-  /* ==========================================================================
-   * DERIVED STATE
-   * ========================================================================== */
-
-  /**
-   * Parse the full route state from current pathname.
-   * Memoized to avoid re-parsing on every render.
-   */
-  const route = useMemo((): RouteState => {
-    return parseRoute(pathname);
-  }, [pathname]);
-
-  return route;
+  return useContext(RouteContext);
 }
