@@ -20,7 +20,7 @@
  * addNotification({
  *   type: 'warning',
  *   message: 'Data file has validation errors.',
- *   trace: ['traffic.json', '/flows/0'],
+ *   details: ['traffic.json', '/flows/0'],
  * });
  *
  * @see NotificationContext.types.ts - Type definitions and context creation
@@ -79,7 +79,7 @@ function reducer(state: NotificationState, action: NotificationAction): Notifica
      * Hash is derived here so callers cannot provide or control it.
      * ======================================================================== */
     case 'ADD_NOTIFICATION': {
-      const hash = getNotificationHash(action.notification.trace);
+      const hash = getNotificationHash(action.notification.details);
 
       /* If already dismissed, do not add it back */
       if (state.dismissedNotificationHashes[hash]) {
