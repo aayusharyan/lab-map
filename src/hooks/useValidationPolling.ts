@@ -129,20 +129,20 @@ export function useValidationPolling(options: UseValidationPollingOptions = {}) 
           return metadata.validationErrors.map((validationError) => ({
             type: 'warning' as const,
             message,
-            trace: [`${pageId}.json`, validationError],
+            details: [`${pageId}.json`, validationError],
           }));
         }
 
         return [{
           type: 'warning' as const,
           message,
-          trace: [`${pageId}.json`, metadata.error || 'Unknown validation error'],
+          details: [`${pageId}.json`, metadata.error || 'Unknown validation error'],
         }];
       });
 
       /* Dispatch only new notifications */
       notifications.forEach((notification) => {
-        const hash = getNotificationHash(notification.trace);
+        const hash = getNotificationHash(notification.details);
 
         /* Skip if already synced this session or dismissed by user */
         if (syncedHashesRef.current.has(hash) || dismissedHashes[hash]) {
