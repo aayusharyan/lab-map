@@ -8,7 +8,7 @@
  *
  * Features:
  * - Type-specific icon and color scheme
- * - Expandable trace details via "Show trace" button
+ * - Expandable details via "Show details" button
  * - Dismissible with close button
  * - Stack depth-based transforms (scale, translate, opacity)
  * - Entry/exit animations
@@ -71,7 +71,7 @@ export function NotificationItem({
   isExiting,
   isInitialMount,
   onDismiss,
-  onShowTrace,
+  onShowDetails,
 }: NotificationItemProps) {
   const IconComponent = NOTIFICATION_ICONS[notification.type];
   const title = NOTIFICATION_TITLES[notification.type];
@@ -102,13 +102,13 @@ export function NotificationItem({
             <strong>{title}</strong>
             <p>{notification.message}</p>
 
-            {notification.trace.length > 0 && (
+            {notification.details.length > 0 && (
               <button
-                className="notification-trace-link"
-                onClick={onShowTrace}
+                className="notification-details-link"
+                onClick={onShowDetails}
                 type="button"
               >
-                Show trace
+                Show details
               </button>
             )}
           </div>
