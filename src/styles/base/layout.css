@@ -41,7 +41,7 @@
 
 /* ============================================================================
  * CANVAS AREA
- * Container for the page visualization (graph or rack) and footer.
+ * Container for the page visualization (graph) and footer.
  * Uses absolute positioning so the canvas gets concrete pixel dimensions.
  * ============================================================================ */
 
