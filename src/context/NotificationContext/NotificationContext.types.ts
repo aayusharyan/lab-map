@@ -33,7 +33,7 @@ import type { NotificationInput } from '@/utils/notification';
  * Internal state shape for notification context.
  *
  * @property {Record<string, NotificationInput>} notifications - Active notifications keyed by their
- *   stable hash. The hash is derived from the trace inside the reducer and serves as both
+ *   stable hash. The hash is derived from the details inside the reducer and serves as both
  *   the unique identifier and the lookup key. Insertion order is preserved.
  * @property {Record<string, true>} dismissedNotificationHashes - Dismissed notifications keyed by stable hash.
  *   This uses a plain object as a set-like lookup table so the app can quickly
@@ -84,7 +84,7 @@ export type NotificationAction =
  * addNotification({
  *   type: 'warning',
  *   message: 'Data file has validation errors.',
- *   trace: ['traffic.json', '/flows/0'],
+ *   details: ['traffic.json', '/flows/0'],
  * });
  */
 export const NotificationContext = createContext<{
