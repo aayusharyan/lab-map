@@ -25,7 +25,7 @@ import type { NotificationInput } from '@/utils/notification';
  * @property isExiting - Whether this notification is currently animating out
  * @property isInitialMount - Whether this is part of the initial batch (for staggered animation)
  * @property onDismiss - Callback when user clicks dismiss button
- * @property onShowTrace - Callback when user clicks "Show trace" button
+ * @property onShowDetails - Callback when user clicks "Show details" button
  */
 export interface NotificationItemProps {
   notification: NotificationInput;
@@ -34,5 +34,5 @@ export interface NotificationItemProps {
   isExiting: boolean;
   isInitialMount: boolean;
   onDismiss: () => void;
-  onShowTrace: () => void;
+  onShowDetails: () => void;
 }
