@@ -1,0 +1,260 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "vlan.schema.json",
+  "$comment": "Lab Map - VLAN Segmentation Page Schema",
+  "title": "VLAN segmentation page topology",
+  "description": "JSON Schema for vlan.json — defines VLAN network segmentation including VLAN clusters, member node assignments, subnets, gateways, and inter-VLAN firewall rules. This schema validates data used by the VLAN page view in the Lab Map application. VLANs are displayed as collapsible clusters that can be expanded to show member nodes.",
+  "type": "object",
+  "required": ["nodes", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "nodes": {
+      "$comment": "Array of VLAN segments and member nodes",
+      "description": "List of all nodes in the VLAN page. This includes both VLAN segment nodes (clusters) with subnet configuration, and individual machine/service nodes that belong to VLANs.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/node" }
+    },
+    "edges": {
+      "$comment": "Array of VLAN membership and inter-VLAN connections",
+      "description": "List of all edges in the VLAN page. Edge types include: member (node belongs to VLAN), intervlan (router connection between VLANs), and wan (external uplink).",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/edge" }
+    }
+  },
+
+  "definitions": {
+    "vlanMeta": {
+      "$comment": "VLAN segment metadata - subnet, gateway, DHCP, members",
+      "description": "Metadata for a VLAN segment node containing network configuration (subnet, gateway, DHCP), member list, virtual IPs, and inter-VLAN firewall rules.",
+      "type": "object",
+      "required": ["vlanId", "name", "subnet"],
+      "additionalProperties": false,
+      "properties": {
+        "vlanId": {
+          "description": "802.1Q VLAN ID (1-4094). Common ranges: 1-999 for user VLANs, 1000+ for infrastructure.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4094
+        },
+        "name": {
+          "description": "VLAN name (e.g., Management, Servers, IoT, Guest)",
+          "type": "string",
+          "minLength": 1
+        },
+        "subnet": {
+          "description": "IPv4 subnet in CIDR notation (e.g., 10.0.10.0/24, 192.168.1.0/24)",
+          "type": "string",
+          "minLength": 1
+        },
+        "gateway": {
+          "description": "Default gateway IP address for this VLAN (typically .1 of subnet)",
+          "type": "string"
+        },
+        "dhcpRange": {
+          "description": "DHCP range if DHCP is enabled (e.g., 10.0.10.100-10.0.10.200)",
+          "type": "string"
+        },
+        "members": {
+          "description": "Array of hostnames that are members of this VLAN",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "vips": {
+          "description": "Array of virtual IP addresses (macvlan) assigned to services in this VLAN",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "interVlanRules": {
+          "description": "Array of inter-VLAN firewall rules (e.g., 'Allow VLAN 10 -> VLAN 20 port 443')",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "captivePortal": {
+          "description": "Whether captive portal is enabled for this VLAN (typically for Guest networks)",
+          "type": "boolean"
+        },
+        "note": {
+          "description": "Additional notes about this VLAN segment",
+          "type": "string"
+        }
+      }
+    },
+
+    "machineMeta": {
+      "$comment": "Machine/service node metadata - basic identification",
+      "description": "Metadata for a machine or service node that is a member of one or more VLANs.",
+      "type": "object",
+      "required": ["hostname", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "description": "Device hostname (e.g., nas-01, k3s-master, pi-hole)",
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "description": "Brief role description (e.g., Primary NAS, DNS Server, K3s Control Plane)",
+          "type": "string",
+          "minLength": 1
+        },
+        "ip": {
+          "description": "Primary IP address in its home VLAN",
+          "type": "string"
+        },
+        "vlan": {
+          "description": "Array of VLAN IDs this node belongs to (for multi-homed devices)",
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "hostedOn": {
+          "description": "Physical host if this is a VM or container",
+          "type": "string"
+        },
+        "note": {
+          "description": "Additional notes about this node",
+          "type": "string"
+        }
+      }
+    },
+
+    "node": {
+      "$comment": "VLAN page node definition - either VLAN segment or machine",
+      "description": "A VLAN page node representing either a VLAN segment (cluster) or a machine/service that belongs to VLANs. The meta type depends on the node type.",
+      "type": "object",
+      "required": ["id", "label", "type", "meta"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this node (used in edge from/to references)",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "Display label shown on the graph",
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "description": "Node type determining visual style and icon. Must match a folder name in public/node-icons/.",
+          "type": "string",
+          "enum": [
+            "generic-internet-1",
+            "generic-internet-2",
+            "generic-internet-3",
+            "generic-internet-4",
+            "generic-vpn-1",
+            "desktop-compute-1",
+            "desktop-compute-2",
+            "desktop-router-1",
+            "server-rack-1u-compute-1",
+            "server-rack-1u-compute-2",
+            "server-rack-1u-nas-hdd-1",
+            "server-rack-1u-router-1",
+            "server-rack-1u-switch-1",
+            "server-rack-1u-switch-2",
+            "server-rack-2u-compute-1",
+            "server-rack-2u-nas-hdd-1",
+            "server-rack-2u-nas-ssd-1"
+          ]
+        },
+        "meta": {
+          "description": "Node metadata - vlanMeta for VLAN segments, machineMeta for machine nodes",
+          "oneOf": [
+            {
+              "description": "VLAN segment node — requires vlanId, name, and subnet fields",
+              "$ref": "#/definitions/vlanMeta"
+            },
+            {
+              "description": "Machine/VIP/internet node — requires hostname and role fields",
+              "$ref": "#/definitions/machineMeta"
+            }
+          ]
+        }
+      }
+    },
+
+    "intervlanEdgeMeta": {
+      "$comment": "Inter-VLAN edge metadata - firewall rule summary",
+      "description": "Optional metadata for inter-VLAN edges specifying allowed services and default deny behavior.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "description": "Array of allowed services/ports between these VLANs (e.g., 'HTTPS (443)', 'SSH (22)')",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "denied": {
+          "description": "Default deny behavior description (e.g., 'All other traffic denied')",
+          "type": "string"
+        }
+      }
+    },
+
+    "edge": {
+      "$comment": "VLAN page edge definition - membership or inter-VLAN connection",
+      "description": "A VLAN page edge representing either VLAN membership (node belongs to VLAN) or inter-VLAN routing with firewall rules.",
+      "type": "object",
+      "required": ["id", "from", "to", "type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this edge",
+          "type": "string",
+          "minLength": 1
+        },
+        "from": {
+          "description": "Source endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "to": {
+          "description": "Target endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "type": {
+          "description": "Edge type: wan (ISP uplink), member (node is member of VLAN), intervlan (router routes between VLANs), gateway-link (dedicated router/gateway connection)",
+          "type": "string",
+          "enum": ["wan", "member", "intervlan", "gateway-link"]
+        },
+        "label": {
+          "description": "Display label for this edge (can be empty string)",
+          "type": "string"
+        },
+        "arrows": {
+          "description": "Arrow direction for vis-network (e.g., to, from, to;from)",
+          "type": "string"
+        },
+        "note": {
+          "description": "Additional notes about this connection",
+          "type": "string"
+        },
+        "meta": {
+          "description": "Additional metadata for inter-VLAN edges (allowed/denied rules)",
+          "$ref": "#/definitions/intervlanEdgeMeta"
+        }
+      }
+    },
+
+    "edgeEndpoint": {
+      "$comment": "Canonical edge endpoint",
+      "description": "Edge endpoint containing node reference and optional port identifier.",
+      "type": "object",
+      "required": ["nodeId"],
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "description": "Referenced node ID",
+          "type": "string",
+          "minLength": 1
+        },
+        "port": {
+          "description": "Port identifier (optional endpoint port)",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

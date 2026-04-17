@@ -1,0 +1,300 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "physical.schema.json",
+  "$comment": "Lab Map - Physical Page Schema",
+  "title": "Physical page topology",
+  "description": "JSON Schema for physical.json — defines the physical network topology including nodes (devices), edges (cable connections), hardware specifications, and switch port mappings. This schema validates data used by the Physical page view in the Lab Map application. Each node represents a physical device (router, switch, server, etc.) with detailed hardware specs, while edges represent actual cable runs between ports.",
+  "type": "object",
+  "required": ["nodes", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "nodes": {
+      "$comment": "Array of physical devices in the network topology",
+      "description": "List of all physical nodes (devices) in the network. Each node has a unique ID, display label, device type, and metadata containing hardware specifications.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/node" }
+    },
+    "edges": {
+      "$comment": "Array of physical cable connections between devices",
+      "description": "List of all physical connections (cables) between nodes. Each edge specifies source/target ports, cable type, speed, and VLAN assignments.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/edge" }
+    }
+  },
+
+  "definitions": {
+    "macAddress": {
+      "$comment": "MAC address format validation - lowercase hex with hyphens",
+      "description": "Network interface MAC address in lowercase hexadecimal with hyphens (e.g., 48-0f-cf-47-68-df). Use 'unknown' if MAC is not known.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{2}-){5}[0-9a-f]{2}$|^unknown$"
+    },
+
+    "nic": {
+      "$comment": "Network Interface Card definition - port details for hardware specs",
+      "description": "Network interface card configuration including port name, link speed, MAC address, and what it connects to.",
+      "type": "object",
+      "required": ["name", "speed"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Interface name as shown in OS (e.g., eth0, enp3s0, lan1)",
+          "type": "string",
+          "minLength": 1
+        },
+        "speed": {
+          "description": "Link speed capability (e.g., 1GbE, 2.5GbE, 10GbE)",
+          "type": "string",
+          "minLength": 1
+        },
+        "mac": {
+          "description": "MAC address of this interface",
+          "$ref": "#/definitions/macAddress"
+        },
+        "connected_to": {
+          "description": "What device/port this NIC connects to (e.g., core-sw:port5)",
+          "type": "string"
+        },
+        "note": {
+          "description": "Optional notes about this interface",
+          "type": "string"
+        }
+      }
+    },
+
+    "storageDevice": {
+      "$comment": "Storage device definition - drives attached to a node",
+      "description": "Storage device specification including device path, capacity, type, model, and performance characteristics.",
+      "type": "object",
+      "required": ["dev", "size", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "dev": {
+          "description": "Device path in OS (e.g., /dev/sda, /dev/nvme0n1)",
+          "type": "string"
+        },
+        "size": {
+          "description": "Storage capacity (e.g., 500GB, 2TB, 8TB)",
+          "type": "string"
+        },
+        "type": {
+          "description": "Storage technology type",
+          "type": "string",
+          "enum": ["SSD", "HDD", "NVMe", "NVMe SSD", "USB", "eMMC"]
+        },
+        "model": {
+          "description": "Drive model name/number",
+          "type": "string"
+        },
+        "seqRead": {
+          "description": "Sequential read speed (e.g., 550MB/s, 3500MB/s)",
+          "type": "string"
+        }
+      }
+    },
+
+    "hardware": {
+      "$comment": "Hardware specifications block - detailed device specs",
+      "description": "Complete hardware specification for a node including CPU, RAM, network interfaces, and storage devices.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "description": "Device model name/number (e.g., Dell PowerEdge R720, Raspberry Pi 4B)",
+          "type": "string"
+        },
+        "cpu": {
+          "description": "CPU model (e.g., Intel Xeon E5-2680 v2, AMD Ryzen 5 5600G)",
+          "type": "string"
+        },
+        "cores": {
+          "description": "CPU core/thread count (e.g., 8C/16T, 6C/12T)",
+          "type": "string"
+        },
+        "ram": {
+          "description": "Total RAM capacity (e.g., 64GB DDR4, 16GB DDR5)",
+          "type": "string"
+        },
+        "wol": {
+          "description": "Wake-on-LAN capability (true if supported and enabled)",
+          "type": "boolean"
+        },
+        "ipmi": {
+          "description": "IPMI/iLO/iDRAC out-of-band management availability",
+          "type": "boolean"
+        },
+        "nics": {
+          "description": "List of network interface cards",
+          "type": "array",
+          "items": { "$ref": "#/definitions/nic" }
+        },
+        "storage": {
+          "description": "List of attached storage devices",
+          "type": "array",
+          "items": { "$ref": "#/definitions/storageDevice" }
+        }
+      }
+    },
+
+    "nodeMeta": {
+      "$comment": "Node metadata - hostname, role, network info, and hardware specs",
+      "description": "Metadata for a physical node containing identification info (hostname, role) and optional hardware specifications.",
+      "type": "object",
+      "required": ["hostname", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "description": "Device hostname (e.g., core-router, nas-01, k3s-master)",
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "description": "Brief role description (e.g., Core Router, Primary NAS, K3s Control Plane)",
+          "type": "string",
+          "minLength": 1
+        },
+        "ip": {
+          "description": "Primary management IP address",
+          "type": "string"
+        },
+        "mac": {
+          "description": "Primary MAC address (for WoL, etc.)",
+          "$ref": "#/definitions/macAddress"
+        },
+        "note": {
+          "description": "Additional notes about this device",
+          "type": "string"
+        },
+        "hardware": {
+          "description": "Detailed hardware specifications",
+          "$ref": "#/definitions/hardware"
+        }
+      }
+    },
+
+    "node": {
+      "$comment": "Physical node definition - a device in the network topology",
+      "description": "A physical network node representing a device such as a router, switch, access point, or server.",
+      "type": "object",
+      "required": ["id", "label", "type", "meta"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this node (used in edge from/to references)",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "Display label shown on the graph",
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "description": "Node type determining visual style and icon. Must match a folder name in public/node-icons/.",
+          "type": "string",
+          "enum": [
+            "generic-internet-1",
+            "generic-internet-2",
+            "generic-internet-3",
+            "generic-internet-4",
+            "generic-vpn-1",
+            "desktop-compute-1",
+            "desktop-compute-2",
+            "desktop-router-1",
+            "server-rack-1u-compute-1",
+            "server-rack-1u-compute-2",
+            "server-rack-1u-nas-hdd-1",
+            "server-rack-1u-router-1",
+            "server-rack-1u-switch-1",
+            "server-rack-1u-switch-2",
+            "server-rack-2u-compute-1",
+            "server-rack-2u-nas-hdd-1",
+            "server-rack-2u-nas-ssd-1"
+          ]
+        },
+        "meta": {
+          "description": "Node metadata with hostname, role, and hardware specs",
+          "$ref": "#/definitions/nodeMeta"
+        }
+      }
+    },
+
+    "edge": {
+      "$comment": "Physical edge definition - a cable connection between nodes",
+      "description": "A physical connection (cable) between two nodes, specifying ports, speed, and VLAN configuration.",
+      "type": "object",
+      "required": ["id", "from", "to", "type", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this edge",
+          "type": "string",
+          "minLength": 1
+        },
+        "from": {
+          "description": "Source endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "to": {
+          "description": "Target endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "type": {
+          "description": "Connection type: wan (ISP uplink), trunk (carries multiple VLANs), access (single VLAN)",
+          "type": "string",
+          "enum": ["wan", "trunk", "access"]
+        },
+        "label": {
+          "description": "Display label for this edge (can be empty string)",
+          "type": "string"
+        },
+        "speed": {
+          "description": "Link speed (e.g., 1Gbps, 10Gbps, 2.5Gbps)",
+          "type": "string"
+        },
+        "vlans": {
+          "description": "VLAN IDs carried by this link (e.g., 10,20,30 or 10-50)",
+          "type": "string"
+        },
+        "cable": {
+          "description": "Cable type (e.g., Cat6, Cat6a, OM4 fiber)",
+          "type": "string"
+        },
+        "cableColor": {
+          "description": "Physical cable color for identification",
+          "type": "string"
+        },
+        "category": {
+          "description": "Cable category for Ethernet (e.g., Cat5e, Cat6, Cat6a)",
+          "type": "string"
+        },
+        "arrows": {
+          "description": "Arrow direction for vis-network (e.g., to, from, to;from)",
+          "type": "string"
+        }
+      }
+    },
+
+    "edgeEndpoint": {
+      "$comment": "Canonical edge endpoint",
+      "description": "Edge endpoint containing node reference and optional port identifier.",
+      "type": "object",
+      "required": ["nodeId"],
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "description": "Referenced node ID",
+          "type": "string",
+          "minLength": 1
+        },
+        "port": {
+          "description": "Port identifier (e.g., eth0, port1, sfp+1)",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

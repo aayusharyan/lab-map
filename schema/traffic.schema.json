@@ -1,0 +1,330 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "traffic.schema.json",
+  "$comment": "Lab Map - Traffic/Services Page Schema",
+  "title": "Traffic / Services page topology",
+  "description": "JSON Schema for traffic.json — defines service flows, Docker containers, Traefik reverse proxy routes, and inter-service dependencies. This schema validates data used by the Traffic page view in the Lab Map application. Nodes represent services and infrastructure, edges represent data flows, and flows provide filterable categories for visualizing specific traffic paths.",
+  "type": "object",
+  "required": ["flows", "nodes", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "flows": {
+      "$comment": "Array of traffic flow categories for filtering",
+      "description": "List of traffic flow definitions. Each flow represents a category of traffic (e.g., web traffic, DNS, monitoring) that can be filtered in the UI. Nodes and edges reference flow IDs to indicate which flows they participate in.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/flowMeta" }
+    },
+    "nodes": {
+      "$comment": "Array of service/infrastructure nodes",
+      "description": "List of all nodes in the traffic page. Each node represents a service, container, or infrastructure component with its flow memberships and service configuration.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/node" }
+    },
+    "edges": {
+      "$comment": "Array of traffic flow connections between nodes",
+      "description": "List of all edges representing traffic flows between nodes. Each edge specifies flow memberships, protocols, ports, and TLS configuration.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/edge" }
+    }
+  },
+
+  "definitions": {
+    "flowMeta": {
+      "$comment": "Traffic flow category definition for UI filtering",
+      "description": "A traffic flow category used to group related nodes and edges for filtering. The flow ID is referenced by nodes and edges to indicate participation.",
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique flow identifier. Must start with 'flow_' followed by lowercase alphanumeric and underscores (e.g., flow_web, flow_dns, flow_monitoring).",
+          "type": "string",
+          "pattern": "^flow_[a-z0-9_]+$"
+        },
+        "label": {
+          "description": "Human-readable flow label shown in the flow bar UI (e.g., Web Traffic, DNS, Monitoring)",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "route": {
+      "$comment": "Traefik/reverse proxy route definition",
+      "description": "A reverse proxy route mapping a domain to a backend service. Used for Traefik, nginx, or similar proxies.",
+      "type": "object",
+      "required": ["domain", "backend"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "description": "Domain or hostname for this route (e.g., grafana.example.com, *.local.example.com)",
+          "type": "string",
+          "minLength": 1
+        },
+        "backend": {
+          "description": "Backend service URL or identifier (e.g., http://grafana:3000, nas-01:5000)",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+
+    "serviceEntry": {
+      "$comment": "Docker container/service definition with full details",
+      "description": "A Docker container or service configuration with image, port mappings, environment variables, and volume mounts.",
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Service/container name (e.g., traefik, grafana, pihole)",
+          "type": "string"
+        },
+        "image": {
+          "description": "Docker image reference (e.g., traefik:v2.10, grafana/grafana:latest)",
+          "type": "string"
+        },
+        "port": {
+          "description": "Port mapping in host:container format (e.g., 80:80, 3000:3000)",
+          "type": "string"
+        },
+        "vip": {
+          "description": "Virtual IP address if using macvlan or similar (can be null if not applicable)",
+          "type": ["string", "null"]
+        },
+        "env": {
+          "description": "List of environment variables (KEY=value format)",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "volumes": {
+          "description": "List of volume mounts (host:container format)",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "note": {
+          "description": "Additional notes about this service",
+          "type": "string"
+        }
+      }
+    },
+
+    "serviceConfig": {
+      "$comment": "Service configuration block for nodes",
+      "description": "Service configuration for a node containing Traefik routes, Docker services, and inter-VLAN firewall rules.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "routes": {
+          "description": "Array of reverse proxy routes (for VIP/Traefik nodes)",
+          "type": "array",
+          "items": { "$ref": "#/definitions/route" }
+        },
+        "services": {
+          "description": "Array of services. Can be simple service names (strings) or full service entries with Docker details.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "description": "Simple service name string",
+                "type": "string"
+              },
+              {
+                "description": "Full service entry with Docker configuration",
+                "$ref": "#/definitions/serviceEntry"
+              }
+            ]
+          }
+        },
+        "interVlanRules": {
+          "description": "List of inter-VLAN firewall rules (for router nodes)",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "nodeMeta": {
+      "$comment": "Node metadata - hostname, role, and service configuration",
+      "description": "Metadata for a traffic page node containing identification and service configuration.",
+      "type": "object",
+      "required": ["hostname", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "hostname": {
+          "description": "Node hostname or identifier (e.g., traefik-vip, nas-01, k3s-master)",
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "description": "Brief role description (e.g., Reverse Proxy VIP, Primary NAS, K3s Control Plane)",
+          "type": "string",
+          "minLength": 1
+        },
+        "ip": {
+          "description": "IP address for this node",
+          "type": "string"
+        },
+        "hostedOn": {
+          "description": "Physical host if this is a VM or container (e.g., proxmox-01, k3s-worker-01)",
+          "type": "string"
+        },
+        "note": {
+          "description": "Additional notes about this node",
+          "type": "string"
+        },
+        "serviceConfig": {
+          "description": "Service configuration including routes, Docker services, and firewall rules",
+          "$ref": "#/definitions/serviceConfig"
+        }
+      }
+    },
+
+    "node": {
+      "$comment": "Traffic page node definition - a service or infrastructure component",
+      "description": "A traffic page node representing a service, container, or infrastructure component that participates in one or more traffic flows.",
+      "type": "object",
+      "required": ["id", "label", "type", "flows", "meta"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this node (used in edge from/to references)",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "Display label shown on the graph",
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "description": "Node type determining visual style and icon. Must match a folder name in public/node-icons/.",
+          "type": "string",
+          "enum": [
+            "generic-internet-1",
+            "generic-internet-2",
+            "generic-internet-3",
+            "generic-internet-4",
+            "generic-vpn-1",
+            "desktop-compute-1",
+            "desktop-compute-2",
+            "desktop-router-1",
+            "server-rack-1u-compute-1",
+            "server-rack-1u-compute-2",
+            "server-rack-1u-nas-hdd-1",
+            "server-rack-1u-router-1",
+            "server-rack-1u-switch-1",
+            "server-rack-1u-switch-2",
+            "server-rack-2u-compute-1",
+            "server-rack-2u-nas-hdd-1",
+            "server-rack-2u-nas-ssd-1"
+          ]
+        },
+        "flows": {
+          "description": "Array of flow IDs this node participates in. Node is visible when any of its flows are selected.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^flow_[a-z0-9_]+$"
+          }
+        },
+        "meta": {
+          "description": "Node metadata with hostname, role, and service configuration",
+          "$ref": "#/definitions/nodeMeta"
+        }
+      }
+    },
+
+    "edge": {
+      "$comment": "Traffic page edge definition - a data flow connection",
+      "description": "A traffic flow connection between two nodes, specifying protocol, ports, TLS, and flow memberships.",
+      "type": "object",
+      "required": ["id", "from", "to", "type", "flows", "arrows"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this edge",
+          "type": "string",
+          "minLength": 1
+        },
+        "from": {
+          "description": "Source endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "to": {
+          "description": "Target endpoint with required nodeId and optional port",
+          "$ref": "#/definitions/edgeEndpoint"
+        },
+        "type": {
+          "description": "Edge type: wan (ISP), cdn (Cloudflare), proxy (reverse proxy), hosts (DNS), forward (port forward), dependency (service dep), internal (internal traffic)",
+          "type": "string",
+          "enum": ["wan", "cdn", "proxy", "hosts", "forward", "dependency", "internal"]
+        },
+        "flows": {
+          "description": "Array of flow IDs this edge participates in. Edge is visible when any of its flows are selected.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^flow_[a-z0-9_]+$"
+          }
+        },
+        "label": {
+          "description": "Display label for this edge (shown on hover)",
+          "type": "string"
+        },
+        "arrows": {
+          "description": "Arrow direction for vis-network (e.g., to, from, to;from)",
+          "type": "string"
+        },
+        "tls": {
+          "description": "Whether this connection uses TLS encryption",
+          "type": "boolean"
+        },
+        "tlsTermination": {
+          "description": "Where TLS is terminated (e.g., cloudflare, traefik, backend)",
+          "type": "string"
+        },
+        "port": {
+          "description": "Port number (can be string like '443' or integer like 443)",
+          "oneOf": [{ "type": "string" }, { "type": "integer" }]
+        },
+        "protocol": {
+          "description": "Protocol (e.g., HTTPS, HTTP, DNS, SSH, SMB)",
+          "type": "string"
+        },
+        "domains": {
+          "description": "List of domains/hostnames carried by this connection",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "note": {
+          "description": "Additional notes about this connection",
+          "type": "string"
+        }
+      }
+    },
+
+    "edgeEndpoint": {
+      "$comment": "Canonical edge endpoint",
+      "description": "Edge endpoint containing node reference and optional port identifier.",
+      "type": "object",
+      "required": ["nodeId"],
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "description": "Referenced node ID",
+          "type": "string",
+          "minLength": 1
+        },
+        "port": {
+          "description": "Port identifier (e.g., eth0, :443, service-port)",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
