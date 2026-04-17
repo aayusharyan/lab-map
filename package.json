@@ -1,6 +1,6 @@
 {
   "name": "lab-map",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
   "type": "module",
   "homepage": "https://lab-map.yush.dev/",
