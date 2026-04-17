@@ -5,11 +5,9 @@
  * Public API:
  * - Constants:
  *   - EDGE_TYPES
- *   - EDGE_TYPE_IDS
  * - Helpers:
  *   - isEdgeType
  *   - getEdgeTypeOrThrow
- *   - getEdgeThemeColor
  *   - toVisEdgeColor
  * - Types:
  *   - EdgeType
@@ -21,10 +19,8 @@
 
 export {
   EDGE_TYPES,
-  EDGE_TYPE_IDS,
   isEdgeType,
   getEdgeTypeOrThrow,
-  getEdgeThemeColor,
   toVisEdgeColor,
 } from './edgeType';
 export type { EdgeType } from './edgeType.types';
