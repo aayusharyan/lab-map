@@ -4,26 +4,24 @@
  *
  * This is the root component of the Lab Map application. It orchestrates the
  * main application layout and handles switching between different visualization
- * pages (Physical, Traffic, VLAN, Rack).
+ * pages (Physical, Traffic, VLAN).
  *
  * Component Structure:
  *   App
  *   ├─ SettingsPanel       (settings modal/drawer)
  *   ├─ AppHeader           (navigation bar with page tabs)
- *   └─ [Active Page]      (one of the four page components)
+ *   └─ [Active Page]      (one of the three page components)
  *       ├─ PhysicalPage   (network topology view)
  *       ├─ TrafficPage    (traffic flow visualization)
- *       ├─ VlanPage       (VLAN configuration view)
- *       └─ RackPage       (physical rack layout)
+ *       └─ VlanPage       (VLAN configuration view)
  *
  * Each page component manages its own:
- * - Canvas/visualization area (graph or layout)
+ * - Canvas/visualization area (graph)
  * - Sidebar (node details, connection info)
  * - Footer (legend, status bar)
  *
  * Refs:
  * - graphRef: Passed to page components for external GraphView control (focusNode)
- * - layoutRef: Passed to RackPage/LayoutView for export actions
  */
 
 /* ============================================================================
@@ -36,12 +34,10 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { AppSubHeader } from '@/components/layout/AppSubHeader';
 import { SettingsPanel } from '@/components/layout/SettingsPanel';
 import { GraphViewHandle } from '@/components/views/graphView/GraphView';
-import { LayoutViewHandle } from '@/components/views/layoutView/LayoutView';
 import { useRoute } from '@/hooks/useRoute';
 import { useTheme } from '@/hooks/useTheme';
 import { useValidationPolling } from '@/hooks/useValidationPolling';
 import { PhysicalPage } from '@/pages/PhysicalPage';
-import { RackPage } from '@/pages/RackPage';
 import { TrafficPage } from '@/pages/TrafficPage';
 import { VlanPage } from '@/pages/VlanPage';
 
@@ -84,12 +80,6 @@ export default function App() {
    * Exposes methods: fitGraph(), focusNode(nodeId)
    */
   const graphRef = useRef<GraphViewHandle>(null);
-
-  /**
-   * Reference to LayoutView component (used by Rack page).
-   * Exposes methods: exportJSON()
-   */
-  const layoutRef = useRef<LayoutViewHandle>(null);
 
   /* ==========================================================================
    * HOOKS INITIALIZATION
@@ -149,9 +139,6 @@ export default function App() {
 
       {/* VLAN configuration view - shows VLAN assignments and segments */}
       {activePage === 'vlan' && <VlanPage graphRef={graphRef} />}
-
-      {/* Physical rack layout - shows device placement in server racks */}
-      {activePage === 'rack' && <RackPage layoutRef={layoutRef} />}
     </div>
   );
 }
