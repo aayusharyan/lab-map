@@ -5,7 +5,6 @@
  * Public API:
  * - Constants:
  *   - NODE_TYPES
- *   - NODE_TYPE_IDS
  * - Helpers:
  *   - isNodeType
  *   - getNodeTypeOrThrow
@@ -22,7 +21,6 @@
 
 export {
   NODE_TYPES,
-  NODE_TYPE_IDS,
   isNodeType,
   getNodeTypeOrThrow,
   getNodeThemeColor,
