@@ -3,13 +3,13 @@
  * @description Notification stack container component
  *
  * Manages a stack of notification banners displayed in the top-right corner.
- * Handles stacking logic, animations, dismiss timing, and the trace modal.
+ * Handles stacking logic, animations, dismiss timing, and the details modal.
  * Individual notifications are rendered via NotificationItem components.
  *
  * Features:
  * - Stacks up to 3 visible notifications with depth transforms
  * - Smooth entry/exit animations for notifications
- * - Modal dialog for viewing detailed trace information
+ * - Modal dialog for viewing expanded notification details
  * - Keyboard accessibility (ESC to close modal)
  * - Auto-replacement from queue when top notifications are dismissed
  *
@@ -19,6 +19,7 @@
  *
  * @see NotificationStack.css - Stack container styles
  * @see NotificationItem.tsx - Individual notification component
+ * @see NotificationDetailsModal.tsx - Expanded details modal
  * @see NotificationContext.tsx - Notification state management
  */
 
@@ -26,12 +27,12 @@
  * IMPORTS
  * ============================================================================ */
 
-import { IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useNotification } from '@/hooks/useNotification';
 import type { NotificationInput } from '@/utils/notification';
 
+import { NotificationDetailsModal } from './NotificationDetailsModal';
 import { NotificationItem } from './NotificationItem';
 
 import './NotificationStack.css';
@@ -45,7 +46,7 @@ import './NotificationStack.css';
  *
  * Manages the display and lifecycle of stacked notification banners.
  * Shows up to 3 notifications simultaneously with depth-based transforms.
- * Handles dismiss animations, trace modal, and automatic queue replacement.
+ * Handles dismiss animations, details modal, and automatic queue replacement.
  *
  * Returns null when there are no visible notifications to display.
  *
@@ -64,10 +65,10 @@ export function NotificationStack() {
     .filter(([hash]) => exitingNotifications[hash] !== undefined)
     .length;
   const visibleEntries = notificationEntries.slice(0, 3 + exitingInTop3Count);
-  const [traceModalNotification, setTraceModalNotification] = useState<NotificationInput | null>(null);
-  const [isTraceModalClosing, setIsTraceModalClosing] = useState(false);
+  const [detailsModalNotification, setDetailsModalNotification] = useState<NotificationInput | null>(null);
+  const [isDetailsModalClosing, setIsDetailsModalClosing] = useState(false);
   const dismissTimeoutsRef = useRef<Record<string, number>>({});
-  const traceModalCloseTimeoutRef = useRef<number | null>(null);
+  const detailsModalCloseTimeoutRef = useRef<number | null>(null);
 
   /* Track whether the initial staggered entry animation has completed.
    * Replacement notifications entering from the queue should appear immediately,
@@ -89,37 +90,37 @@ export function NotificationStack() {
       Object.values(dismissTimeoutsRef.current).forEach((timeoutId) => {
         window.clearTimeout(timeoutId);
       });
-      if (traceModalCloseTimeoutRef.current !== null) {
-        window.clearTimeout(traceModalCloseTimeoutRef.current);
+      if (detailsModalCloseTimeoutRef.current !== null) {
+        window.clearTimeout(detailsModalCloseTimeoutRef.current);
       }
     };
   }, []);
 
-  const openTraceModal = useCallback((notification: NotificationInput) => {
-    if (traceModalCloseTimeoutRef.current !== null) {
-      window.clearTimeout(traceModalCloseTimeoutRef.current);
-      traceModalCloseTimeoutRef.current = null;
+  const openDetailsModal = useCallback((notification: NotificationInput) => {
+    if (detailsModalCloseTimeoutRef.current !== null) {
+      window.clearTimeout(detailsModalCloseTimeoutRef.current);
+      detailsModalCloseTimeoutRef.current = null;
     }
 
-    setIsTraceModalClosing(false);
-    setTraceModalNotification(notification);
+    setIsDetailsModalClosing(false);
+    setDetailsModalNotification(notification);
   }, []);
 
-  const closeTraceModal = useCallback(() => {
-    if (!traceModalNotification || isTraceModalClosing) return;
+  const closeDetailsModal = useCallback(() => {
+    if (!detailsModalNotification || isDetailsModalClosing) return;
 
-    setIsTraceModalClosing(true);
-    traceModalCloseTimeoutRef.current = window.setTimeout(() => {
-      setTraceModalNotification(null);
-      setIsTraceModalClosing(false);
-      traceModalCloseTimeoutRef.current = null;
+    setIsDetailsModalClosing(true);
+    detailsModalCloseTimeoutRef.current = window.setTimeout(() => {
+      setDetailsModalNotification(null);
+      setIsDetailsModalClosing(false);
+      detailsModalCloseTimeoutRef.current = null;
     }, 180);
-  }, [isTraceModalClosing, traceModalNotification]);
+  }, [isDetailsModalClosing, detailsModalNotification]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        closeTraceModal();
+        closeDetailsModal();
       }
     };
 
@@ -127,7 +128,7 @@ export function NotificationStack() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [closeTraceModal]);
+  }, [closeDetailsModal]);
 
   if (visibleEntries.length === 0) return null;
 
@@ -165,47 +166,19 @@ export function NotificationStack() {
             isInitialMount={!isInitializedRef.current}
             notification={notification}
             onDismiss={() => handleDismiss(notificationKey, stackDepth)}
-            onShowTrace={() => openTraceModal(notification)}
+            onShowDetails={() => openDetailsModal(notification)}
             stackDepth={stackDepth}
             stackIndex={index}
           />
         );
       })}
 
-      {traceModalNotification && (
-        <div
-          aria-modal="true"
-          className={`notification-trace-modal-backdrop${isTraceModalClosing ? ' is-closing' : ''}`}
-          onClick={closeTraceModal}
-          role="dialog"
-        >
-          <div
-            className={`notification-trace-modal${isTraceModalClosing ? ' is-closing' : ''}`}
-            data-type={traceModalNotification.type}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="notification-trace-modal-header">
-              <strong>Notification Trace</strong>
-              <button
-                className="notification-trace-modal-close"
-                onClick={closeTraceModal}
-                type="button"
-              >
-                <IconX aria-hidden="true" stroke={2} />
-              </button>
-            </div>
-
-            <p className="notification-trace-modal-message">
-              {traceModalNotification.message}
-            </p>
-
-            <ol className="notification-trace-modal-list">
-              {traceModalNotification.trace.map((traceEntry, idx) => (
-                <li key={idx}>{traceEntry}</li>
-              ))}
-            </ol>
-          </div>
-        </div>
+      {detailsModalNotification && (
+        <NotificationDetailsModal
+          isClosing={isDetailsModalClosing}
+          notification={detailsModalNotification}
+          onClose={closeDetailsModal}
+        />
       )}
     </div>
   );
