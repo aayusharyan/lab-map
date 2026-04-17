@@ -12,10 +12,10 @@
     "url": "https://github.com/aayusharyan/lab-map/issues"
   },
   "scripts": {
-    "dev": "concurrently \"vite\" \"node watcher.js\" --names \"vite,watch\" --prefix-colors \"cyan,green\"",
+    "dev": "concurrently \"vite\" \"node scripts/watcher.js\" --names \"vite,watch\" --prefix-colors \"cyan,green\"",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "watch": "node watcher.js",
+    "watch": "node scripts/watcher.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
