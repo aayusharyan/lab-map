@@ -1,0 +1,108 @@
+name: Bug Report
+description: Report a bug or error encountered while using Lab Map
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this issue! This helps us improve Lab Map.
+
+        Please fill out the details below to help us diagnose the problem.
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: What Happened?
+      description: Describe the error or unexpected behavior you encountered.
+      placeholder: |
+        e.g., "Page shows an error message", "Graph doesn't render", "Buttons not working"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment Type
+      description: How are you running Lab Map?
+      options:
+        - Docker container
+        - Self-hosted (built from source)
+        - Local development (pnpm dev)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser are you using?
+      placeholder: e.g., Chrome 120, Firefox 121, Safari 17
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device Type
+      description: What device are you accessing Lab Map from?
+      options:
+        - Desktop/Laptop
+        - Tablet
+        - Mobile
+    validations:
+      required: true
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Browser Console Errors
+      description: |
+        Open browser DevTools (F12), go to the Console tab, and paste any red error messages here.
+      placeholder: |
+        Right-click → Inspect → Console tab → copy errors
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: network-errors
+    attributes:
+      label: Network Tab Errors
+      description: |
+        In DevTools, check the Network tab for failed requests (shown in red). List any URLs that failed.
+      placeholder: |
+        e.g., /data/physical.json - 404 Not Found
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: What were you doing when the error occurred?
+      placeholder: |
+        1. Opened Lab Map
+        2. Clicked on...
+        3. Error appeared
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help (screenshots, recent changes, etc.)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have tried refreshing the page
+          required: false
+        - label: I have tried clearing my browser cache
+          required: false
