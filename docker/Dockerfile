@@ -3,7 +3,7 @@
 # @description Multi-stage Docker build for Lab Map application
 #
 # Multi-stage build with integrated watcher for real-time validation.
-# The watcher validates data on startup and monitors /app/data for changes.
+# The watcher validates data on startup and monitors /app/config for changes.
 # Keeps last valid data when new data is invalid, shows warnings in UI.
 #
 # Images are built by CI/CD and published to ghcr.io/aayusharyan/lab-map
@@ -49,8 +49,11 @@ RUN corepack enable && corepack prepare pnpm@latest --activate && \
 COPY watcher.js ./
 COPY schema ./schema
 
+# Copy default config (baked into image — volume mount overrides at runtime)
+COPY config ./config
+
 # Create data directories
-RUN mkdir -p /app/data /usr/share/nginx/html/data
+RUN mkdir -p /app/config /usr/share/nginx/html/data
 
 # Copy built React app to nginx serving directory
 COPY --from=builder /app/dist /usr/share/nginx/html
