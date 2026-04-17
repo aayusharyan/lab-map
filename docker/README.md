@@ -22,7 +22,7 @@ docker compose -f docker/docker-compose.yml up -d
 
 ```bash
 docker run -d -p 8080:80 \
-  -v /path/to/your/data:/app/data \
+  -v /path/to/your/config:/app/config \
   --name lab-map \
   ghcr.io/aayusharyan/lab-map:latest
 ```
@@ -32,7 +32,7 @@ Access at: http://localhost:8080
 ## How It Works
 
 ```
-Your data directory (mounted at /app/data)
+Your config directory (mounted at /app/config)
     ↓
 Watcher detects changes (chokidar)
     ↓
@@ -53,12 +53,11 @@ React app shows validation warnings when data is invalid
 ## Directory Structure
 
 ```
-/app/data/              # Your mounted data directory (source)
+/app/config/            # Your mounted config directory (source)
   ├── physical.json
   ├── traffic.json
   ├── vlan.json
-  ├── rack.json
-  └── default_settings.json
+  └── settings.json
 
 /usr/share/nginx/html/data/  # Validated data served by nginx
   ├── physical.json           # Validated data
