@@ -22,7 +22,7 @@
  * - Keep examples and property docs in sync with the actual type definitions.
  *
  * @see src/utils/nodeType/nodeType.ts - Source of canonical `NodeTypeId` values
- * @see src/types/topology.ts - `RawNode` extends `Node`
+ * @see src/utils/page/page.types.ts - PageData uses RawNode[]
  * @see src/utils/page/page.ts - Node rendering/transformation pipeline
  */
 
@@ -148,4 +148,29 @@ export interface Node {
   attributes?: NodeAttribute[];
   subSections?: NodeSubSection[];
   sections?: NodeSection[];
+}
+
+/**
+ * Node as loaded from data files.
+ *
+ * This is the "raw" node structure before vis-network styling is applied.
+ * Matches the structure defined in JSON schema files.
+ *
+ * Extends `Node` with traffic flow references and an escape hatch for
+ * legacy `meta` payloads (normalised into `attributes`/`sections` at load time).
+ *
+ * @property {string[]} [flows] - Traffic flow IDs (traffic page)
+ * @property {string} [_flowNodeId] - Internal: original node ID in flow mode
+ * @property {string} [_flowLabel] - Internal: original label in flow mode
+ * @property {Record<string, unknown>} [meta] - Legacy metadata; normalised on load
+ *
+ * @see src/utils/data.ts - normalizeLegacyNodeShape() consumes `meta`
+ * @see src/utils/page/page.types.ts - PageData uses RawNode[]
+ */
+export interface RawNode extends Node {
+  flows?: string[];
+  _flowNodeId?: string;
+  _flowLabel?: string;
+  /** @deprecated Legacy payload; normalized into attributes/sections at load time. */
+  meta?: Record<string, unknown>;
 }
