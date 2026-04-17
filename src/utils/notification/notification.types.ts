@@ -49,22 +49,22 @@ export type NotificationType = 'warning' | 'info' | 'error' | 'success';
  *
  * This is both the shape callers pass into NotificationContext when adding
  * notifications, and the value type stored in the notifications Record.
- * The hash is derived from the trace inside the reducer and stored as the
+ * The hash is derived from the details inside the reducer and stored as the
  * Record key, so hashing logic stays centralized and callers cannot control it.
  *
  * Fields:
  * - type: The notification category (determines styling)
  * - message: The human-readable summary shown in the banner
- * - trace: A list of strings describing where the notification came from
+ * - details: A list of strings describing where the notification came from
  *
  * @property {NotificationType} type - Notification category for styling
  * @property {string} message - Human-readable notification summary
- * @property {string[]} trace - Ordered trace describing the notification source/path
+ * @property {string[]} details - Ordered entries describing the notification source/path
  */
 export interface NotificationInput {
   type: NotificationType;
   message: string;
-  trace: string[];
+  details: string[];
 }
 
 /* ============================================================================
