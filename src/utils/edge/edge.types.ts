@@ -23,7 +23,7 @@
  * - Keep examples and property docs in sync with the actual type definitions.
  *
  * @see src/utils/edgeType/edgeType.ts - Source of canonical `EdgeTypeId` values
- * @see src/types/topology.ts - `RawEdge` extends `Edge`
+ * @see src/utils/page/page.types.ts - PageData uses RawEdge[]
  * @see src/utils/page/page.ts - Edge rendering/transformation pipeline
  */
 
@@ -150,4 +150,78 @@ export interface Edge {
   attributes?: EdgeAttribute[];
   subSections?: EdgeSubSection[];
   sections?: EdgeSection[];
+}
+
+/**
+ * Edge-specific metadata.
+ *
+ * Contains additional information about network connections.
+ * Typically populated from JSON data and used for tooltip display.
+ *
+ * @property {string[]} [allowed] - Allowed VLAN IDs on this link
+ * @property {string} [denied] - Denied traffic types
+ */
+export interface EdgeMeta {
+  allowed?: string[];
+  denied?: string;
+}
+
+/**
+ * Edge as loaded from data files.
+ *
+ * This is the "raw" edge structure before vis-network styling is applied.
+ * Matches the structure defined in JSON schema files.
+ *
+ * Extends `Edge` with physical/application properties, traffic flow references,
+ * and legacy compatibility fields.
+ *
+ * Physical Properties:
+ * @property {string} [speed] - Link speed (e.g. "10G")
+ * @property {string} [cable] - Cable type (e.g. "fiber")
+ * @property {string} [cableColor] - Physical cable color
+ * @property {string} [category] - Cable category (e.g. "Cat6")
+ * @property {string} [vlans] - Allowed VLANs on this link
+ *
+ * Application Properties:
+ * @property {boolean} [tls] - TLS encryption enabled
+ * @property {string} [tlsTermination] - TLS termination point
+ * @property {string} [port] - Application port
+ * @property {string} [protocol] - Protocol (e.g. "HTTP", "HTTPS")
+ * @property {string[]} [domains] - Associated domains
+ * @property {string} [note] - Additional notes
+ *
+ * Traffic / Internal:
+ * @property {string[]} [flows] - Traffic flow IDs (traffic page)
+ * @property {string} [arrows] - Arrow direction (vis-network)
+ * @property {string} [_flowLabel] - Internal: original label in flow mode
+ * @property {RawEdge} [_raw] - Internal: original edge before transformation
+ *
+ * Legacy (deprecated):
+ * @property {string} [fromPort] - Legacy field; use `from.port` instead
+ * @property {string} [toPort] - Legacy field; use `to.port` instead
+ *
+ * @see src/utils/page/page.types.ts - PageData uses RawEdge[]
+ * @see src/utils/data.ts - normalizeLegacyEdgeShape() processes fromPort/toPort
+ */
+export interface RawEdge extends Edge {
+  flows?: string[];
+  arrows?: string;
+  /** @deprecated Legacy field; use `from.port`. */
+  fromPort?: string;
+  /** @deprecated Legacy field; use `to.port`. */
+  toPort?: string;
+  speed?: string;
+  cable?: string;
+  cableColor?: string;
+  category?: string;
+  vlans?: string;
+  tls?: boolean;
+  tlsTermination?: string;
+  port?: string;
+  protocol?: string;
+  domains?: string[];
+  note?: string;
+  meta?: EdgeMeta;
+  _raw?: RawEdge;
+  _flowLabel?: string;
 }
