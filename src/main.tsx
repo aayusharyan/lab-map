@@ -9,13 +9,15 @@
  * Provider Hierarchy:
  *   StrictMode (React development checks)
  *     └─ SettingsProvider (theme, font size, UI preferences)
- *         └─ NotificationProvider (notifications from any source)
- *             └─ App (root component)
+ *         └─ RouteProvider (URL routing — patches history exactly once)
+ *             └─ NotificationProvider (notifications from any source)
+ *                 └─ App (root component)
  *
  * This hierarchy ensures that:
  * 1. Settings are available to all components (outermost provider)
- * 2. Validation warnings are available to any component that needs them
- * 3. StrictMode catches potential issues during development
+ * 2. Route state is derived from a single history patch, shared via context
+ * 3. Validation warnings are available to any component that needs them
+ * 4. StrictMode catches potential issues during development
  *
  * Entry Point:
  * - Vite uses this file as the main entry (configured in index.html)
@@ -37,6 +39,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { NotificationProvider } from '@/context/NotificationContext';
+import { RouteProvider } from '@/context/RouteContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 
 import App from './App';
@@ -68,9 +71,11 @@ const root = createRoot(rootElement);
 root.render(
   <StrictMode>
     <SettingsProvider>
-      <NotificationProvider>
-        <App />
-      </NotificationProvider>
+      <RouteProvider>
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
+      </RouteProvider>
     </SettingsProvider>
   </StrictMode>
 );
