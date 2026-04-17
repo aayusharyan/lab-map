@@ -99,8 +99,6 @@ const EDGE_TYPES_MAP = defineEdgeTypes({
 /** Canonical edge type keys derived from EDGE_TYPES. */
 export type EdgeTypeId = keyof typeof EDGE_TYPES_MAP;
 export const EDGE_TYPES: Record<EdgeTypeId, EdgeType> = EDGE_TYPES_MAP;
-export const EDGE_TYPE_IDS = Object.keys(EDGE_TYPES_MAP) as EdgeTypeId[];
-
 /**
  * Type guard for validating canonical edge type IDs.
  *
@@ -126,23 +124,11 @@ export function getEdgeTypeOrThrow(type: string | undefined): EdgeType {
 }
 
 /**
- * Resolve an edge line color for a given theme preference.
- *
- * @param {EdgeType} edgeType - Canonical edge type config
- * @param {ThemeId} [theme='system'] - Theme preference
- * @returns {string} Theme-resolved edge line color
- */
-export function getEdgeThemeColor(edgeType: EdgeType, theme: ThemeId = 'system'): string {
-  const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
-  return resolvedTheme === 'dark' ? edgeType.color.dark : edgeType.color.light;
-}
-
-/**
  * Convert an edge type to a vis-network edge color object.
  *
  * @param {EdgeType} edgeType - Canonical edge type config
  * @param {ThemeId} [theme='system'] - Theme preference
- * @returns {{ color: string; hover: string; highlight: string }} vis-network color set for line/hover/highlight
+ * @returns {{ color: string; hover: string; highlight: string }} vis-network color set
  */
 export function toVisEdgeColor(edgeType: EdgeType, theme: ThemeId = 'system'): { color: string; hover: string; highlight: string } {
   const resolvedTheme = theme === 'system' ? getSystemTheme() : theme;
