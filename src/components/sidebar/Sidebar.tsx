@@ -4,7 +4,7 @@
  *
  * This component renders the right sidebar panel that displays details
  * about the currently selected node or edge. The content adapts based
- * on the active page (physical, traffic, vlan, rack).
+ * on the active page (physical, traffic, vlan).
  *
  * Component Structure:
  *   Sidebar
@@ -32,21 +32,21 @@
 import { useRef, useMemo } from 'react';
 
 import type { GraphViewHandle } from '@/components/views/graphView/GraphView';
-import { Legend } from './Legend';
-import { useRoute } from '@/hooks/useRoute';
 import { useSettingsValue } from '@/hooks/useSettings';
 import { useSidebarResize } from '@/hooks/useSidebarResize';
 import { useTheme } from '@/hooks/useTheme';
-import type { RawNode, RawEdge } from '@/types/topology';
-import { getNodeTypeOrThrow, type NodeType } from '@/utils/nodeType';
+import type { RawEdge } from '@/utils/edge';
 import { getEdgeTypeOrThrow, toVisEdgeColor, type EdgeType } from '@/utils/edgeType';
 import { flattenAttributes } from '@/utils/node';
+import type { RawNode , NodeAttribute, NodeSubSection, NodeSection } from '@/utils/node';
+import { getNodeTypeOrThrow, getNodeThemeColor, type NodeType } from '@/utils/nodeType';
 import { navigateToNode } from '@/utils/routing';
 
-import '@/styles/components/sidebar.css';
+import { Legend } from './Legend';
+import styles from './Sidebar.module.css';
 
 import type { RefObject } from 'react';
-import type { NodeAttribute, NodeSubSection, NodeSection } from '@/utils/node';
+
 
 /* ============================================================================
  * TYPE DEFINITIONS
@@ -61,7 +61,6 @@ import type { NodeAttribute, NodeSubSection, NodeSection } from '@/utils/node';
  * @property {RawNode | null} selectedNode - Currently selected node (derived from URL)
  * @property {RawEdge | null} selectedEdge - Currently selected edge (derived from URL)
  * @property {string} pageLabel - Display label for the current page
- * @property {string} pageDescription - Description text for the current page
  * @property {string[]} nodeTypes - Canonical node type IDs for this page legend
  * @property {string[]} edgeTypes - Valid edge types for this page (for legend)
  */
@@ -72,7 +71,6 @@ interface Props {
   selectedNode: RawNode | null;
   selectedEdge: RawEdge | null;
   pageLabel: string;
-  pageDescription: string;
   nodeTypes: string[];
   edgeTypes: string[];
 }
@@ -98,8 +96,8 @@ function renderAttributeTable(
 
   return (
     <div key={tableKey}>
-      <div className="prop-key" style={{ marginBottom: 6 }}>{tableLabel}</div>
-      <table className="sb-table">
+      <div className={styles.propKey} style={{ marginBottom: 6 }}>{tableLabel}</div>
+      <table className={styles.table}>
         <thead>
           <tr><th>Attribute</th><th>Value</th></tr>
         </thead>
@@ -128,9 +126,9 @@ function PropRow({ label, value }: { label: string; value: React.ReactNode }) {
   if (value === null || value === undefined || value === '' || value === 'unknown') return null;
 
   return (
-    <div className="prop-row">
-      <span className="prop-key">{label}</span>
-      <span className="prop-val">{value}</span>
+    <div className={styles.propRow}>
+      <span className={styles.propKey}>{label}</span>
+      <span className={styles.propVal}>{value}</span>
     </div>
   );
 }
@@ -139,7 +137,7 @@ function PropRow({ label, value }: { label: string; value: React.ReactNode }) {
  * SbSection - section heading within sidebar content.
  */
 function SbSection({ children }: { children: React.ReactNode }) {
-  return <h3 className="sb-section">{children}</h3>;
+  return <h3 className={styles.section}>{children}</h3>;
 }
 
 /**
@@ -147,7 +145,7 @@ function SbSection({ children }: { children: React.ReactNode }) {
  */
 function SidebarEmpty() {
   return (
-    <div className="sidebar-empty">
+    <div className={styles.empty}>
       <p>Click a node to see details</p>
     </div>
   );
@@ -161,7 +159,7 @@ function NodeIcon({ type }: { type: string }) {
   const { resolvedTheme } = useTheme();
 
   return (
-    <div className="sb-node-icon">
+    <div className={styles.nodeIcon}>
       <img src={resolvedTheme === 'dark' ? style.iconURL.dark : style.iconURL.light} alt={type} />
     </div>
   );
@@ -253,18 +251,18 @@ function ConnectionList({ node, allNodes, allEdges, onNodeClick }: {
   return (
     <>
       <SbSection>Connections</SbSection>
-      <ul className="conn-list">
+      <ul className={styles.connList}>
         {neighbours.map(({ node: n, edge: e }, i) => {
           const portHint = (e.from.port && e.to.port) ? `${e.from.port} ↔ ${e.to.port}` : (e.from.port || e.to.port || null);
           const label = e.label ? e.label.replace(/\n/g, ' · ') : null;
 
           return (
             <li key={i}>
-              <span className="conn-link" onClick={() => onNodeClick(n.id)}>
+              <span className={styles.connLink} onClick={() => onNodeClick(n.id)}>
                 {n.label.split('\n')[0]}
               </span>
-              {portHint && <span className="conn-port">{portHint}</span>}
-              {label && <span className="conn-label">{label}</span>}
+              {portHint && <span className={styles.connPort}>{portHint}</span>}
+              {label && <span className={styles.connLabel}>{label}</span>}
             </li>
           );
         })}
@@ -281,13 +279,12 @@ function ConnectionList({ node, allNodes, allEdges, onNodeClick }: {
  * Sidebar component - resizable panel with node/edge details.
  *
  * Renders different content based on:
- * - Active page (physical, traffic, vlan, rack)
+ * - Active page (physical, traffic, vlan)
  * - Selection type (node, edge, or nothing)
  *
  * Includes resize handle, page description, and optional legend.
  */
-export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pageLabel, pageDescription, nodeTypes, edgeTypes }: Props) {
-  const { page: activePage } = useRoute();
+export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pageLabel, nodeTypes, edgeTypes }: Props) {
   const { showLegend: isLegendVisible } = useSettingsValue();
 
   /** Ref for sidebar element (used by resize hook) */
@@ -330,8 +327,8 @@ export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pa
     return (
       <>
         <NodeIcon type={node.type} />
-        <div className={`sb-badge sb-badge--${node.type}`}>{style.label}</div>
-        <h2 className="sb-title">{node.label}</h2>
+        <div className={styles.badge}>{style.label}</div>
+        <h2 className={styles.title}>{node.label}</h2>
         <PropRow label="ID" value={node.id} />
         <EntityContent
           attributes={node.attributes}
@@ -366,8 +363,8 @@ export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pa
 
     return (
       <>
-        <div className="sb-badge" style={{ background: edgeColor }}>{edgeTypeName}</div>
-        <h2 className="sb-title" style={{ fontSize: 13 }}>{fromName} → {toName}</h2>
+        <div className={styles.badge} style={{ background: edgeColor }}>{edgeTypeName}</div>
+        <h2 className={styles.title} style={{ fontSize: 13 }}>{fromName} → {toName}</h2>
         {edge.label && <PropRow label="Label" value={edge.label} />}
         {portHint && <PropRow label="Ports" value={portHint} />}
         <EntityContent
@@ -391,21 +388,16 @@ export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pa
     /* No selection - show empty state */
     if (!selectedNode) return <SidebarEmpty />;
 
-    /* Node selected - show page-specific content */
+    /* Node selected - show node details and connections */
     return (
       <>
-        {(activePage === 'physical' || activePage === 'traffic' || activePage === 'vlan') && renderNodeContent(selectedNode)}
-        {activePage === 'rack' && <SidebarEmpty />}
-
-        {/* Connection list (not shown for rack page) */}
-        {activePage !== 'rack' && (
-          <ConnectionList
-            node={selectedNode}
-            allNodes={nodes}
-            allEdges={edges}
-            onNodeClick={handleNodeClick}
-          />
-        )}
+        {renderNodeContent(selectedNode)}
+        <ConnectionList
+          node={selectedNode}
+          allNodes={nodes}
+          allEdges={edges}
+          onNodeClick={handleNodeClick}
+        />
       </>
     );
   }
@@ -413,22 +405,17 @@ export function Sidebar({ graphRef, nodes, edges, selectedNode, selectedEdge, pa
   return (
     <aside className="app-sidebar" ref={sidebarRef as React.RefObject<HTMLElement>}>
       {/* Drag handle for resizing sidebar width */}
-      <div className="sidebar-resizer" {...resizerProps} />
+      <div className={styles.resizer} {...resizerProps} />
 
       {/* Header with page badge and hint */}
-      <div className="sidebar-header">
-        <span className="sb-page-badge">{pageLabel}</span>
-        <span className="sidebar-hint">Click a node</span>
+      <div className={styles.header}>
+        <span className={styles.pageBadge}>{pageLabel}</span>
+        <span className={styles.hint}>Click a node</span>
       </div>
 
       {/* Scrollable content area */}
-      <div id="sidebar-content" style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', scrollbarWidth: 'thin' }}>
+      <div className={styles.content}>
         {renderContent()}
-      </div>
-
-      {/* Sidebar footer with page description */}
-      <div className="sidebar-footer" style={{ padding: '6px 14px', fontSize: 'calc(11px * var(--ui-scale))', color: 'var(--text-muted)', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
-        {pageDescription}
       </div>
 
       {/* Optional legend (based on settings) */}
