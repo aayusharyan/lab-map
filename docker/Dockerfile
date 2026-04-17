@@ -32,7 +32,7 @@ RUN pnpm run build
 # -----------------------------------------------------------------------------
 FROM node:24-alpine AS production
 
-LABEL version="0.2.0"
+LABEL version="0.3.0"
 LABEL description="Lab Map with integrated data validation and watcher"
 
 # Install nginx for serving static files
