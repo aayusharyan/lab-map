@@ -20,12 +20,12 @@ echo ""
 
 # Validate initial data files on startup
 echo "Validating initial data files..."
-node watcher.js --validate
+node scripts/watcher.js --validate
 
 # Start watcher in background
 echo ""
 echo "Starting file watcher service..."
-node watcher.js &
+node scripts/watcher.js &
 WATCHER_PID=$!
 
 # Start nginx in foreground
