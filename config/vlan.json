@@ -1,0 +1,478 @@
+{
+  "$comment": "Lab Map - VLAN Segmentation Example. Fictional VLAN layout for Meridian Systems. Six VLANs with strict segmentation: management gear isolated on VLAN 1, production services on VLAN 10, storage traffic on VLAN 20, staging fully isolated on VLAN 30, workstations on VLAN 40, guest Wi-Fi on VLAN 50. Inter-VLAN rules enforced by OPNsense firewall.",
+  "nodes": [
+    {
+      "id": "vlan-mgmt",
+      "label": "VLAN 1\nManagement",
+      "type": "server-rack-1u-switch-1",
+      "meta": {
+        "vlanId": 1,
+        "name": "Management",
+        "subnet": "10.0.1.0/24",
+        "gateway": "10.0.1.1",
+        "dhcpRange": "10.0.1.100-10.0.1.200",
+        "members": ["edge-router", "core-sw", "access-sw"],
+        "interVlanRules": [
+          "Allow VLAN 10 → VLAN 1: IPMI/iDRAC (UDP 623, TCP 443)",
+          "Allow VLAN 40 → VLAN 1: HTTPS (443) — switch management UI only",
+          "Deny all other inter-VLAN traffic into VLAN 1"
+        ],
+        "note": "Management VLAN — network gear and out-of-band access only. iDRAC9 addresses for srv-compute-01 (10.0.1.11), srv-compute-02 (10.0.1.12), srv-compute-03 IPMI (10.0.1.13), nas-01 IPMI (10.0.1.14)."
+      }
+    },
+    {
+      "id": "vlan-prod",
+      "label": "VLAN 10\nProduction",
+      "type": "server-rack-2u-compute-1",
+      "meta": {
+        "vlanId": 10,
+        "name": "Production",
+        "subnet": "10.0.10.0/24",
+        "gateway": "10.0.10.1",
+        "dhcpRange": "10.0.10.50-10.0.10.100",
+        "members": ["srv-compute-01", "srv-compute-02"],
+        "vips": ["10.0.10.2 (Traefik)", "10.0.10.3 (CoreDNS)"],
+        "interVlanRules": [
+          "Allow VLAN 40 → VLAN 10: HTTPS (443), HTTP (80), DNS (UDP 53), SSH (22)",
+          "Allow VLAN 10 → VLAN 20: NFS (2049), S3 (9000), SMB (445)",
+          "Allow VPN 10.99.0.0/24 → VLAN 10: all services",
+          "Deny VLAN 30 → VLAN 10: all traffic (staging isolation)"
+        ],
+        "note": "Production VLAN — all live services. Traefik VIP (10.0.10.2) handles inbound HTTPS. CoreDNS VIP (10.0.10.3) serves as primary resolver for all VLANs."
+      }
+    },
+    {
+      "id": "vlan-storage",
+      "label": "VLAN 20\nStorage",
+      "type": "server-rack-2u-nas-hdd-1",
+      "meta": {
+        "vlanId": 20,
+        "name": "Storage",
+        "subnet": "10.0.20.0/24",
+        "gateway": "10.0.20.1",
+        "members": ["nas-01"],
+        "interVlanRules": [
+          "Allow VLAN 10 → VLAN 20: NFS (2049), S3 API (9000), HTTPS (443)",
+          "Allow VLAN 40 → VLAN 20: SMB (445) — workstation file shares",
+          "Deny VLAN 30 → VLAN 20: all traffic",
+          "Deny VLAN 50 → VLAN 20: all traffic"
+        ],
+        "note": "Dedicated storage VLAN — all NFS, SMB, and S3 traffic isolated here. Static addressing only; no DHCP. Servers on VLAN 10 reach NAS via inter-VLAN routing through edge-router."
+      }
+    },
+    {
+      "id": "vlan-staging",
+      "label": "VLAN 30\nStaging",
+      "type": "server-rack-1u-compute-1",
+      "meta": {
+        "vlanId": 30,
+        "name": "Staging",
+        "subnet": "10.0.30.0/24",
+        "gateway": "10.0.30.1",
+        "dhcpRange": "10.0.30.50-10.0.30.200",
+        "members": ["srv-compute-03"],
+        "interVlanRules": [
+          "Allow VLAN 30 → Internet: HTTP (80), HTTPS (443) — package downloads",
+          "Allow VLAN 30 → VLAN 10: TCP 22 (SSH to GitLab only, IP-restricted)",
+          "Deny VLAN 30 → VLAN 10: all other traffic",
+          "Deny VLAN 30 → VLAN 20: all traffic",
+          "Deny VLAN 30 → VLAN 40: all traffic"
+        ],
+        "note": "Isolated staging VLAN — srv-compute-03 runs GitLab CI runners here. Cannot reach production services. Mirrors production Docker images but uses separate data volumes."
+      }
+    },
+    {
+      "id": "vlan-workstations",
+      "label": "VLAN 40\nWorkstations",
+      "type": "desktop-compute-1",
+      "meta": {
+        "vlanId": 40,
+        "name": "Workstations",
+        "subnet": "10.0.40.0/24",
+        "gateway": "10.0.40.1",
+        "dhcpRange": "10.0.40.20-10.0.40.100",
+        "members": ["ws-alice", "ws-bob", "office-gw"],
+        "interVlanRules": [
+          "Allow VLAN 40 → VLAN 10: HTTPS (443), HTTP (80), SSH (22), DNS (UDP 53)",
+          "Allow VLAN 40 → VLAN 20: SMB (445), NFS (2049) — file shares",
+          "Allow VLAN 40 → VLAN 1: HTTPS (443) — switch management only",
+          "Deny VLAN 40 → VLAN 30: all traffic",
+          "Deny VLAN 40 → VLAN 50: all traffic"
+        ],
+        "note": "Staff workstation VLAN — Alice (10.0.40.21) and Bob (10.0.40.22) have wired connections. Wireless devices join via office-gw (GL.iNet Flint 2). DHCP served by edge-router."
+      }
+    },
+    {
+      "id": "vlan-guest",
+      "label": "VLAN 50\nGuest Wi-Fi",
+      "type": "generic-internet-1",
+      "meta": {
+        "vlanId": 50,
+        "name": "Guest Wi-Fi",
+        "subnet": "10.0.50.0/24",
+        "gateway": "10.0.50.1",
+        "dhcpRange": "10.0.50.10-10.0.50.250",
+        "captivePortal": true,
+        "interVlanRules": [
+          "Allow VLAN 50 → Internet: HTTP (80), HTTPS (443) — internet only",
+          "Allow VLAN 50 → VLAN 10: DNS (UDP 53) — CoreDNS VIP only",
+          "Deny VLAN 50 → VLAN 10: all other traffic",
+          "Deny VLAN 50 → VLAN 20: all traffic",
+          "Deny VLAN 50 → VLAN 30: all traffic",
+          "Deny VLAN 50 → VLAN 40: all traffic"
+        ],
+        "note": "Guest network — internet access only with captive portal. Captive portal splash page served by edge-router (OPNsense). No inter-VLAN access except outbound DNS."
+      }
+    },
+    {
+      "id": "v-edge-router",
+      "label": "edge-router",
+      "type": "server-rack-1u-router-1",
+      "meta": {
+        "hostname": "edge-router",
+        "role": "Edge Firewall / VLAN Gateway",
+        "ip": "10.0.1.1",
+        "vlan": [1, 10, 20, 30, 40, 50],
+        "note": "OPNsense 24.1 — layer-3 gateway for all VLANs. Manages all inter-VLAN firewall rules and NAT. WireGuard VPN endpoint on 10.99.0.1."
+      }
+    },
+    {
+      "id": "v-core-sw",
+      "label": "core-sw",
+      "type": "server-rack-1u-switch-1",
+      "meta": {
+        "hostname": "core-sw",
+        "role": "Core Distribution Switch",
+        "ip": "10.0.1.3",
+        "vlan": [1],
+        "note": "Cisco SG350-28P — all VLANs trunked through but management address is VLAN 1 only."
+      }
+    },
+    {
+      "id": "v-access-sw",
+      "label": "access-sw",
+      "type": "server-rack-1u-switch-1",
+      "meta": {
+        "hostname": "access-sw",
+        "role": "Workstation Access Switch",
+        "ip": "10.0.1.4",
+        "vlan": [1],
+        "note": "Cisco SG350-10 — management on VLAN 1. Downlink ports assigned to VLAN 40 (workstations) or VLAN 50 (guest)."
+      }
+    },
+    {
+      "id": "v-srv01",
+      "label": "srv-compute-01",
+      "type": "server-rack-2u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-01",
+        "role": "Primary Application Server",
+        "ip": "10.0.10.11",
+        "vlan": [1, 10, 20],
+        "note": "VLAN trunk: VLAN 1 (management/iDRAC), VLAN 10 (production services), VLAN 20 (storage — not mounted directly, only via VIP routing)."
+      }
+    },
+    {
+      "id": "v-srv02",
+      "label": "srv-compute-02",
+      "type": "server-rack-2u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-02",
+        "role": "Secondary Application Server",
+        "ip": "10.0.10.12",
+        "vlan": [1, 10, 20],
+        "note": "VLAN trunk: VLAN 1 (management/iDRAC), VLAN 10 (production), VLAN 20 (NFS mount from nas-01 for Nextcloud data)."
+      }
+    },
+    {
+      "id": "v-srv03",
+      "label": "srv-compute-03",
+      "type": "server-rack-1u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-03",
+        "role": "Staging / CI Runner Server",
+        "ip": "10.0.30.11",
+        "vlan": [1, 30],
+        "note": "Isolated to VLAN 30 (staging) plus VLAN 1 management/IPMI. Cannot communicate with production VLAN 10 — firewall deny-all between VLAN 30 and VLAN 10."
+      }
+    },
+    {
+      "id": "v-nas01",
+      "label": "nas-01",
+      "type": "server-rack-2u-nas-hdd-1",
+      "meta": {
+        "hostname": "nas-01",
+        "role": "Primary NAS — TrueNAS SCALE",
+        "ip": "10.0.20.10",
+        "vlan": [1, 20],
+        "note": "VLAN 20 (storage traffic) + VLAN 1 (IPMI management). All NFS and SMB connections routed via VLAN 20."
+      }
+    },
+    {
+      "id": "v-vip-traefik",
+      "label": "Traefik VIP",
+      "type": "server-rack-1u-router-1",
+      "meta": {
+        "hostname": "traefik-vip",
+        "role": "Reverse Proxy — macvlan VIP",
+        "ip": "10.0.10.2",
+        "vlan": [10],
+        "hostedOn": "srv-compute-01",
+        "note": "Docker macvlan container — dedicated IP 10.0.10.2 on VLAN 10. Handles all inbound proxy routing."
+      }
+    },
+    {
+      "id": "v-vip-coredns",
+      "label": "CoreDNS VIP",
+      "type": "server-rack-1u-router-1",
+      "meta": {
+        "hostname": "coredns-vip",
+        "role": "Internal DNS — macvlan VIP",
+        "ip": "10.0.10.3",
+        "vlan": [10],
+        "hostedOn": "srv-compute-01",
+        "note": "Docker macvlan container — dedicated IP 10.0.10.3 on VLAN 10. Primary DNS for all VLANs; pushed via DHCP on every VLAN."
+      }
+    },
+    {
+      "id": "v-ws-alice",
+      "label": "ws-alice",
+      "type": "desktop-compute-1",
+      "meta": {
+        "hostname": "ws-alice",
+        "role": "Lead Developer Workstation",
+        "ip": "10.0.40.21",
+        "vlan": [40],
+        "note": "Wired VLAN 40. Accesses git.meridian.io, files.meridian.io, and SMB shares on nas-01."
+      }
+    },
+    {
+      "id": "v-ws-bob",
+      "label": "ws-bob",
+      "type": "desktop-compute-1",
+      "meta": {
+        "hostname": "ws-bob",
+        "role": "DevOps Engineer Workstation",
+        "ip": "10.0.40.22",
+        "vlan": [40],
+        "note": "Wired VLAN 40. Manages infrastructure via Ansible/Terraform. Has SSH access to all servers via bastion policy."
+      }
+    },
+    {
+      "id": "v-office-gw",
+      "label": "office-gw",
+      "type": "desktop-router-1",
+      "meta": {
+        "hostname": "office-gw",
+        "role": "Office Gateway / Wi-Fi AP",
+        "ip": "10.0.40.1",
+        "vlan": [40, 50],
+        "note": "GL.iNet Flint 2 — trunk port with VLAN 40 for staff and VLAN 50 for guest Wi-Fi SSIDs. Separate SSIDs: 'Meridian-Staff' (VLAN 40), 'Meridian-Guest' (VLAN 50)."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "ve-router-mgmt",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-mgmt" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-router-prod",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-router-storage",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-router-staging",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-staging" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-router-workstations",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-workstations" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-router-guest",
+      "from": { "nodeId": "v-edge-router" },
+      "to": { "nodeId": "vlan-guest" },
+      "type": "member",
+      "label": "gateway"
+    },
+    {
+      "id": "ve-coresw-mgmt",
+      "from": { "nodeId": "v-core-sw" },
+      "to": { "nodeId": "vlan-mgmt" },
+      "type": "member",
+      "label": "VLAN 1"
+    },
+    {
+      "id": "ve-accesssw-mgmt",
+      "from": { "nodeId": "v-access-sw" },
+      "to": { "nodeId": "vlan-mgmt" },
+      "type": "member",
+      "label": "VLAN 1"
+    },
+    {
+      "id": "ve-srv01-prod",
+      "from": { "nodeId": "v-srv01" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "member",
+      "label": "VLAN 10"
+    },
+    {
+      "id": "ve-srv01-storage",
+      "from": { "nodeId": "v-srv01" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "member",
+      "label": "VLAN 20"
+    },
+    {
+      "id": "ve-srv02-prod",
+      "from": { "nodeId": "v-srv02" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "member",
+      "label": "VLAN 10"
+    },
+    {
+      "id": "ve-srv02-storage",
+      "from": { "nodeId": "v-srv02" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "member",
+      "label": "VLAN 20"
+    },
+    {
+      "id": "ve-srv03-staging",
+      "from": { "nodeId": "v-srv03" },
+      "to": { "nodeId": "vlan-staging" },
+      "type": "member",
+      "label": "VLAN 30"
+    },
+    {
+      "id": "ve-nas01-storage",
+      "from": { "nodeId": "v-nas01" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "member",
+      "label": "VLAN 20"
+    },
+    {
+      "id": "ve-traefik-prod",
+      "from": { "nodeId": "v-vip-traefik" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "member",
+      "label": "VIP 10.0.10.2"
+    },
+    {
+      "id": "ve-coredns-prod",
+      "from": { "nodeId": "v-vip-coredns" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "member",
+      "label": "VIP 10.0.10.3"
+    },
+    {
+      "id": "ve-alice-workstations",
+      "from": { "nodeId": "v-ws-alice" },
+      "to": { "nodeId": "vlan-workstations" },
+      "type": "member",
+      "label": "VLAN 40"
+    },
+    {
+      "id": "ve-bob-workstations",
+      "from": { "nodeId": "v-ws-bob" },
+      "to": { "nodeId": "vlan-workstations" },
+      "type": "member",
+      "label": "VLAN 40"
+    },
+    {
+      "id": "ve-officegw-workstations",
+      "from": { "nodeId": "v-office-gw" },
+      "to": { "nodeId": "vlan-workstations" },
+      "type": "member",
+      "label": "VLAN 40"
+    },
+    {
+      "id": "ve-officegw-guest",
+      "from": { "nodeId": "v-office-gw" },
+      "to": { "nodeId": "vlan-guest" },
+      "type": "member",
+      "label": "VLAN 50"
+    },
+    {
+      "id": "ve-ivlan-workstations-prod",
+      "from": { "nodeId": "vlan-workstations" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "intervlan",
+      "label": "Allowed",
+      "arrows": "to",
+      "meta": {
+        "allowed": ["HTTPS (443)", "HTTP (80)", "SSH (22)", "DNS UDP (53)"],
+        "denied": "All other traffic denied"
+      }
+    },
+    {
+      "id": "ve-ivlan-workstations-storage",
+      "from": { "nodeId": "vlan-workstations" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "intervlan",
+      "label": "File Shares",
+      "arrows": "to",
+      "meta": {
+        "allowed": ["SMB (445)", "NFS (2049)"],
+        "denied": "All other traffic denied"
+      }
+    },
+    {
+      "id": "ve-ivlan-prod-storage",
+      "from": { "nodeId": "vlan-prod" },
+      "to": { "nodeId": "vlan-storage" },
+      "type": "intervlan",
+      "label": "Storage Access",
+      "arrows": "to",
+      "meta": {
+        "allowed": ["NFS (2049)", "S3 API (9000)", "HTTPS (443)"],
+        "denied": "All other traffic denied"
+      }
+    },
+    {
+      "id": "ve-ivlan-staging-prod",
+      "from": { "nodeId": "vlan-staging" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "intervlan",
+      "label": "Isolated",
+      "arrows": "to",
+      "note": "Staging is fully isolated from production — firewall deny-all rule. CI runners on VLAN 30 cannot reach live services on VLAN 10.",
+      "meta": {
+        "allowed": [],
+        "denied": "All traffic denied — staging isolation policy"
+      }
+    },
+    {
+      "id": "ve-ivlan-guest-prod",
+      "from": { "nodeId": "vlan-guest" },
+      "to": { "nodeId": "vlan-prod" },
+      "type": "intervlan",
+      "label": "Blocked",
+      "arrows": "to",
+      "note": "Guest VLAN has internet access only — no access to any internal VLANs except CoreDNS for resolution.",
+      "meta": {
+        "allowed": ["DNS UDP (53) → CoreDNS VIP only"],
+        "denied": "All other traffic denied — internet-only policy"
+      }
+    }
+  ]
+}

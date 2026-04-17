@@ -1,0 +1,742 @@
+{
+  "$comment": "Lab Map - Physical Topology Example. Fictional infrastructure for Meridian Systems — a small tech studio running self-hosted services in a colocation rack. Demonstrates physical cabling, switch port mapping, VLAN trunk assignments, and full hardware specifications across routers, switches, servers, NAS, and workstations.",
+  "nodes": [
+    {
+      "id": "internet",
+      "label": "Internet",
+      "type": "generic-internet-1",
+      "meta": {
+        "hostname": "Internet",
+        "role": "WAN / Dual ISP Uplink",
+        "ip": "dynamic (ISP-assigned)",
+        "note": "Dual ISP feeds — primary fiber 1Gbps symmetric (AS64496), secondary cable 500/50Mbps failover. No BGP; ECMP failover handled by edge-router via CARP. Static /29 public block on primary link."
+      }
+    },
+    {
+      "id": "vpn",
+      "label": "WireGuard VPN",
+      "type": "generic-vpn-1",
+      "meta": {
+        "hostname": "wg-remote",
+        "role": "Remote Worker VPN Tunnel",
+        "ip": "10.99.0.0/24",
+        "note": "WireGuard tunnel terminated on edge-router. Remote workers receive addresses in 10.99.0.0/24 and access production services via split-tunnel. DNS pushed as 10.0.10.3 (CoreDNS VIP)."
+      }
+    },
+    {
+      "id": "edge-router",
+      "label": "edge-router",
+      "type": "server-rack-1u-router-1",
+      "meta": {
+        "hostname": "edge-router",
+        "role": "Edge Firewall / WAN Gateway",
+        "ip": "10.0.1.1",
+        "mac": "a4-bf-01-3e-9c-12",
+        "note": "OPNsense 24.1 on Protectli VP2420. Handles WAN failover via CARP, inter-VLAN routing, WireGuard VPN endpoint, and firewall policy enforcement. 4x 2.5GbE Intel i226-V NICs. No iDRAC — managed via web UI on VLAN 1.",
+        "hardware": {
+          "model": "Protectli VP2420",
+          "cpu": "Intel Celeron J6412",
+          "cores": "4C/4T",
+          "ram": "16GB DDR4-3200 SO-DIMM",
+          "wol": false,
+          "ipmi": false,
+          "nics": [
+            {
+              "name": "igb0",
+              "speed": "2.5GbE",
+              "mac": "a4-bf-01-3e-9c-12",
+              "note": "WAN primary — ISP fiber uplink"
+            },
+            {
+              "name": "igb1",
+              "speed": "2.5GbE",
+              "mac": "a4-bf-01-3e-9c-13",
+              "note": "WAN secondary — ISP cable failover"
+            },
+            {
+              "name": "igb2",
+              "speed": "2.5GbE",
+              "mac": "a4-bf-01-3e-9c-14",
+              "connected_to": "core-sw:gi1",
+              "note": "LAN trunk — carries VLANs 1,10,20,30,40,50"
+            },
+            {
+              "name": "igb3",
+              "speed": "2.5GbE",
+              "mac": "a4-bf-01-3e-9c-15",
+              "note": "Reserved — future DMZ segment"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "128GB",
+              "type": "NVMe",
+              "model": "Silicon Power SP128GNP031",
+              "seqRead": "1800MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "core-sw",
+      "label": "core-sw",
+      "type": "server-rack-1u-switch-1",
+      "meta": {
+        "hostname": "core-sw",
+        "role": "Core Distribution Switch",
+        "ip": "10.0.1.3",
+        "mac": "f0-9f-c2-aa-11-01",
+        "note": "Cisco SG350-28P — 24x 1GbE PoE+, 2x combo SFP, 2x SFP uplinks. 802.1Q VLAN tagging on all ports. Trunk uplink to edge-router; trunk downlinks to access switch and all rack servers. Managed via HTTPS on VLAN 1.",
+        "hardware": {
+          "model": "Cisco SG350-28P",
+          "nics": [
+            {
+              "name": "gi1",
+              "speed": "1GbE",
+              "connected_to": "edge-router:igb2",
+              "note": "Trunk uplink — VLANs 1,10,20,30,40,50"
+            },
+            {
+              "name": "gi2",
+              "speed": "1GbE",
+              "connected_to": "access-sw:gi1",
+              "note": "Trunk downlink — VLANs 1,40,50"
+            },
+            {
+              "name": "gi3",
+              "speed": "1GbE",
+              "connected_to": "srv-compute-01:enp4s0",
+              "note": "Trunk — VLANs 1,10,20"
+            },
+            {
+              "name": "gi4",
+              "speed": "1GbE",
+              "connected_to": "srv-compute-02:enp4s0",
+              "note": "Trunk — VLANs 1,10,20"
+            },
+            {
+              "name": "gi5",
+              "speed": "1GbE",
+              "connected_to": "srv-compute-03:enp4s0",
+              "note": "Trunk — VLANs 1,30 (staging isolated)"
+            },
+            {
+              "name": "gi6",
+              "speed": "1GbE",
+              "connected_to": "nas-01:eth0",
+              "note": "Access — VLAN 20 (storage network)"
+            },
+            {
+              "name": "sfp1",
+              "speed": "1GbE",
+              "note": "Reserved SFP uplink"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "access-sw",
+      "label": "access-sw",
+      "type": "server-rack-1u-switch-1",
+      "meta": {
+        "hostname": "access-sw",
+        "role": "Workstation Access Switch",
+        "ip": "10.0.1.4",
+        "mac": "f0-9f-c2-bb-22-01",
+        "note": "Cisco SG350-10 — 8x 1GbE, 2x combo SFP. Serves workstation VLAN 40 and guest VLAN 50. Trunk uplink to core-sw. Captive portal redirect for VLAN 50 enforced at edge-router.",
+        "hardware": {
+          "model": "Cisco SG350-10",
+          "nics": [
+            {
+              "name": "gi1",
+              "speed": "1GbE",
+              "connected_to": "core-sw:gi2",
+              "note": "Trunk uplink — VLANs 1,40,50"
+            },
+            {
+              "name": "gi2",
+              "speed": "2.5GbE",
+              "connected_to": "ws-alice:eth0",
+              "note": "Access — VLAN 40 (workstations)"
+            },
+            {
+              "name": "gi3",
+              "speed": "1GbE",
+              "connected_to": "ws-bob:eth0",
+              "note": "Access — VLAN 40 (workstations)"
+            },
+            {
+              "name": "gi4",
+              "speed": "1GbE",
+              "connected_to": "office-gw:eth0",
+              "note": "Trunk — VLANs 40,50 (office gateway/AP)"
+            },
+            {
+              "name": "gi5",
+              "speed": "1GbE",
+              "note": "Untagged VLAN 50 — guest drop port"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "srv-compute-01",
+      "label": "srv-compute-01",
+      "type": "server-rack-2u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-01",
+        "role": "Primary Application Server",
+        "ip": "10.0.10.11",
+        "mac": "d4-ae-52-7c-01-aa",
+        "note": "Dell PowerEdge R630 — primary production host. Runs Traefik, GitLab, CoreDNS, Vaultwarden, and Uptime Kuma via Docker Compose. ZFS mirror on SSD pair for container volumes. iDRAC9 accessible on 10.0.1.11.",
+        "hardware": {
+          "model": "Dell PowerEdge R630",
+          "cpu": "2x Intel Xeon E5-2680 v4",
+          "cores": "28C/56T",
+          "ram": "128GB DDR4-2400 ECC RDIMM",
+          "wol": false,
+          "ipmi": true,
+          "nics": [
+            {
+              "name": "enp4s0",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-01-aa",
+              "connected_to": "core-sw:gi3",
+              "note": "VLAN trunk — management + production + storage"
+            },
+            {
+              "name": "enp4s0d1",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-01-ab",
+              "note": "Bonding spare — unused"
+            },
+            {
+              "name": "eno1",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-01-ac",
+              "note": "iDRAC9 dedicated management — VLAN 1 only"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/sda",
+              "size": "480GB",
+              "type": "SSD",
+              "model": "Dell SSDSC2BX480G4R",
+              "seqRead": "520MB/s"
+            },
+            {
+              "dev": "/dev/sdb",
+              "size": "480GB",
+              "type": "SSD",
+              "model": "Dell SSDSC2BX480G4R",
+              "seqRead": "520MB/s"
+            },
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "1TB",
+              "type": "NVMe SSD",
+              "model": "Samsung PM983 MZ4LB1T9HALS",
+              "seqRead": "3200MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "srv-compute-02",
+      "label": "srv-compute-02",
+      "type": "server-rack-2u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-02",
+        "role": "Secondary Application Server",
+        "ip": "10.0.10.12",
+        "mac": "d4-ae-52-7c-02-aa",
+        "note": "Dell PowerEdge R630 — secondary production host. Runs Grafana, Prometheus, Nextcloud, and MinIO via Docker Compose. NFS mount from nas-01 for Nextcloud data directory. iDRAC9 on 10.0.1.12.",
+        "hardware": {
+          "model": "Dell PowerEdge R630",
+          "cpu": "2x Intel Xeon E5-2690 v4",
+          "cores": "28C/56T",
+          "ram": "256GB DDR4-2400 ECC RDIMM",
+          "wol": false,
+          "ipmi": true,
+          "nics": [
+            {
+              "name": "enp4s0",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-02-aa",
+              "connected_to": "core-sw:gi4",
+              "note": "VLAN trunk — management + production + storage"
+            },
+            {
+              "name": "enp4s0d1",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-02-ab",
+              "note": "Bonding spare — unused"
+            },
+            {
+              "name": "eno1",
+              "speed": "1GbE",
+              "mac": "d4-ae-52-7c-02-ac",
+              "note": "iDRAC9 dedicated management — VLAN 1 only"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/sda",
+              "size": "960GB",
+              "type": "SSD",
+              "model": "Micron 5300 MTFDDAK960TDS",
+              "seqRead": "540MB/s"
+            },
+            {
+              "dev": "/dev/sdb",
+              "size": "960GB",
+              "type": "SSD",
+              "model": "Micron 5300 MTFDDAK960TDS",
+              "seqRead": "540MB/s"
+            },
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "2TB",
+              "type": "NVMe SSD",
+              "model": "Intel P4510 SSDPE2KX020T8",
+              "seqRead": "3200MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "srv-compute-03",
+      "label": "srv-compute-03",
+      "type": "server-rack-1u-compute-1",
+      "meta": {
+        "hostname": "srv-compute-03",
+        "role": "Staging / CI Runner Server",
+        "ip": "10.0.30.11",
+        "mac": "ec-f4-bb-5a-03-aa",
+        "note": "Supermicro 1019S-MC0T — dedicated staging environment and GitLab CI runner. Fully isolated on VLAN 30. Cannot reach production VLAN 10 (firewall deny-all). IPMI on 10.0.1.13.",
+        "hardware": {
+          "model": "Supermicro SuperServer 1019S-MC0T",
+          "cpu": "Intel Xeon E-2136",
+          "cores": "6C/12T",
+          "ram": "64GB DDR4-2666 ECC UDIMM",
+          "wol": true,
+          "ipmi": true,
+          "nics": [
+            {
+              "name": "enp4s0",
+              "speed": "1GbE",
+              "mac": "ec-f4-bb-5a-03-aa",
+              "connected_to": "core-sw:gi5",
+              "note": "VLAN trunk — VLAN 1 mgmt + VLAN 30 staging"
+            },
+            {
+              "name": "ipmi0",
+              "speed": "1GbE",
+              "mac": "ec-f4-bb-5a-03-ff",
+              "note": "IPMI BMC — VLAN 1 management"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/sda",
+              "size": "2TB",
+              "type": "SSD",
+              "model": "Seagate Nytro 1351 XA2000LE10063",
+              "seqRead": "560MB/s"
+            },
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "500GB",
+              "type": "NVMe SSD",
+              "model": "Samsung 970 EVO Plus MZ-V7S500",
+              "seqRead": "3500MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nas-01",
+      "label": "nas-01",
+      "type": "server-rack-2u-nas-hdd-1",
+      "meta": {
+        "hostname": "nas-01",
+        "role": "Primary NAS — File & Backup Storage",
+        "ip": "10.0.20.10",
+        "mac": "ac-1f-6b-88-77-01",
+        "note": "TrueNAS SCALE 24.04 on Supermicro chassis. ZFS pool: 8x 16TB Seagate Exos X18 in RAIDZ2 (~96TB usable). Optane P4800X as SLOG for sync write acceleration. Exports NFS to srv-compute-02 (Nextcloud), SMB to workstations, S3-compatible target for MinIO backups. IPMI on 10.0.1.14.",
+        "hardware": {
+          "model": "Supermicro SuperChassis 826BE1C-R741JBOD",
+          "cpu": "Intel Xeon E-2278G",
+          "cores": "8C/16T",
+          "ram": "64GB DDR4-2666 ECC UDIMM",
+          "wol": false,
+          "ipmi": true,
+          "nics": [
+            {
+              "name": "eth0",
+              "speed": "1GbE",
+              "mac": "ac-1f-6b-88-77-01",
+              "connected_to": "core-sw:gi6",
+              "note": "Storage VLAN 20 — NFS and SMB traffic"
+            },
+            {
+              "name": "eth1",
+              "speed": "1GbE",
+              "mac": "ac-1f-6b-88-77-02",
+              "note": "Spare — LACP aggregation candidate"
+            },
+            {
+              "name": "ipmi0",
+              "speed": "1GbE",
+              "mac": "ac-1f-6b-88-77-ff",
+              "note": "IPMI — VLAN 1 management"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/sda",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdb",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdc",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdd",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sde",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdf",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdg",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/sdh",
+              "size": "16TB",
+              "type": "HDD",
+              "model": "Seagate Exos X18 ST16000NM000J",
+              "seqRead": "261MB/s"
+            },
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "480GB",
+              "type": "NVMe",
+              "model": "Intel Optane P4800X SSDPED1K480GA (ZFS SLOG)",
+              "seqRead": "2500MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "office-gw",
+      "label": "office-gw",
+      "type": "desktop-router-1",
+      "meta": {
+        "hostname": "office-gw",
+        "role": "Office Gateway / Wi-Fi 6 AP",
+        "ip": "10.0.40.1",
+        "mac": "dc-a6-32-ff-11-22",
+        "note": "GL.iNet GL-MT6000 (Flint 2) running OpenWrt 23.05. Bridges wireless clients onto VLAN 40 for workstations and VLAN 50 for guests. Captive portal on VLAN 50 redirects to edge-router. Managed via GL Admin panel.",
+        "hardware": {
+          "model": "GL.iNet GL-MT6000 (Flint 2)",
+          "cpu": "MediaTek MT7986A",
+          "cores": "4C/4T",
+          "ram": "1GB DDR4",
+          "wol": false,
+          "ipmi": false,
+          "nics": [
+            {
+              "name": "eth0",
+              "speed": "1GbE",
+              "mac": "dc-a6-32-ff-11-22",
+              "connected_to": "access-sw:gi4",
+              "note": "Trunk uplink — VLANs 40,50"
+            },
+            {
+              "name": "eth1",
+              "speed": "1GbE",
+              "mac": "dc-a6-32-ff-11-23",
+              "note": "LAN passthrough — wired office devices"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/mtdblock0",
+              "size": "8GB",
+              "type": "eMMC",
+              "model": "Internal eMMC"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ws-alice",
+      "label": "ws-alice",
+      "type": "desktop-compute-1",
+      "meta": {
+        "hostname": "ws-alice",
+        "role": "Lead Developer Workstation",
+        "ip": "10.0.40.21",
+        "mac": "3c-7c-3f-ab-cd-01",
+        "note": "Alice's primary workstation running Ubuntu 24.04 LTS. Mounts NFS share from nas-01 for project assets. Triggers GitLab CI pipelines via SSH. Dual 4K monitors.",
+        "hardware": {
+          "model": "Custom ATX Build",
+          "cpu": "AMD Ryzen 9 7950X",
+          "cores": "16C/32T",
+          "ram": "64GB DDR5-6000",
+          "wol": true,
+          "ipmi": false,
+          "nics": [
+            {
+              "name": "eth0",
+              "speed": "2.5GbE",
+              "mac": "3c-7c-3f-ab-cd-01",
+              "connected_to": "access-sw:gi2",
+              "note": "Wired — VLAN 40 access port"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "2TB",
+              "type": "NVMe SSD",
+              "model": "Samsung 990 Pro MZ-V9P2T0B",
+              "seqRead": "7450MB/s"
+            },
+            {
+              "dev": "/dev/sda",
+              "size": "4TB",
+              "type": "HDD",
+              "model": "Seagate BarraCuda ST4000DM004",
+              "seqRead": "190MB/s"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ws-bob",
+      "label": "ws-bob",
+      "type": "desktop-compute-1",
+      "meta": {
+        "hostname": "ws-bob",
+        "role": "DevOps Engineer Workstation",
+        "ip": "10.0.40.22",
+        "mac": "3c-7c-3f-ab-cd-02",
+        "note": "Bob's workstation running Arch Linux. Primary machine for infrastructure automation with Ansible and Terraform. Runs local Docker daemon for staging tests. WireGuard client installed for remote access when off-site.",
+        "hardware": {
+          "model": "Custom mATX Build",
+          "cpu": "AMD Ryzen 7 5800X3D",
+          "cores": "8C/16T",
+          "ram": "32GB DDR4-3600",
+          "wol": true,
+          "ipmi": false,
+          "nics": [
+            {
+              "name": "eth0",
+              "speed": "1GbE",
+              "mac": "3c-7c-3f-ab-cd-02",
+              "connected_to": "access-sw:gi3",
+              "note": "Wired — VLAN 40 access port"
+            }
+          ],
+          "storage": [
+            {
+              "dev": "/dev/nvme0n1",
+              "size": "1TB",
+              "type": "NVMe SSD",
+              "model": "WD Black SN850X WDS100T2X0E",
+              "seqRead": "7300MB/s"
+            },
+            {
+              "dev": "/dev/sda",
+              "size": "2TB",
+              "type": "HDD",
+              "model": "WD Red Plus WD20EFPX",
+              "seqRead": "180MB/s"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-wan-primary",
+      "from": { "nodeId": "internet" },
+      "to": { "nodeId": "edge-router", "port": "igb0" },
+      "type": "wan",
+      "label": "WAN Primary — 1Gbps fiber, static /29",
+      "speed": "1Gbps",
+      "cable": "Cat6a",
+      "cableColor": "yellow"
+    },
+    {
+      "id": "e-wan-failover",
+      "from": { "nodeId": "internet" },
+      "to": { "nodeId": "edge-router", "port": "igb1" },
+      "type": "wan",
+      "label": "WAN Failover — 500Mbps cable, CARP",
+      "speed": "500Mbps",
+      "cable": "Cat6",
+      "cableColor": "orange"
+    },
+    {
+      "id": "e-vpn-tunnel",
+      "from": { "nodeId": "vpn" },
+      "to": { "nodeId": "edge-router" },
+      "type": "wan",
+      "label": "WireGuard UDP:51820"
+    },
+    {
+      "id": "e-router-core",
+      "from": { "nodeId": "edge-router", "port": "igb2" },
+      "to": { "nodeId": "core-sw", "port": "gi1" },
+      "type": "trunk",
+      "label": "Trunk",
+      "speed": "2.5Gbps",
+      "vlans": "1,10,20,30,40,50",
+      "cable": "Cat6a",
+      "cableColor": "blue",
+      "category": "Cat6a"
+    },
+    {
+      "id": "e-core-access",
+      "from": { "nodeId": "core-sw", "port": "gi2" },
+      "to": { "nodeId": "access-sw", "port": "gi1" },
+      "type": "trunk",
+      "label": "Trunk",
+      "speed": "1Gbps",
+      "vlans": "1,40,50",
+      "cable": "Cat6",
+      "cableColor": "gray",
+      "category": "Cat6"
+    },
+    {
+      "id": "e-core-srv01",
+      "from": { "nodeId": "core-sw", "port": "gi3" },
+      "to": { "nodeId": "srv-compute-01", "port": "enp4s0" },
+      "type": "trunk",
+      "label": "Trunk",
+      "speed": "1Gbps",
+      "vlans": "1,10,20",
+      "cable": "Cat6",
+      "cableColor": "white",
+      "category": "Cat6"
+    },
+    {
+      "id": "e-core-srv02",
+      "from": { "nodeId": "core-sw", "port": "gi4" },
+      "to": { "nodeId": "srv-compute-02", "port": "enp4s0" },
+      "type": "trunk",
+      "label": "Trunk",
+      "speed": "1Gbps",
+      "vlans": "1,10,20",
+      "cable": "Cat6",
+      "cableColor": "white",
+      "category": "Cat6"
+    },
+    {
+      "id": "e-core-srv03",
+      "from": { "nodeId": "core-sw", "port": "gi5" },
+      "to": { "nodeId": "srv-compute-03", "port": "enp4s0" },
+      "type": "trunk",
+      "speed": "1Gbps",
+      "vlans": "1,30",
+      "cable": "Cat6",
+      "cableColor": "green",
+      "category": "Cat6",
+      "label": "Trunk (staging isolated)"
+    },
+    {
+      "id": "e-core-nas",
+      "from": { "nodeId": "core-sw", "port": "gi6" },
+      "to": { "nodeId": "nas-01", "port": "eth0" },
+      "type": "access",
+      "label": "VLAN 20",
+      "speed": "1Gbps",
+      "vlans": "20",
+      "cable": "Cat6",
+      "cableColor": "purple",
+      "category": "Cat6"
+    },
+    {
+      "id": "e-access-ws-alice",
+      "from": { "nodeId": "access-sw", "port": "gi2" },
+      "to": { "nodeId": "ws-alice", "port": "eth0" },
+      "type": "access",
+      "label": "VLAN 40",
+      "speed": "2.5Gbps",
+      "vlans": "40",
+      "cable": "Cat6a",
+      "cableColor": "black",
+      "category": "Cat6a"
+    },
+    {
+      "id": "e-access-ws-bob",
+      "from": { "nodeId": "access-sw", "port": "gi3" },
+      "to": { "nodeId": "ws-bob", "port": "eth0" },
+      "type": "access",
+      "label": "VLAN 40",
+      "speed": "1Gbps",
+      "vlans": "40",
+      "cable": "Cat6",
+      "cableColor": "black",
+      "category": "Cat6"
+    },
+    {
+      "id": "e-access-officegw",
+      "from": { "nodeId": "access-sw", "port": "gi4" },
+      "to": { "nodeId": "office-gw", "port": "eth0" },
+      "type": "trunk",
+      "speed": "1Gbps",
+      "vlans": "40,50",
+      "cable": "Cat6",
+      "cableColor": "gray",
+      "category": "Cat6",
+      "label": "Trunk (VLAN 40+50, office AP)"
+    }
+  ]
+}

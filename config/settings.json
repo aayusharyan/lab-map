@@ -1,0 +1,13 @@
+{
+  "$comment": "Lab Map - Application Settings. Defines default preferences: default page, theme, font size, zoom behavior, sidebar width, and physics simulation settings. Validated by schema/settings.schema.json. These settings are loaded on first run and can be changed in the settings panel during runtime.",
+  "defaultPage": "physical",
+  "theme": "dark",
+  "fontSize": 14,
+  "scrollToZoom": true,
+  "sidebarWidth": 340,
+  "showLegend": true,
+  "showEdgeLabels": true,
+  "physics": {
+    "enabled": true
+  }
+}

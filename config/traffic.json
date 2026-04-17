@@ -1,0 +1,661 @@
+{
+  "$comment": "Lab Map - Traffic/Services Example. Fictional service topology for Meridian Systems. Demonstrates reverse proxy routing, CDN flows, inter-service dependencies, monitoring scrape paths, and NFS/S3 storage flows. Use flow filters in the UI to isolate specific traffic paths.",
+  "flows": [
+    {
+      "id": "flow_inbound_https",
+      "label": "Inbound HTTPS"
+    },
+    {
+      "id": "flow_monitoring",
+      "label": "Monitoring"
+    },
+    {
+      "id": "flow_vpn_access",
+      "label": "VPN Access"
+    },
+    {
+      "id": "flow_storage",
+      "label": "Storage / Backup"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "internet",
+      "label": "Internet",
+      "type": "generic-internet-1",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "meta": {
+        "hostname": "Internet",
+        "role": "WAN / Public Internet",
+        "note": "Public internet entry point. Inbound HTTPS arrives via Cloudflare CDN proxy. WireGuard VPN connects remote workers directly to edge-router on UDP 51820."
+      }
+    },
+    {
+      "id": "cdn-cloudflare",
+      "label": "Cloudflare CDN",
+      "type": "generic-internet-1",
+      "flows": ["flow_inbound_https"],
+      "meta": {
+        "hostname": "cdn.cloudflare.com",
+        "role": "CDN / DDoS Protection",
+        "ip": "104.21.x.x (anycast)",
+        "note": "Cloudflare proxies all public domains — git.meridian.io, metrics.meridian.io, files.meridian.io, vault.meridian.io, status.meridian.io. TLS terminated at Cloudflare edge. Origin connection uses Cloudflare Tunnel (cloudflared) to Traefik VIP.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "cloudflared",
+              "image": "cloudflare/cloudflared:2024.5.0",
+              "note": "Tunnel connector running on srv-compute-01 — outbound only, no open inbound ports"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "vpn-gw",
+      "label": "WireGuard VPN",
+      "type": "generic-vpn-1",
+      "flows": ["flow_vpn_access"],
+      "meta": {
+        "hostname": "wg-remote",
+        "role": "Remote Worker VPN Gateway",
+        "ip": "10.99.0.0/24",
+        "hostedOn": "edge-router",
+        "note": "WireGuard endpoint on edge-router. Remote workers receive 10.99.0.0/24 addresses and access production services via split-tunnel. DNS pushed as 10.0.10.3 (CoreDNS VIP) so internal domains resolve correctly off-site."
+      }
+    },
+    {
+      "id": "traefik-vip",
+      "label": "Traefik\n(VIP 10.0.10.2)",
+      "type": "server-rack-1u-router-1",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "meta": {
+        "hostname": "traefik-vip",
+        "role": "Reverse Proxy — macvlan VIP",
+        "ip": "10.0.10.2",
+        "hostedOn": "srv-compute-01",
+        "note": "Traefik v3 running as Docker container with macvlan NIC (VIP 10.0.10.2). Handles TLS termination for internal traffic, routing rules via Docker labels, and Let's Encrypt certificate management. Dashboard on port 8080 (internal only).",
+        "serviceConfig": {
+          "routes": [
+            { "domain": "git.meridian.io", "backend": "http://gitlab:80" },
+            { "domain": "metrics.meridian.io", "backend": "http://grafana:3000" },
+            { "domain": "files.meridian.io", "backend": "http://nextcloud:80" },
+            { "domain": "vault.meridian.io", "backend": "http://vaultwarden:3000" },
+            { "domain": "status.meridian.io", "backend": "http://uptime-kuma:3001" },
+            { "domain": "s3.meridian.io", "backend": "http://minio:9001" }
+          ],
+          "services": [
+            {
+              "name": "traefik",
+              "image": "traefik:v3.0.3",
+              "port": "443:443",
+              "vip": "10.0.10.2",
+              "volumes": [
+                "/var/run/docker.sock:/var/run/docker.sock:ro",
+                "/srv/traefik/certs:/certs"
+              ],
+              "note": "Cloudflare Tunnel as entrypoint — no direct 443 exposure"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "coredns-vip",
+      "label": "CoreDNS\n(VIP 10.0.10.3)",
+      "type": "server-rack-1u-router-1",
+      "flows": ["flow_inbound_https", "flow_monitoring", "flow_vpn_access"],
+      "meta": {
+        "hostname": "coredns-vip",
+        "role": "Internal DNS — macvlan VIP",
+        "ip": "10.0.10.3",
+        "hostedOn": "srv-compute-01",
+        "note": "CoreDNS 1.11 running as Docker container with macvlan VIP. Authoritative for meridian.internal zone. Forwards public queries to 1.1.1.1 (Cloudflare) and 8.8.8.8 (Google). DHCP servers on all VLANs push 10.0.10.3 as DNS.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "coredns",
+              "image": "coredns/coredns:1.11.3",
+              "port": "53:53/udp",
+              "vip": "10.0.10.3",
+              "volumes": ["/srv/coredns/Corefile:/etc/coredns/Corefile:ro"],
+              "note": "Corefile configures meridian.internal zone + forward to upstream resolvers"
+            }
+          ],
+          "interVlanRules": [
+            "Allow all VLANs → UDP 53 (DNS queries)",
+            "Allow VPN 10.99.0.0/24 → UDP 53"
+          ]
+        }
+      }
+    },
+    {
+      "id": "gitlab",
+      "label": "GitLab CE",
+      "type": "server-rack-2u-compute-1",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "meta": {
+        "hostname": "gitlab",
+        "role": "Git Hosting / CI-CD Platform",
+        "ip": "10.0.10.11",
+        "hostedOn": "srv-compute-01",
+        "note": "GitLab CE 16.11 — source code hosting, merge requests, GitLab CI/CD, and container registry. Runners registered on srv-compute-03 (staging VLAN 30). Data persisted on NVMe volume on srv-compute-01.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "gitlab",
+              "image": "gitlab/gitlab-ce:16.11.0-ce.0",
+              "port": "80:80",
+              "volumes": [
+                "/srv/gitlab/config:/etc/gitlab",
+                "/srv/gitlab/data:/var/opt/gitlab",
+                "/srv/gitlab/logs:/var/log/gitlab"
+              ],
+              "env": [
+                "GITLAB_OMNIBUS_CONFIG=external_url 'https://git.meridian.io'",
+                "GITLAB_OMNIBUS_CONFIG+=pages_external_url 'https://pages.meridian.io'"
+              ],
+              "note": "Container registry on port 5050 — internal only"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "grafana",
+      "label": "Grafana",
+      "type": "server-rack-1u-compute-1",
+      "flows": ["flow_inbound_https", "flow_monitoring"],
+      "meta": {
+        "hostname": "grafana",
+        "role": "Metrics Dashboards",
+        "ip": "10.0.10.12",
+        "hostedOn": "srv-compute-02",
+        "note": "Grafana 10.4 — dashboards for node metrics, Docker container stats, NAS pool health, and application performance. Data source: Prometheus on port 9090. Admin panel at metrics.meridian.io.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "grafana",
+              "image": "grafana/grafana:10.4.2",
+              "port": "3000:3000",
+              "volumes": ["/srv/grafana:/var/lib/grafana"],
+              "env": [
+                "GF_SERVER_ROOT_URL=https://metrics.meridian.io",
+                "GF_AUTH_GENERIC_OAUTH_ENABLED=true"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "prometheus",
+      "label": "Prometheus",
+      "type": "server-rack-1u-compute-1",
+      "flows": ["flow_monitoring"],
+      "meta": {
+        "hostname": "prometheus",
+        "role": "Metrics Collection — Prometheus",
+        "ip": "10.0.10.12",
+        "hostedOn": "srv-compute-02",
+        "note": "Prometheus 2.52 — scrapes node_exporter on all hosts (port 9100), cadvisor on Docker hosts, GitLab metrics (port 9168), Nextcloud exporter (9205), TrueNAS API (port 80), and MinIO metrics. 15s scrape interval, 30d retention.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "prometheus",
+              "image": "prom/prometheus:v2.52.0",
+              "port": "9090:9090",
+              "volumes": [
+                "/srv/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro",
+                "/srv/prometheus/data:/prometheus"
+              ]
+            },
+            {
+              "name": "node-exporter",
+              "image": "prom/node-exporter:v1.8.0",
+              "port": "9100:9100",
+              "note": "Also deployed on srv-compute-01, srv-compute-03 via Ansible"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nextcloud",
+      "label": "Nextcloud",
+      "type": "server-rack-2u-compute-1",
+      "flows": ["flow_inbound_https", "flow_vpn_access", "flow_storage"],
+      "meta": {
+        "hostname": "nextcloud",
+        "role": "File Sync & Collaboration",
+        "ip": "10.0.10.12",
+        "hostedOn": "srv-compute-02",
+        "note": "Nextcloud 29 — file sync, shared drives, calendar (CalDAV), and contacts (CardDAV) for the Meridian team. Data directory NFS-mounted from nas-01:/mnt/pool/nextcloud. Preview generation offloaded to Imaginary sidecar. External S3 bucket (MinIO) used for object storage backend.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "nextcloud",
+              "image": "nextcloud:29-apache",
+              "port": "80:80",
+              "volumes": [
+                "nextcloud_app:/var/www/html",
+                "/mnt/nas-nfs/nextcloud:/var/www/html/data"
+              ],
+              "env": [
+                "NEXTCLOUD_TRUSTED_DOMAINS=files.meridian.io",
+                "REDIS_HOST=redis",
+                "OBJECTSTORE_S3_HOST=minio",
+                "OBJECTSTORE_S3_PORT=9000",
+                "OBJECTSTORE_S3_BUCKET=nextcloud-objects"
+              ],
+              "note": "Redis sidecar for session caching, MariaDB for database"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "vaultwarden",
+      "label": "Vaultwarden",
+      "type": "server-rack-1u-compute-1",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "meta": {
+        "hostname": "vaultwarden",
+        "role": "Password Manager — Bitwarden-compatible",
+        "ip": "10.0.10.11",
+        "hostedOn": "srv-compute-01",
+        "note": "Vaultwarden 1.30 — self-hosted Bitwarden-compatible vault. Team uses the official Bitwarden clients on desktop and mobile. Admin token stored in environment secret. SQLite DB backed up nightly to MinIO via rclone.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "vaultwarden",
+              "image": "vaultwarden/server:1.30.5",
+              "port": "3000:80",
+              "volumes": ["/srv/vaultwarden:/data"],
+              "env": [
+                "DOMAIN=https://vault.meridian.io",
+                "SIGNUPS_ALLOWED=false",
+                "INVITATIONS_ALLOWED=true",
+                "SMTP_HOST=smtp.sendgrid.net"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "uptime-kuma",
+      "label": "Uptime Kuma",
+      "type": "server-rack-1u-compute-1",
+      "flows": ["flow_inbound_https", "flow_monitoring"],
+      "meta": {
+        "hostname": "uptime-kuma",
+        "role": "Status Page / Uptime Monitor",
+        "ip": "10.0.10.11",
+        "hostedOn": "srv-compute-01",
+        "note": "Uptime Kuma 1.23 — monitors all public endpoints and internal services. Public status page at status.meridian.io. Sends alerts to Slack and PagerDuty on downtime. Checks every 60s from inside VLAN 10.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "uptime-kuma",
+              "image": "louislam/uptime-kuma:1.23.13",
+              "port": "3001:3001",
+              "volumes": ["/srv/uptime-kuma:/app/data"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "minio",
+      "label": "MinIO",
+      "type": "server-rack-2u-nas-ssd-1",
+      "flows": ["flow_storage", "flow_monitoring"],
+      "meta": {
+        "hostname": "minio",
+        "role": "S3-compatible Object Store",
+        "ip": "10.0.10.12",
+        "hostedOn": "srv-compute-02",
+        "note": "MinIO RELEASE.2024-05-10 — S3-compatible object storage used as Nextcloud primary storage backend and backup target for Vaultwarden, GitLab, and Grafana. Data stored on NVMe volume on srv-compute-02. Console at s3.meridian.io.",
+        "serviceConfig": {
+          "services": [
+            {
+              "name": "minio",
+              "image": "minio/minio:RELEASE.2024-05-10T01-41-38Z",
+              "port": "9000:9000",
+              "volumes": ["/srv/minio/data:/data"],
+              "env": [
+                "MINIO_ROOT_USER=minioadmin",
+                "MINIO_ROOT_PASSWORD=<set-in-env-file>",
+                "MINIO_VOLUMES=/data"
+              ],
+              "note": "Buckets: nextcloud-objects, gitlab-backups, vaultwarden-backups, grafana-backups"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nas-01",
+      "label": "nas-01\n(TrueNAS)",
+      "type": "server-rack-2u-nas-hdd-1",
+      "flows": ["flow_storage", "flow_monitoring"],
+      "meta": {
+        "hostname": "nas-01",
+        "role": "NAS — NFS / SMB File Server",
+        "ip": "10.0.20.10",
+        "note": "TrueNAS SCALE 24.04 — 8x 16TB RAIDZ2 pool (~96TB usable). Exports NFS share /mnt/pool/nextcloud to srv-compute-02. SMB shares for workstations (ws-alice, ws-bob). SNMP and TrueNAS REST API scraped by Prometheus for pool health metrics.",
+        "serviceConfig": {
+          "services": [
+            "NFS: /mnt/pool/nextcloud → srv-compute-02",
+            "SMB: \\\\nas-01\\projects → ws-alice, ws-bob",
+            "SMB: \\\\nas-01\\backups → rclone target"
+          ]
+        }
+      }
+    },
+    {
+      "id": "srv-compute-01",
+      "label": "srv-compute-01",
+      "type": "server-rack-2u-compute-1",
+      "flows": ["flow_monitoring"],
+      "meta": {
+        "hostname": "srv-compute-01",
+        "role": "Physical Host — Primary App Server",
+        "ip": "10.0.10.11",
+        "note": "Dell PowerEdge R630 — physical host for Traefik, CoreDNS, GitLab, Vaultwarden, Uptime Kuma, and Cloudflare Tunnel. node_exporter on port 9100 scraped by Prometheus."
+      }
+    },
+    {
+      "id": "srv-compute-02",
+      "label": "srv-compute-02",
+      "type": "server-rack-2u-compute-1",
+      "flows": ["flow_monitoring"],
+      "meta": {
+        "hostname": "srv-compute-02",
+        "role": "Physical Host — Secondary App Server",
+        "ip": "10.0.10.12",
+        "note": "Dell PowerEdge R630 — physical host for Grafana, Prometheus, Nextcloud, and MinIO. node_exporter on port 9100 scraped by Prometheus."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "te-internet-cdn",
+      "from": { "nodeId": "internet" },
+      "to": { "nodeId": "cdn-cloudflare" },
+      "type": "cdn",
+      "flows": ["flow_inbound_https"],
+      "label": "CDN Proxy",
+      "arrows": "to",
+      "tls": true,
+      "tlsTermination": "cloudflare",
+      "protocol": "HTTPS",
+      "port": "443",
+      "domains": [
+        "git.meridian.io",
+        "metrics.meridian.io",
+        "files.meridian.io",
+        "vault.meridian.io",
+        "status.meridian.io"
+      ]
+    },
+    {
+      "id": "te-internet-vpn",
+      "from": { "nodeId": "internet" },
+      "to": { "nodeId": "vpn-gw" },
+      "type": "wan",
+      "flows": ["flow_vpn_access"],
+      "label": "WireGuard",
+      "arrows": "to",
+      "protocol": "UDP",
+      "port": "51820"
+    },
+    {
+      "id": "te-cdn-traefik",
+      "from": { "nodeId": "cdn-cloudflare" },
+      "to": { "nodeId": "traefik-vip" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https"],
+      "label": "Tunnel → Traefik",
+      "arrows": "to",
+      "tls": true,
+      "tlsTermination": "traefik",
+      "protocol": "HTTPS",
+      "port": "443",
+      "note": "Cloudflare Tunnel (cloudflared) — outbound-only, no open ports on firewall"
+    },
+    {
+      "id": "te-vpn-traefik",
+      "from": { "nodeId": "vpn-gw" },
+      "to": { "nodeId": "traefik-vip" },
+      "type": "proxy",
+      "flows": ["flow_vpn_access"],
+      "label": "VPN → Traefik",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "80",
+      "note": "Remote workers access internal services via Traefik on VLAN 10 after VPN connects"
+    },
+    {
+      "id": "te-traefik-gitlab",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "gitlab" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "label": "git.meridian.io",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "80",
+      "domains": ["git.meridian.io"]
+    },
+    {
+      "id": "te-traefik-grafana",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "grafana" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https"],
+      "label": "metrics.meridian.io",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "3000",
+      "domains": ["metrics.meridian.io"]
+    },
+    {
+      "id": "te-traefik-nextcloud",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "nextcloud" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "label": "files.meridian.io",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "80",
+      "domains": ["files.meridian.io"]
+    },
+    {
+      "id": "te-traefik-vaultwarden",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "vaultwarden" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "label": "vault.meridian.io",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "3000",
+      "domains": ["vault.meridian.io"]
+    },
+    {
+      "id": "te-traefik-uptime",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "uptime-kuma" },
+      "type": "proxy",
+      "flows": ["flow_inbound_https"],
+      "label": "status.meridian.io",
+      "arrows": "to",
+      "tls": false,
+      "protocol": "HTTP",
+      "port": "3001",
+      "domains": ["status.meridian.io"]
+    },
+    {
+      "id": "te-grafana-prometheus",
+      "from": { "nodeId": "grafana" },
+      "to": { "nodeId": "prometheus" },
+      "type": "dependency",
+      "flows": ["flow_monitoring"],
+      "label": "Data Source",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9090",
+      "note": "Grafana queries Prometheus for all dashboard panels"
+    },
+    {
+      "id": "te-prometheus-gitlab",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "gitlab" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "Scrape :9168",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9168",
+      "note": "GitLab built-in Prometheus metrics endpoint"
+    },
+    {
+      "id": "te-prometheus-nextcloud",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "nextcloud" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "Scrape :9205",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9205",
+      "note": "nextcloud-exporter sidecar"
+    },
+    {
+      "id": "te-prometheus-nas",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "nas-01" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "Scrape TrueNAS",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "80",
+      "note": "TrueNAS REST API scrape for pool health, SMART data, and throughput"
+    },
+    {
+      "id": "te-prometheus-minio",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "minio" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "Scrape :9000",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9000",
+      "note": "MinIO built-in /minio/health/live and /minio/metrics/v3"
+    },
+    {
+      "id": "te-prometheus-srv01",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "srv-compute-01" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "node_exporter",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9100"
+    },
+    {
+      "id": "te-prometheus-srv02",
+      "from": { "nodeId": "prometheus" },
+      "to": { "nodeId": "srv-compute-02" },
+      "type": "internal",
+      "flows": ["flow_monitoring"],
+      "label": "node_exporter",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9100"
+    },
+    {
+      "id": "te-nextcloud-nas",
+      "from": { "nodeId": "nextcloud" },
+      "to": { "nodeId": "nas-01" },
+      "type": "dependency",
+      "flows": ["flow_storage"],
+      "label": "NFS Mount",
+      "arrows": "to",
+      "protocol": "NFS",
+      "port": "2049",
+      "note": "nas-01:/mnt/pool/nextcloud mounted at /var/www/html/data on srv-compute-02"
+    },
+    {
+      "id": "te-nextcloud-minio",
+      "from": { "nodeId": "nextcloud" },
+      "to": { "nodeId": "minio" },
+      "type": "dependency",
+      "flows": ["flow_storage"],
+      "label": "S3 Object Store",
+      "arrows": "to",
+      "protocol": "HTTP",
+      "port": "9000",
+      "note": "Nextcloud uses MinIO as primary object storage via S3 API"
+    },
+    {
+      "id": "te-minio-nas",
+      "from": { "nodeId": "minio" },
+      "to": { "nodeId": "nas-01" },
+      "type": "dependency",
+      "flows": ["flow_storage"],
+      "label": "SMB Backup",
+      "arrows": "to",
+      "protocol": "SMB",
+      "port": "445",
+      "note": "Nightly rclone job syncs MinIO buckets to nas-01 SMB share as off-tier backup"
+    },
+    {
+      "id": "te-gitlab-host",
+      "from": { "nodeId": "gitlab" },
+      "to": { "nodeId": "srv-compute-01" },
+      "type": "hosts",
+      "flows": ["flow_inbound_https", "flow_monitoring"],
+      "label": "hosted on",
+      "arrows": "to"
+    },
+    {
+      "id": "te-traefik-host",
+      "from": { "nodeId": "traefik-vip" },
+      "to": { "nodeId": "srv-compute-01" },
+      "type": "hosts",
+      "flows": ["flow_inbound_https", "flow_vpn_access"],
+      "label": "hosted on",
+      "arrows": "to"
+    },
+    {
+      "id": "te-nextcloud-host",
+      "from": { "nodeId": "nextcloud" },
+      "to": { "nodeId": "srv-compute-02" },
+      "type": "hosts",
+      "flows": ["flow_inbound_https", "flow_vpn_access", "flow_storage"],
+      "label": "hosted on",
+      "arrows": "to"
+    },
+    {
+      "id": "te-grafana-host",
+      "from": { "nodeId": "grafana" },
+      "to": { "nodeId": "srv-compute-02" },
+      "type": "hosts",
+      "flows": ["flow_monitoring"],
+      "label": "hosted on",
+      "arrows": "to"
+    }
+  ]
+}
