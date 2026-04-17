@@ -51,7 +51,7 @@ export default tseslint.config(
       'node_modules',   /* Dependencies */
       '.vite',          /* Vite cache */
       '*.config.js',    /* Config files (this file) */
-      'watcher.js',     /* File watcher (plain JS) */
+      'scripts/',       /* Build scripts (plain JS) */
     ],
   },
 
