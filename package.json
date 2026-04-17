@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "An interactive canvas-based visualizer for datacenter and lab infrastructure",
   "type": "module",
-  "homepage": "https://yush.dev/lab-map",
+  "homepage": "https://lab-map.yush.dev/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aayusharyan/lab-map.git"
@@ -26,10 +26,7 @@
     "network-diagram",
     "topology",
     "visualization",
-    "server-rack",
-    "rack-diagram",
     "diagram",
-    "server-room",
     "network-map",
     "infrastructure-diagram",
     "IT",
@@ -37,7 +34,6 @@
     "asset-management",
     "network-topology",
     "server",
-    "rack",
     "cabling",
     "documentation"
   ],
@@ -53,12 +49,11 @@
     "pnpm": ">=9"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.40.0",
     "ajv": "^8.18.0",
     "chokidar": "^4.0.3",
-    "konva": "^9.3.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-konva": "^18.2.10",
     "vis-network": "^9.1.9"
   },
   "devDependencies": {
