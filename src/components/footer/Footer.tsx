@@ -37,7 +37,7 @@ const GITHUB_URL = 'https://github.com/aayusharyan/lab-map';
  */
 export function Footer({ description }: FooterProps): JSX.Element {
   return (
-    <footer className={styles.footer}>
+    <footer className={`app-footer ${styles.footer}`}>
       <span className={styles.text}>{description}</span>
       <a
         href={GITHUB_URL}
