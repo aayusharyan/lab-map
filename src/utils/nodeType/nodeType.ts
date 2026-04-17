@@ -3,7 +3,7 @@
  * @description Canonical node type registry and node-style helpers
  *
  * This module defines the single source of truth for node visual types used
- * across graph rendering, legends, sidebars, and rack layout icon loading.
+ * across graph rendering, legends, and sidebars.
  *
  * Exports:
  * - NODE_TYPES: Canonical node registry keyed by real icon folder names
@@ -24,8 +24,6 @@
  * @see nodeType.types.ts - Canonical NodeType model
  * @see page.ts - Node transformation for vis-network
  * @see GraphView.tsx - Runtime theme updates on graph nodes
- * @see useVisNetwork.ts - Shared vis-network setup and theme sync
- * @see LayoutView.tsx - Rack layout icon loading
  */
 
 /* ============================================================================
@@ -197,8 +195,6 @@ const NODE_TYPES_MAP = defineNodeTypes({
 /** Canonical node type keys derived from NODE_TYPES. */
 export type NodeTypeId = keyof typeof NODE_TYPES_MAP;
 export const NODE_TYPES: Record<NodeTypeId, NodeType> = NODE_TYPES_MAP;
-export const NODE_TYPE_IDS = Object.keys(NODE_TYPES_MAP) as NodeTypeId[];
-
 /**
  * Type guard for validating canonical node type IDs.
  *
