@@ -46,7 +46,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate && \
     pnpm install --prod --frozen-lockfile
 
 # Copy validation infrastructure
-COPY watcher.js ./
+COPY scripts ./scripts
 COPY schema ./schema
 
 # Copy default config (baked into image — volume mount overrides at runtime)
