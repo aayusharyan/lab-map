@@ -16,6 +16,7 @@
 ## Checklist
 
 - [ ] I have read the [contributing guidelines](../CONTRIBUTING.md)
+- [ ] I have read and agree to the [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [ ] I have tested my changes locally
 - [ ] My code follows the project's style guidelines
 - [ ] I have updated documentation if needed
