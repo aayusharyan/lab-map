@@ -456,17 +456,23 @@ const GraphView = forwardRef<GraphViewHandle, GraphViewProps>(({ nodes, edges, p
       }
     });
 
-    /* Hide tooltip during drag by setting very high delay */
+    /* Track selection state before drag to restore it after */
+    let preDragSelectedNodes: (string | number)[] = [];
+    let preDragSelectedEdges: (string | number)[] = [];
+
+    /* Hide tooltip during drag and save current selection */
     net.on('dragStart', () => {
+      preDragSelectedNodes = net.getSelectedNodes();
+      preDragSelectedEdges = net.getSelectedEdges();
       net.setOptions({ interaction: { tooltipDelay: 999999 } });
     });
 
-    /* Clear selection and restore tooltip after drag ends.
-       Dragging a node automatically selects it in vis-network, but we don't want
-       the selection to persist after the drag operation completes. */
+    /* Restore pre-drag selection state and tooltip after drag ends.
+       If nodes/edges were selected before drag, keep them selected.
+       If nothing was selected before drag, clear the auto-selection from dragging. */
     net.on('dragEnd', () => {
-      net.selectNodes([]);
-      net.selectEdges([]);
+      net.selectNodes(preDragSelectedNodes);
+      net.selectEdges(preDragSelectedEdges);
       net.setOptions({ interaction: { tooltipDelay: 300 } });
     });
 
