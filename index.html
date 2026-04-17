@@ -5,7 +5,7 @@
 
   Theme Flash Prevention:
   An inline script runs BEFORE the page renders to apply the saved theme
-  (dark/light) from localStorage. This prevents the "flash of incorrect
+  (dark/light/system) from localStorage. This prevents the "flash of incorrect
   theme" (FOIT) that would otherwise occur when React hydrates.
 -->
 <html lang="en">
@@ -30,16 +30,18 @@
         dark:  { bg: '#0f1117', text: '#e8eaf0' },
         light: { bg: '#f0f2f7', text: '#111827' }
       };
-      /* Read saved theme, default to system preference, fallback to light for old systems */
-      var theme = 'light';
-      if (window.matchMedia) {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
-        else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
-      }
+      /* Read saved preference, default to system preference, fallback to light for old systems */
+      var saved = 'system';
       try {
-        var saved = localStorage.getItem('topology-theme');
-        if (saved === 'light' || saved === 'dark') theme = saved;
+        var stored = localStorage.getItem('lab-map-theme');
+        if (stored === 'light' || stored === 'dark' || stored === 'system') saved = stored;
       } catch (e) { /* localStorage may be blocked in private mode */ }
+      var theme = 'light';
+      if (saved === 'dark' || saved === 'light') {
+        theme = saved;
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        theme = 'dark';
+      }
       /* Apply theme immediately */
       var colors = themes[theme];
       document.documentElement.setAttribute('data-theme', theme);
