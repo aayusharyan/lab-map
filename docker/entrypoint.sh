@@ -14,7 +14,7 @@ echo "Lab Map - Starting Services"
 echo "=========================================="
 echo ""
 echo "Configuration:"
-echo "  - Data directory: /app/data"
+echo "  - Config directory: /app/config"
 echo "  - Output directory: /usr/share/nginx/html/data"
 echo ""
 
