@@ -1,0 +1,212 @@
+/**
+ * @file NotificationDetailsModal.css
+ * @description Styles for the notification details modal
+ *
+ * Backdrop and modal dialog for viewing expanded notification details.
+ * Rendered via a React portal so it sits above all other content.
+ * Type-specific color schemes and dark theme overrides are included here.
+ */
+
+/* ============================================================================
+ * BACKDROP
+ * ============================================================================ */
+.notification-details-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 120;
+  pointer-events: auto;
+  animation: detailsBackdropIn 180ms ease;
+}
+
+.notification-details-modal-backdrop.is-closing {
+  animation: detailsBackdropOut 180ms ease forwards;
+}
+
+/* ============================================================================
+ * MODAL
+ * ============================================================================ */
+.notification-details-modal {
+  width: min(780px, 100%);
+  max-height: min(80vh, 760px);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--notification-bg, #fff7e6) 92%, #fff);
+  border: 1px solid var(--notification-border, #f59e0b);
+  border-radius: 14px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  animation: detailsModalIn 200ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.notification-details-modal.is-closing {
+  animation: detailsModalOut 180ms ease forwards;
+}
+
+/* ============================================================================
+ * MODAL CONTENT
+ * ============================================================================ */
+.notification-details-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--notification-border, #f59e0b) 45%, transparent);
+}
+
+.notification-details-modal-header strong {
+  color: var(--notification-text, #8a4b00);
+  font-size: calc(14px * var(--ui-scale));
+}
+
+.notification-details-modal-close {
+  border: none;
+  background: none;
+  color: var(--notification-text, #8a4b00);
+  font-size: calc(18px * var(--ui-scale));
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.notification-details-modal-close svg {
+  width: calc(18px * var(--ui-scale));
+  height: calc(18px * var(--ui-scale));
+}
+
+.notification-details-modal-message {
+  margin: 0;
+  padding: 12px 14px 6px;
+  color: var(--notification-text-muted, #9a5b00);
+  font-size: calc(13px * var(--ui-scale));
+  line-height: 1.45;
+}
+
+.notification-details-modal-list {
+  margin: 0;
+  padding: 8px 24px 16px 36px;
+  overflow: auto;
+  color: var(--notification-text, #8a4b00);
+  font-size: calc(12px * var(--ui-scale));
+  line-height: 1.4;
+}
+
+.notification-details-modal-list li {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================================================
+ * TYPE COLOR SCHEMES
+ * ============================================================================ */
+.notification-details-modal[data-type="warning"] {
+  --notification-bg: #fff7e6;
+  --notification-border: #f59e0b;
+  --notification-text: #8a4b00;
+  --notification-text-muted: #9a5b00;
+}
+
+.notification-details-modal[data-type="info"] {
+  --notification-bg: #eff6ff;
+  --notification-border: #3b82f6;
+  --notification-text: #1e40af;
+  --notification-text-muted: #1d4ed8;
+}
+
+.notification-details-modal[data-type="error"] {
+  --notification-bg: #fef2f2;
+  --notification-border: #ef4444;
+  --notification-text: #991b1b;
+  --notification-text-muted: #b91c1c;
+}
+
+.notification-details-modal[data-type="success"] {
+  --notification-bg: #f0fdf4;
+  --notification-border: #22c55e;
+  --notification-text: #166534;
+  --notification-text-muted: #15803d;
+}
+
+/* ============================================================================
+ * DARK THEME OVERRIDES
+ * ============================================================================ */
+[data-theme="dark"] .notification-details-modal[data-type="warning"] {
+  --notification-bg: #2a2419;
+  --notification-border: #d97706;
+  --notification-text: #fbbf24;
+  --notification-text-muted: #f59e0b;
+}
+
+[data-theme="dark"] .notification-details-modal[data-type="info"] {
+  --notification-bg: #172554;
+  --notification-border: #3b82f6;
+  --notification-text: #93c5fd;
+  --notification-text-muted: #60a5fa;
+}
+
+[data-theme="dark"] .notification-details-modal[data-type="error"] {
+  --notification-bg: #2c1515;
+  --notification-border: #dc2626;
+  --notification-text: #fca5a5;
+  --notification-text-muted: #f87171;
+}
+
+[data-theme="dark"] .notification-details-modal[data-type="success"] {
+  --notification-bg: #14261d;
+  --notification-border: #16a34a;
+  --notification-text: #86efac;
+  --notification-text-muted: #4ade80;
+}
+
+/* ============================================================================
+ * ANIMATIONS
+ * ============================================================================ */
+@keyframes detailsBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes detailsBackdropOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes detailsModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes detailsModalOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ============================================================================
+ * ACCESSIBILITY
+ * ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .notification-details-modal-backdrop,
+  .notification-details-modal {
+    animation: none;
+    transition-duration: 1ms;
+  }
+}
