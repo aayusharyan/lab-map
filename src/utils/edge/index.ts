@@ -14,6 +14,8 @@
  *    - EdgeEndpoint
  *    - EdgeSubSection
  *    - EdgeSection
+ *    - EdgeMeta
+ *    - RawEdge
  *
  * Design notes:
  * - Keep helper exports small and focused.
@@ -22,11 +24,11 @@
  *
  * @see edge.ts - Edge utility helpers
  * @see edge.types.ts - Canonical edge contract definitions
- * @see src/types/topology.ts - Raw topology contracts extending Edge
+ * @see src/utils/page/page.types.ts - PageData wraps RawEdge[]
  *
  * Import style:
  * import { flattenEdgeAttributes, type Edge } from '@/utils/edge';
  */
 
 export { flattenEdgeAttributes } from './edge';
-export type { Edge, EdgeAttribute, EdgeEndpoint, EdgeSubSection, EdgeSection } from './edge.types';
+export type { Edge, EdgeAttribute, EdgeEndpoint, EdgeSubSection, EdgeSection, EdgeMeta, RawEdge } from './edge.types';
