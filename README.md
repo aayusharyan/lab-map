@@ -11,23 +11,28 @@
 ## Features
 
 - Interactive network topology visualization
-- Rack view for physical infrastructure layout
 - Real-time data updates from JSON configuration
 - Zero-downtime data validation with UI error warnings
-- Graph and rack-based views
+- Physical, traffic flow, and VLAN graph views
 
 ## Quick Start (Docker)
 
-The easiest way to run Lab Map:
+The easiest way to run Lab Map — ships with default data so visualizations work immediately:
 
 ```bash
-docker run -d -p 8080:80 \
-  -v /path/to/your/data:/app/data \
-  --name lab-map \
-  ghcr.io/aayusharyan/lab-map:latest
+docker run -d -p 8080:80 --name lab-map ghcr.io/aayusharyan/lab-map:latest
 ```
 
 Access at http://localhost:8080
+
+To use your own data, mount a local directory:
+
+```bash
+docker run -d -p 8080:80 \
+  -v /path/to/your/config:/app/config \
+  --name lab-map \
+  ghcr.io/aayusharyan/lab-map:latest
+```
 
 See [docker/README.md](docker/README.md) for more options and data file format.
 
@@ -53,15 +58,7 @@ See [docker/README.md](docker/README.md) for more options and data file format.
    pnpm install
    ```
 
-3. Set up your data files:
-
-   ```bash
-   # Copy example files to get started
-   cp examples/*.json data/
-
-   # Or create your own data files in the data/ directory
-   # See examples/ for reference on the expected format
-   ```
+3. Start the development server:
 
 ### Development
 
@@ -71,7 +68,7 @@ Start the development server with hot reload:
 pnpm dev
 ```
 
-This runs both the Vite dev server and the data file watcher, which automatically validates configuration files in `data/` on changes.
+This runs both the Vite dev server and the data file watcher, which automatically validates configuration files in `config/` on changes.
 
 ### Build
 
@@ -91,34 +88,26 @@ pnpm preview
 
 ## Configuration
 
-Lab Map uses JSON configuration files in the `data/` directory:
+Lab Map uses JSON configuration files in the `config/` directory:
 
 - **`physical.json`** - Physical network topology (nodes, connections)
 - **`traffic.json`** - Traffic flow data between nodes
 - **`vlan.json`** - VLAN configuration and assignments
-- **`rack.json`** - Physical rack layout and device placement
 - **`settings.json`** - Application settings and preferences
 
 ### Validation & Error Handling
 
 Lab Map features zero-downtime data validation. When you modify configuration files, they are automatically validated against strict JSON schemas. If a file contains errors (e.g., a missing required field or wrong data type), the application won't break. Instead, it gracefully continues serving the last valid version of your data while displaying warning banners in the web UI to help you debug and fix the issue.
 
-### Example Files
+**Note:** The `public/data/` directory is gitignored — it is generated automatically by the watcher on startup and should not be committed.
 
-The `examples/` directory contains sample configurations to help you get started. These files demonstrate the expected structure and format for each configuration type.
+## Community
 
-**Quick start:**
-
-```bash
-# Copy all examples to your data directory
-cp examples/*.json data/
-
-# Or copy specific files
-cp examples/physical.json data/
-cp examples/rack.json data/
-```
-
-**Note:** The `data/` and `public/data/` directories are gitignored to prevent accidentally committing sensitive infrastructure information.
+- **Bug reports**: [GitHub Issues](https://github.com/aayusharyan/lab-map/issues)
+- **Feature requests**: [GitHub Issues](https://github.com/aayusharyan/lab-map/issues/new/choose)
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **Code of Conduct**: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- **Security**: [SECURITY.md](SECURITY.md)
 
 ## License
 
